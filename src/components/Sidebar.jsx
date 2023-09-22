@@ -9,27 +9,30 @@ import { FaRegMoneyBillAlt } from "react-icons/fa"
 const Sidebar = ({ children }) => {
 	return (
 		<div className="flex border-inherit">
-			<div className="w-15 m-1 h-screen p-4 mt-2 bg-purple-800 rounded-lg border-r-[1px] flex flex-col justify-between border-inherit">
-				<div className="flex flex-col items-center">
+			<div className="w-20 m-1 h-screen pt-4 mt-2 bg-purple-800 rounded-lg flex flex-col justify-between border-inherit">
+				<div className="flex flex-col">
 					<Link href="/agenda">
-						<div className="bg-purple-800 text-white p-3 rounded-lg inline-block">
-							<RxCalendar size={20} />
+						<div className="flex flex-col ml-2 items-center text-white hover:text-purple-800 hover:bg-white cursor-pointer my-4 rounded-l-lg inline-block">
+							<RxCalendar size={30} />
+							<span className="text-sm">Agenda</span>
 						</div>
 					</Link>
-					<span className="border-b-[1px] border-gray-100 w-full p-2"></span>
 					<Link href="/listaPacientes">
-						<div className="bg-gray-100 hover:bg-gray-200 cursor-pointer my-4 p-3 rounded-lg inline-block">
-							<HiUserGroup size={20} />
+						<div className="flex flex-col ml-2 pr-1 items-center text-white hover:text-purple-800 hover:bg-white cursor-pointer my-4 rounded-l-lg inline-block">
+							<HiUserGroup size={30} />
+							<span className="text-sm">Pacientes</span>
 						</div>
 					</Link>
 					<Link href="/financeiro">
-						<div className="bg-gray-100 hover:bg-gray-200 cursor-pointer my-4 p-3 rounded-lg inline-block">
-							<FaRegMoneyBillAlt size={20} />
+						<div className="flex flex-col items-center pr-1  ml-2 text-white hover:text-purple-800 hover:bg-white cursor-pointer  my-3 rounded-l-lg inline-block">
+							<FaRegMoneyBillAlt size={25} />
+							<span className="text-sm">Financeiro</span>
 						</div>
 					</Link>
 					<Link href="/opcoes">
-						<div className="bg-gray-100 hover:bg-gray-200 cursor-pointer my-4 p-3 rounded-lg inline-block">
-							<FiSettings size={20} />
+						<div className="flex flex-col items-center ml-2 text-white hover:text-purple-800 hover:bg-white cursor-pointer my-4 rounded-l-lg inline-block">
+							<FiSettings size={25} />
+							<span className="text-sm">Opções</span>
 						</div>
 					</Link>
 				</div>

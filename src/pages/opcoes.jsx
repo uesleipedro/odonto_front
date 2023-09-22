@@ -1,7 +1,7 @@
-const agenda = () => {
+const opcoes = () => {
     return (
         <div>Em construção...</div>
     )
 }
 
-export default agenda
+export default opcoes

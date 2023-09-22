@@ -4,11 +4,21 @@ import { BiSolidFileDoc } from "react-icons/bi"
 import { MdAttachMoney } from "react-icons/md"
 import Link from "next/link"
 import api from "../utils/Api"
+import BasicModal from "../components/BasicModal"
 
 const ListaPacientes = () => {
 
     const [paciente, setPaciente] = useState([])
     const [searchVal, setSearchVal] = useState('')
+    const [idToDelete, setIdToDelete] = useState(0)
+
+    useEffect(() => {
+        const init = async () => {
+            const { Datepicker, Input, initTE, Modal, Ripple } = await import("tw-elements");
+            initTE({ Datepicker, Input, Modal, Ripple });
+        };
+        init();
+    }, []);
 
     useEffect(() => {
         fetchPaciente()
@@ -24,16 +34,24 @@ const ListaPacientes = () => {
             })
     }
 
+    const handleDeletePaciente = async (id_paciente) => {
+        await api.delete(`paciente/${id_paciente}`)
+            .then(response => {
+                if (response.status === 204) {
+                    console.log(`Deleted post with ID ${id_paciente}`)
+                    setPaciente(paciente.filter(paciente => paciente.id_paciente.filter(p => p.id_paciente !== id_paciente)))
+                }
+            })
+            .catch(error => {
+                console.error(error);
+            })
+    }
+
     const filteredData = useMemo(() => {
         if (searchVal.trim() === '') {
             return paciente
         }
-        return paciente.filter(dataItem => dataItem.nome.toLowerCase().includes(searchVal.toLocaleLowerCase()));
-
-        // paciente.filter((e) => {
-        //     return e == ! null && e.nome.toLowerCase().includes(searchVal.toLocaleLowerCase())
-        // }
-
+        return paciente.filter(dataItem => dataItem.nome.toLowerCase().includes(searchVal.toLocaleLowerCase()))
     }, [paciente, searchVal])
 
     return (
@@ -79,7 +97,13 @@ const ListaPacientes = () => {
                                                 <a className="text-purple-800 hover:text-purple-900" href="#">
                                                     <MdAttachMoney />
                                                 </a>
-                                                <a className="text-purple-800 hover:text-purple-900" href="#">
+                                                <a
+                                                    data-te-toggle="modal"
+                                                    data-te-target="#exampleModal"
+                                                    data-te-ripple-init
+                                                    data-te-ripple-color="light"
+                                                    onClick={() => setIdToDelete(data.id_paciente)}
+                                                    className="text-purple-800 hover:text-purple-900" href="#">
                                                     <FaTrashAlt />
                                                 </a>
                                             </td>
@@ -92,6 +116,12 @@ const ListaPacientes = () => {
                 </div>
             </div>
 
+            <BasicModal
+                title="Teste"
+                body="Deseja realmente excluir esse paciente?"
+                doIt={(event) => handleDeletePaciente(idToDelete)}
+
+            />
         </div>
     )
 }
