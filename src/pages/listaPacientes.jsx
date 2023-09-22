@@ -25,7 +25,15 @@ const ListaPacientes = () => {
     }, []);
 
     const fetchPaciente = async () => {
-        await api.get('paciente')
+        await api.get('paciente',
+            {
+                headers: {
+                    "Cache-Control": "no-cache",
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "Access-Control-Allow-Origin": "*",
+                },
+            }
+        )
             .then(response => {
                 setPaciente([...paciente, ...response.data])
             })
