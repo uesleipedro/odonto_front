@@ -38,7 +38,8 @@ const ListaPacientes = () => {
                 setPaciente([...paciente, ...response.data])
             })
             .catch(function (error) {
-                console.error(error.message);
+                ///console.error(error.message);
+                console.log('Aconteceu algum erro')
             })
     }
 
