@@ -20,11 +20,7 @@ const ListaPacientes = () => {
         init();
     }, []);
 
-    useEffect(() => {
-        fetchPaciente()
-    }, []);
-
-    const fetchPaciente = async () => {
+    useEffect(async () => {
         await api.get('paciente',
             {
                 headers: {
@@ -41,7 +37,7 @@ const ListaPacientes = () => {
                 console.error(error);
                 // console.log('Aconteceu algum erro')
             })
-    }
+    }, []);
 
     const handleDeletePaciente = async (id_paciente) => {
         await api.delete(`paciente/${id_paciente}`)
