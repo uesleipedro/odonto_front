@@ -4,24 +4,24 @@ import api from "../utils/Api"
 
 const CadastroUsuario = () => {
 
-    const [paciente, setPaciente] = useState()
+    const [user, setUser] = useState()
 
     const updateName = e => {
         const fieldName = e.target.name
-        setPaciente(existingValues => ({
+        setUser(existingValues => ({
             ...existingValues,
             [fieldName]: e.target.value,
         }))
     }
 
     const sendPacienteData = () => {
-        api.post('/paciente', paciente)
+        api.post('/user', user)
             .then(function (response) {
                 if (response.status === 201)
                     alert("Salvo com sucesso")
             })
-            .catch(function (error) {
-                console.log(error)
+            .catch(e => {
+                alert(e)
             })
     }
 

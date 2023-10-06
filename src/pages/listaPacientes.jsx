@@ -3,6 +3,7 @@ import { FaTooth, FaBookMedical, FaTrashAlt } from "react-icons/fa"
 import { BiSolidFileDoc } from "react-icons/bi"
 import { MdAttachMoney } from "react-icons/md"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import api from "../utils/Api"
 import BasicModal from "../components/BasicModal"
 
@@ -11,6 +12,7 @@ const ListaPacientes = () => {
     const [paciente, setPaciente] = useState([])
     const [searchVal, setSearchVal] = useState('')
     const [idToDelete, setIdToDelete] = useState(0)
+    const router = useRouter()
 
     useEffect(() => {
         const init = async () => {
@@ -18,38 +20,35 @@ const ListaPacientes = () => {
             initTE({ Datepicker, Input, Modal, Ripple });
         };
         init();
+    }, [])
+
+
+    useEffect(() => {
+        const getPacientList = async () => {
+            await api.get('paciente',
+            )
+                .then(response => {
+                    setPaciente([...paciente, ...response.data])
+                })
+                .catch(function (error) {
+                    console.error(error);
+                })
+        }
+        getPacientList()
     }, []);
 
-    useEffect(async () => {
-        await api.get('paciente',
-            {
-                headers: {
-                    "Cache-Control": "no-cache",
-                    "Content-Type": "application/x-www-form-urlencoded",
-                    "Access-Control-Allow-Origin": "*",
-                },
-            }
-        )
-            .then(response => {
-                setPaciente([...paciente, ...response.data])
-            })
-            .catch(function (error) {
-                console.error(error);
-                // console.log('Aconteceu algum erro')
-            })
-    }, []);
 
     const handleDeletePaciente = async (id_paciente) => {
         await api.delete(`paciente/${id_paciente}`)
             .then(response => {
                 if (response.status === 204) {
-                    console.log(`Deleted post with ID ${id_paciente}`)
-                    setPaciente(paciente.filter(paciente => paciente.id_paciente.filter(p => p.id_paciente !== id_paciente)))
+                    alert('Apagado com sucesso')
                 }
             })
             .catch(error => {
                 console.error(error);
             })
+        router.refresh()
     }
 
     const filteredData = useMemo(() => {
@@ -122,7 +121,7 @@ const ListaPacientes = () => {
             </div>
 
             <BasicModal
-                title="Teste"
+                title="Excluir Paciente"
                 body="Deseja realmente excluir esse paciente?"
                 doIt={(event) => handleDeletePaciente(idToDelete)}
 

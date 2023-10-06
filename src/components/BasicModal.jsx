@@ -2,10 +2,6 @@ import Link from "next/link"
 
 const BasicModal = (props) => {
 
-    const fun = () => {
-        
-    }
-
     return (
         <div
             data-te-modal-init
