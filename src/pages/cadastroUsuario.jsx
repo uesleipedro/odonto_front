@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react"
 import Link from "next/link"
 import api from "../utils/Api"
+import middleware from "../middleware"
 
 const CadastroUsuario = () => {
 

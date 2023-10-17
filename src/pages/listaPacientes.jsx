@@ -4,8 +4,12 @@ import { BiSolidFileDoc } from "react-icons/bi"
 import { MdAttachMoney } from "react-icons/md"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 import api from "../utils/Api"
 import BasicModal from "../components/BasicModal"
+
+const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub21lIjoiRGFydGhWYWRlciIsImlhdCI6MTY5NjU5ODI2MCwiZXhwIjoxNjk2NzcxMDYwfQ.GakWs7gLYzD1iAnIIS8p9Wu26i1aVi7PZAehATyzEuQ"
 
 const ListaPacientes = () => {
 
@@ -13,6 +17,15 @@ const ListaPacientes = () => {
     const [searchVal, setSearchVal] = useState('')
     const [idToDelete, setIdToDelete] = useState(0)
     const router = useRouter()
+
+    const authHeader = () => {
+        //const token = getTokenFromCookies();
+        return {
+            headers: {
+                Authorization: "Bearer " + token,
+            },
+        };
+    };
 
     useEffect(() => {
         const init = async () => {
@@ -25,7 +38,7 @@ const ListaPacientes = () => {
 
     useEffect(() => {
         const getPacientList = async () => {
-            await api.get('paciente',
+            await api.get('paciente', authHeader()
             )
                 .then(response => {
                     setPaciente([...paciente, ...response.data])
@@ -41,9 +54,8 @@ const ListaPacientes = () => {
     const handleDeletePaciente = async (id_paciente) => {
         await api.delete(`paciente/${id_paciente}`)
             .then(response => {
-                if (response.status === 204) {
-                    alert('Apagado com sucesso')
-                }
+                if (response.status === 204)
+                    return
             })
             .catch(error => {
                 console.error(error);
@@ -57,6 +69,26 @@ const ListaPacientes = () => {
         }
         return paciente.filter(dataItem => dataItem.nome.toLowerCase().includes(searchVal.toLocaleLowerCase()))
     }, [paciente, searchVal])
+
+
+    const MySwal = withReactContent(Swal)
+    const showSwalWithLink = (id_paciente) => {
+        MySwal.fire({
+            title: 'Deseja realmente excluir?',
+            showDenyButton: true,
+            // showCancelButton: true,
+            confirmButtonText: 'Excluir',
+            denyButtonText: `Cancelar`,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                handleDeletePaciente(id_paciente)
+                Swal.fire('Excluído!', '', 'success')
+            } else if (result.isDenied) {
+                Swal.fire('Nenhuma alteração foi realizada', '', 'info')
+            }
+        })
+    }
+
 
     return (
         <div className="m-5 p-5  rounded-lg shadow-lg">
@@ -101,13 +133,9 @@ const ListaPacientes = () => {
                                                 <a className="text-purple-800 hover:text-purple-900" href="#">
                                                     <MdAttachMoney />
                                                 </a>
-                                                <a
-                                                    data-te-toggle="modal"
-                                                    data-te-target="#exampleModal"
-                                                    data-te-ripple-init
-                                                    data-te-ripple-color="light"
-                                                    onClick={() => setIdToDelete(data.id_paciente)}
-                                                    className="text-purple-800 hover:text-purple-900" href="#">
+                                                <a className="text-purple-800 hover:text-purple-900" href="#"
+                                                    onClick={() => showSwalWithLink(data.id_paciente)}
+                                                >
                                                     <FaTrashAlt />
                                                 </a>
                                             </td>
