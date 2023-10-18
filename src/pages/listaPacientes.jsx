@@ -11,8 +11,8 @@ import BasicModal from "../components/BasicModal"
 import Cookies from "js-cookie"
 
 // const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub21lIjoiRGFydGhWYWRlciIsImlhdCI6MTY5NjU5ODI2MCwiZXhwIjoxNjk2NzcxMDYwfQ.GakWs7gLYzD1iAnIIS8p9Wu26i1aVi7PZAehATyzEuQ"
-const user = Cookies.get("user")
-const token = JSON.parse(user).token
+const token = Cookies.get("jwt")
+// const token = JSON.parse(user).token
 
 const ListaPacientes = () => {
 
@@ -25,7 +25,7 @@ const ListaPacientes = () => {
         //const token = getTokenFromCookies();
         return {
             headers: {
-                Authorization: "Bearer " + token,
+                Authorization: "Bearer " +  Cookies.get("jwt"),
             },
         };
     };

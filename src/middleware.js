@@ -42,32 +42,36 @@ import { authRoutes, protectedRoutes } from './router/routes'
 import { jwtVerify } from "jose"
 
 export async function middleware(request) {
-    const currentUser = await request.cookies.get("user")?.value
+    console.log('TESE TESTE TESTE')
+    const jwt = request.cookies.get("jwt")
     const SECRET_KEY = 'your-secret-key-here'
 
     // if (request.nextUrl.pathname !== "/login" && !currentUser) {
     //     return NextResponse.redirect(new URL("/login", request.url))
     // }
+    console.log('jwt-----', jwt)
+    // if (jwt) {
+    //     const { payload, protectedHeader } =
+    //         await jwtVerify(jwt, new TextEncoder().encode(SECRET_KEY))
 
-    if (currentUser) {
-        const { payload, protectedHeader } =
-            await jwtVerify(JSON.parse(currentUser).token, new TextEncoder().encode(SECRET_KEY))
-
-        // console.log("<<<<<<<<<>>>>>>>", protectedHeader)
-        // console.log("-------------------=====", payload)
-    }
+    //     console.log("<<<<<<<<<>>>>>>>", protectedHeader)
+    //     console.log("-------------------=====", payload)
+    // }
 
     if (
         protectedRoutes.includes(request.nextUrl.pathname) &&
-        (!currentUser || Date.now() > payload.expe)
+        (!request.cookies.has('jwt'))
+        // /*|| Date.now() > payload.expe*/)
     ) {
-        request.cookies.delete("user")
-        const response = NextResponse.redirect(new URL("/login", request.url))
-        request.cookies.delete("user")
+        console.log('mmmmm', request.cookies.get('jwt'))
+        request.cookies.delete("jwt")
+        return NextResponse.redirect(new URL("/login", request.url))
+        // return NextResponse.rewrite(new URL('/login', request.url))
+        // request.cookies.delete("jwt")
 
-        return response
+        // return response
     } else {
-        //  console.log('>>>>>>>>>>.', payload)
+        //console.log('>>>>>>>>>>.', jwt.value)
     }
 
     // if (authRoutes.includes(request.nextUrl.pathname) && currentUser)

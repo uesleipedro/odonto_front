@@ -13,7 +13,7 @@ const FullCalendar = () => {
 
     const calendarRef = useRef(null);
     const [paciente, setPaciente] = useState([])
-    const [token, setToken] = useState('')
+    const [token, setToken] = useState(Cookies.get("token"))
     const [options, setOptions] = useState('')
 
 
@@ -37,6 +37,10 @@ const FullCalendar = () => {
     }
 
     useEffect(() => {
+        // setToken(Cookies.get("user") ? JSON.parse(?.token) : null)
+    })
+
+    useEffect(() => {
         console.log(token)
         handleGetPacientList()
     }, [token])
@@ -46,10 +50,6 @@ const FullCalendar = () => {
     }, [paciente])
 
     useEffect(() => {
-        setToken(JSON.parse(Cookies.get("user")).token)
-
-
-        console.log(options)
 
         const calendar = new Calendar(calendarRef.current, {
             locales: [ptBr],
@@ -70,39 +70,6 @@ const FullCalendar = () => {
 
             // //Create new event
             select: async function (arg) {
-
-
-                // const { value: password } = await Swal.fire({
-                //     title: 'Select field validation',
-                //     input: 'select',
-                //     inputOptions: {
-                //         apples: 'Apples',
-                //         bananas: 'Bananas',
-                //         grapes: 'Grapes',
-                //         oranges: 'Oranges'
-                //     },
-                //     inputPlaceholder: 'Select a fruit',
-                //     showCancelButton: true,
-                //     inputValidator: (value) => {
-                //         return new Promise((resolve) => {
-                //             if (value === 'oranges') {
-                //                 resolve()
-                //             } else {
-                //                 resolve('You need to select oranges :)')
-                //             }
-                //         })
-                //     }
-                // })
-
-                // if (password) {
-                //     Swal.fire(`Entered password: ${password}`)
-                // }
-
-                // <option value="volvo">Volvo</option>
-                //         <option value="saab">Saab</option>
-                //         <option value="mercedes">Mercedes</option>
-                //         <option value="audi">Audi</option>
-
                 Swal.fire({
                     html: `
                     <input id="nome" name="nome" class="swal2-input" placeholder="Nome" />

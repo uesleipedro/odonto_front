@@ -11,9 +11,7 @@ export default class UseAuth {
         const response = await api.post('user/login', { email: user, senha: passwd })
             .then((response) => {
                 if (response.status === 201) {
-                    Cookie.set("user", JSON.stringify({
-                        token: response.data.token,
-                    }))
+                    Cookie.set("jwt", response.data.token)
 
                     return true
                 } else if (response.status === 500) {
@@ -25,13 +23,11 @@ export default class UseAuth {
                 console.error(error.message)
                 return false
             })
-        console.log('response ---->', response)
         return response
-
     }
 
     static async logout() {
-        Cookie.remove("user")
+        Cookie.remove("jwt")
     }
 
 }
