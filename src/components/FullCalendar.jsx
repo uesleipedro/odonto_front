@@ -7,6 +7,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import Swal from 'sweetalert2'
 import api from '../utils/Api';
 import Cookies from "js-cookie"
+import ModalCadastroCliente from './ModalCadastroCliente';
 
 
 const FullCalendar = () => {
@@ -55,12 +56,12 @@ const FullCalendar = () => {
             locales: [ptBr],
             locale: 'pt-br',
             plugins: [dayGridPlugin, interactionPlugin, timeGridPlugin],
-            initialView: 'dayGridMonth',
+            initialView: 'timeGridWeek',
             selectable: true,
             headerToolbar: {
                 left: "prev,next,today",
                 center: "title",
-                right: "dayGridMonth,timeGridDay"
+                right: "dayGridMonth,timeGridWeek,timeGridDay"
             },
             navLinks: true, // can click day/week names to navigate views
             selectable: true,
@@ -68,53 +69,64 @@ const FullCalendar = () => {
             editable: true,
             dayMaxEvents: true,
 
+            dateClick: function (info) {
+                alert('Clicked on: ' + info.dateStr);
+                alert('Coordinates: ' + info.jsEvent.pageX + ',' + info.jsEvent.pageY);
+                alert('Current view: ' + info.view.type);
+                // change the day's background color just for fun
+                info.dayEl.style.backgroundColor = 'red';
+            },
+
             // //Create new event
             select: async function (arg) {
-                Swal.fire({
-                    html: `
-                    <input id="nome" name="nome" class="swal2-input" placeholder="Nome" />
-                    <select name="cars" id="cars" class="swal2-input" >
-                        ${paciente.map((data) => (
-                        `<option value="">${data.nome}</option>`
-                    ))}        
-                    </select>`,
-                    //icon: "info",
-                    showCancelButton: true,
-                    buttonsStyling: true,
-                    confirmButtonText: "Criar agenda",
-                    cancelButtonText: "Cancelar",
-                }).then(function (result) {
-                    if (result.value) {
-                        let title = document.getElementById('nome').value;
-                        if (title) {
-                            calendar.addEvent({
-                                title: title,
-                                start: arg.start,
-                                end: arg.end,
-                                allDay: arg.allDay
-                            })
 
-                            const data = {
-                                id_empresa: 1,
-                                id_paciente: 1,
-                                id_profissional: 1,
-                                obs: "asdf",
-                                id_metodo_pagamento: 1,
-                                total_pagamento_servico: 100.0,
-                                desconto: 10.0,
-                                status: 1
-                            }
-                        }
-                        calendar.unselect()
-                    } else if (result.dismiss === "cancel") {
-                        Swal.fire({
-                            text: "Nenhuma alteração foi realizada",
-                            icon: "error",
-                            buttonsStyling: true,
-                            confirmButtonText: "Ok",
-                        });
-                    }
-                });
+
+
+                // Swal.fire({
+                //     html: `
+                //     <input id="nome" name="nome" class="swal2-input" placeholder="Nome" />
+                //     <select name="cars" id="cars" class="swal2-input" >
+                //         ${paciente.map((data) => (
+                //         `<option value="">${data.nome}</option>`
+                //     ))}        
+                //     </select>`,
+                //     //icon: "info",
+                //     showCancelButton: true,
+                //     buttonsStyling: true,
+                //     confirmButtonText: "Criar agenda",
+                //     cancelButtonText: "Cancelar",
+                // }).then(function (result) {
+                //     if (result.value) {
+                //         let title = document.getElementById('nome').value;
+                //         if (title) {
+                //             calendar.addEvent({
+                //                 title: title,
+                //                 start: arg.start,
+                //                 end: arg.end,
+                //                 allDay: arg.allDay
+                //             })
+
+                //             const data = {
+                //                 id_empresa: 1,
+                //                 id_paciente: 1,
+                //                 id_profissional: 1,
+                //                 obs: "asdf",
+                //                 id_metodo_pagamento: 1,
+                //                 total_pagamento_servico: 100.0,
+                //                 desconto: 10.0,
+                //                 status: 1
+                //             }
+                //         }
+                //         calendar.unselect()
+                //     } else if (result.dismiss === "cancel") {
+                //         Swal.fire({
+                //             text: "Nenhuma alteração foi realizada",
+                //             icon: "error",
+                //             buttonsStyling: true,
+                //             confirmButtonText: "Ok",
+                //         });
+                //     }
+                // });
             },
 
             // // Delete event
