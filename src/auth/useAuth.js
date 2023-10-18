@@ -19,9 +19,10 @@ export default class UseAuth {
                 return true
             })
             .catch((error) => {
-                return false
+                return error.message
             })
 
+            console.log('response--->',response)
         return response
     }
 

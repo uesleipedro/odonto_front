@@ -11,7 +11,9 @@ const login = () => {
 
         const authorized = await UseAuth.login({ user, passwd })
         if (!authorized) {
-            alert(`Erro na autenticação - ${authorized}`)
+            //alert(`Erro na autenticação - ${authorized}`)
+            console.log('>>>', authorized)
+            alert(authorized)
             return
         }
 
