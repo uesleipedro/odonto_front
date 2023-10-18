@@ -50,6 +50,7 @@ const ListaPacientes = () => {
                     console.error(error);
                 })
         }
+        console.log("PATH ---->", process.env.NEXT_PUBLIC_PATH)
         getPacientList()
     }, []);
 
