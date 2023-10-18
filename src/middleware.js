@@ -49,13 +49,13 @@ export async function middleware(request) {
     //     return NextResponse.redirect(new URL("/login", request.url))
     // }
 
-    // if (currentUser) {
-    // const { payload, protectedHeader } =
-    //     await jwtVerify(JSON.parse(currentUser).token, new TextEncoder().encode(SECRET_KEY))
+    if (currentUser) {
+        const { payload, protectedHeader } =
+            await jwtVerify(JSON.parse(currentUser).token, new TextEncoder().encode(SECRET_KEY))
 
-    // console.log("<<<<<<<<<>>>>>>>", protectedHeader)
-    // console.log("-------------------=====", payload)
-    //}
+        // console.log("<<<<<<<<<>>>>>>>", protectedHeader)
+        // console.log("-------------------=====", payload)
+    }
 
     if (
         protectedRoutes.includes(request.nextUrl.pathname) &&

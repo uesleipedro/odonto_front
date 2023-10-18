@@ -6,16 +6,30 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import Swal from 'sweetalert2'
 import api from '../utils/Api';
+import Cookies from "js-cookie"
+
 
 const FullCalendar = () => {
+
     const calendarRef = useRef(null);
     const [paciente, setPaciente] = useState([])
+    const [token, setToken] = useState('')
+    const [options, setOptions] = useState('')
+
+
+    const authHeader = () => {
+        return {
+            headers: {
+                Authorization: "Bearer " + token,
+            },
+        };
+    };
 
     const handleGetPacientList = async () => {
         await api.get('paciente', authHeader()
         )
             .then(response => {
-                setPaciente([...paciente, ...response.data])
+                setPaciente([...response.data])
             })
             .catch(function (error) {
                 console.error(error);
@@ -23,6 +37,19 @@ const FullCalendar = () => {
     }
 
     useEffect(() => {
+        console.log(token)
+        handleGetPacientList()
+    }, [token])
+
+    useEffect(() => {
+
+    }, [paciente])
+
+    useEffect(() => {
+        setToken(JSON.parse(Cookies.get("user")).token)
+
+
+        console.log(options)
 
         const calendar = new Calendar(calendarRef.current, {
             locales: [ptBr],
@@ -71,14 +98,18 @@ const FullCalendar = () => {
                 //     Swal.fire(`Entered password: ${password}`)
                 // }
 
+                // <option value="volvo">Volvo</option>
+                //         <option value="saab">Saab</option>
+                //         <option value="mercedes">Mercedes</option>
+                //         <option value="audi">Audi</option>
+
                 Swal.fire({
-                    html: `<input id="nome" name="nome" class="swal2-input" placeholder="Nome" />
-                   
-                    <select name="cars" id="cars">
-                        <option value="volvo">Volvo</option>
-                        <option value="saab">Saab</option>
-                        <option value="mercedes">Mercedes</option>
-                        <option value="audi">Audi</option>
+                    html: `
+                    <input id="nome" name="nome" class="swal2-input" placeholder="Nome" />
+                    <select name="cars" id="cars" class="swal2-input" >
+                        ${paciente.map((data) => (
+                        `<option value="">${data.nome}</option>`
+                    ))}        
                     </select>`,
                     //icon: "info",
                     showCancelButton: true,
@@ -183,7 +214,7 @@ const FullCalendar = () => {
         });
 
         calendar.render();
-    }, []);
+    }, [paciente]);
 
     return (
         <div ref={calendarRef}></div>
