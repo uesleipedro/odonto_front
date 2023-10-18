@@ -44,7 +44,6 @@ import { jwtVerify } from "jose"
 export async function middleware(request) {
     const currentUser = await request.cookies.get("user")?.value
     const SECRET_KEY = 'your-secret-key-here'
-    console.log('>>>>> ', request.nextUrl.pathname)
 
     // if (request.nextUrl.pathname !== "/login" && !currentUser) {
     //     return NextResponse.redirect(new URL("/login", request.url))
@@ -62,9 +61,9 @@ export async function middleware(request) {
         protectedRoutes.includes(request.nextUrl.pathname) &&
         (!currentUser || Date.now() > payload.expe)
     ) {
-        request.cookies.delete("jwt")
+        request.cookies.delete("user")
         const response = NextResponse.redirect(new URL("/login", request.url))
-        response.cookies.delete("jwt")
+        request.cookies.delete("user")
 
         return response
     } else {

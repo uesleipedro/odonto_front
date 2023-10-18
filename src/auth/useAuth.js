@@ -14,16 +14,20 @@ export default class UseAuth {
                     Cookie.set("user", JSON.stringify({
                         token: response.data.token,
                     }))
+
+                    return true
+                } else if (response.status === 500) {
+                    return false
                 }
 
-                return true
             })
             .catch((error) => {
-                return error.message
+                console.error(error.message)
+                return false
             })
-
-            console.log('response--->',response)
+        console.log('response ---->', response)
         return response
+
     }
 
     static async logout() {
