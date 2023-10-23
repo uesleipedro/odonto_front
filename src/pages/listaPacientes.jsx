@@ -25,7 +25,7 @@ const ListaPacientes = () => {
         //const token = getTokenFromCookies();
         return {
             headers: {
-                Authorization: "Bearer " +  Cookies.get("jwt"),
+                Authorization: "Bearer " + Cookies.get("jwt"),
             },
         };
     };
@@ -50,7 +50,6 @@ const ListaPacientes = () => {
                     console.error(error);
                 })
         }
-        console.log("PATH ---->", process.env.NEXT_PUBLIC_PATH)
         getPacientList()
     }, []);
 

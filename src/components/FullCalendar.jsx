@@ -8,6 +8,7 @@ import Swal from 'sweetalert2'
 import api from '../utils/Api';
 import Cookies from "js-cookie"
 import ModalCadastroCliente from './ModalCadastroCliente';
+import Select from 'react-select'
 
 
 const FullCalendar = () => {
@@ -15,8 +16,9 @@ const FullCalendar = () => {
     const calendarRef = useRef(null);
     const [paciente, setPaciente] = useState([])
     const [token, setToken] = useState(Cookies.get("token"))
-    const [options, setOptions] = useState('')
-
+    const [modal, setModal] = useState(false)
+    const [options, setOptions] = useState([])
+    const [agendamento, setAgendamento] = useState({})
 
     const authHeader = () => {
         return {
@@ -26,11 +28,41 @@ const FullCalendar = () => {
         };
     };
 
+    const updateField = e => {
+
+        const fieldName = e.target.name
+        setAgendamento(existingValues => ({
+            ...existingValues,
+            [fieldName]: e.target.value,
+        }))
+        console.log(agendamento)
+    }
+
+    useEffect(() => {
+        let testet = []
+        paciente.map(x => {
+            // return x.nome
+            testet.push({ value: x.id_paciente, label: x.nome })
+        })
+        setOptions([...testet])
+        console.log(testet)
+    }, [paciente])
+
     const handleGetPacientList = async () => {
         await api.get('paciente', authHeader()
         )
             .then(response => {
+                console.log(response.data)
                 setPaciente([...response.data])
+
+                // let testet = []
+                // paciente.map(x => {
+                //     // return x.nome
+                //     testet.push({ value: x.id_paciente, label: x.nome })
+                // })
+                // setOptions([...testet])
+                // console.log(testet)
+
             })
             .catch(function (error) {
                 console.error(error);
@@ -38,19 +70,30 @@ const FullCalendar = () => {
     }
 
     useEffect(() => {
-        // setToken(Cookies.get("user") ? JSON.parse(?.token) : null)
-    })
+        const init = async () => {
+            const {
+                Modal,
+                Ripple,
+                initTE,
+                Datepicker,
+                Input,
+                Timepicker,
+            } = await import("tw-elements");
+            initTE({
+                Modal,
+                Ripple,
+                initTE,
+                Datepicker,
+                Input,
+                Timepicker,
+            });
+        };
+        init();
+    }, [])
 
     useEffect(() => {
-        console.log(token)
-        handleGetPacientList()
-    }, [token])
-
-    useEffect(() => {
-
-    }, [paciente])
-
-    useEffect(() => {
+        const picker = document.querySelector("#timepicker-format");
+        //const tpFormat24 = new Timepicker(picker, { format24: true, });
 
         const calendar = new Calendar(calendarRef.current, {
             locales: [ptBr],
@@ -75,17 +118,19 @@ const FullCalendar = () => {
                 alert('Current view: ' + info.view.type);
                 // change the day's background color just for fun
                 info.dayEl.style.backgroundColor = 'red';
+
+
             },
 
             // //Create new event
             select: async function (arg) {
 
-
-
+                setModal(true)
+                handleGetPacientList()
                 // Swal.fire({
                 //     html: `
-                //     <input id="nome" name="nome" class="swal2-input" placeholder="Nome" />
-                //     <select name="cars" id="cars" class="swal2-input" >
+                //     <input id="nome" name="nome" className="swal2-input" placeholder="Nome" />
+                //     <select name="cars" id="cars" className="swal2-input" >
                 //         ${paciente.map((data) => (
                 //         `<option value="">${data.nome}</option>`
                 //     ))}        
@@ -113,7 +158,7 @@ const FullCalendar = () => {
                 //                 obs: "asdf",
                 //                 id_metodo_pagamento: 1,
                 //                 total_pagamento_servico: 100.0,
-                //                 desconto: 10.0,
+                //       timepicker-inline-          desconto: 10.0,
                 //                 status: 1
                 //             }
                 //         }
@@ -135,8 +180,8 @@ const FullCalendar = () => {
             //     const { value: formValues } = await Swal.fire({
             //         title: 'Multiple inputs',
             //         html:
-            //             '<input id="swal-input1" class="swal2-input">' +
-            //             '<input id="swal-input2" class="swal2-input">',
+            //             '<input id="swal-input1" className="swal2-input">' +
+            //             '<input id="swal-input2" className="swal2-input">',
             //         focusConfirm: false,
             //         preConfirm: () => {
             //             return [
@@ -196,7 +241,251 @@ const FullCalendar = () => {
     }, [paciente]);
 
     return (
-        <div ref={calendarRef}></div>
+        <>
+            <div ref={calendarRef}></div>
+
+            {/* <button
+                type="button"
+                className="inline-block rounded bg-primary px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_#3b71ca] transition duration-150 ease-in-out hover:bg-primary-600 hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:bg-primary-600 focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:outline-none focus:ring-0 active:bg-primary-700 active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] dark:shadow-[0_4px_9px_-4px_rgba(59,113,202,0.5)] dark:hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)]"
+                data-te-toggle="modal"
+                data-te-target="#exampleModalVarying"
+                data-te-ripple-init
+                data-te-ripple-color="light">
+                Launch demo modal
+            </button> */}
+            {modal &&
+                <div
+                    data-te-modal-init
+                    // data-te-backdrop="false"
+                    // className="fixed left-0 top-0 z-[1055] block h-full w-full overflow-y-auto overflow-x-hidden outline-none bg-color:grey-700"
+                    className="fixed left-0 top-0 z-[1055] block h-full w-full overflow-y-auto overflow-x-hidden outline-none bg-black/[.8]"
+                    id="exampleModalVarying"
+                    tabindex="-1"
+                    aria-labelledby="exampleModalVaryingLabel"
+                >
+                    <div
+                        data-te-modal-dialog-ref
+                        // className="pointer-events-none relative w-auto translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
+                        className=" pointer-events-none relative w-auto opacity-100 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:my-7 min-[576px]:max-w-[500px]">
+                        <div
+                            className=" block min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none dark:bg-neutral-600">
+                            <div
+                                className="bg-purple-600 flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
+                                <h5
+                                    className="text-white text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200"
+                                    id="exampleModalVaryingLabel">
+                                    Editar Evento
+                                </h5>
+                                <button
+                                    type="button"
+                                    className="text-white box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
+                                    data-te-modal-dismiss
+                                    aria-label="Close"
+                                    onClick={() => setModal(false)}>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke-width="1.5"
+                                        stroke="currentColor"
+                                        className="h-6 w-6">
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <div className="relative flex-auto p-4" data-te-modal-body-ref>
+                                <form>
+                                    <div className="mb-3">
+                                        <Select
+                                            name="paciente"
+                                            options={options}
+                                            placeholder="Paciente"
+                                             />
+                                    </div>
+                                    <div className="mb-3 flex flex-row items-center justify-center gap-2">
+                                        <h3 className="text-sm font-medium text-gray-900 dark:text-gray-300">Status</h3>
+                                        <ul className="items-center w-full text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg sm:flex dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                            <li className="w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600">
+                                                <div className="flex items-center pl-3">
+                                                    <input id="horizontal-list-radio-license" type="radio" value="" name="list-radio" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500" />
+                                                    <label for="horizontal-list-radio-license" className="w-full py-3 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Confirmado </label>
+                                                </div>
+                                            </li>
+                                            <li className="w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600">
+                                                <div className="flex items-center pl-3">
+                                                    <input id="horizontal-list-radio-id" type="radio" value="" name="list-radio" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500" />
+                                                    <label for="horizontal-list-radio-id" className="w-full py-3 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Cancelado</label>
+                                                </div>
+                                            </li>
+                                            <li className="w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600">
+                                                <div className="flex items-center pl-3">
+                                                    <input id="horizontal-list-radio-millitary" type="radio" value="" name="list-radio" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500" />
+                                                    <label for="horizontal-list-radio-millitary" className="w-full py-3 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Pendente</label>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div className="mb-3">
+                                        <input
+                                            type="text"
+                                            className="relative m-0 -mr-0.5 block w-full flex-auto rounded-l border border-solid border-neutral-300 bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary focus:text-neutral-700 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none dark:border-neutral-400 dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:focus:border-primary"
+                                            name="evento"
+                                            id="recipient-name"
+                                            placeholder="Evento"
+                                            onChange={updateField} />
+                                    </div>
+                                    <div className="mb-3">
+                                        <Select
+                                            options={options}
+                                            placeholder="Dentista"
+                                            name="dentista" />
+                                    </div>
+                                    <div className="mb-3 flex flex-row">
+                                        <div
+                                            className="relative mb-3"
+                                            data-te-datepicker-init
+                                            data-te-input-wrapper-init>
+                                            <input
+                                                type="text"
+                                                className="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 peer-focus:text-primary data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:peer-focus:text-primary [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0"
+                                                placeholder="Selecione a data"
+                                                onChange={updateField}
+                                                name="data"
+                                            />
+                                            <label
+                                                for="floatingInput"
+                                                className="pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[1.6] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[0.9rem] peer-focus:scale-[0.8] peer-focus:text-primary peer-data-[te-input-state-active]:-translate-y-[0.9rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none dark:text-neutral-200 dark:peer-focus:text-primary"
+                                            >Data</label
+                                            >
+                                        </div>
+                                        {/* <div
+                                            className="relative"
+                                            data-te-format24="true"
+                                            id="timepicker-format"
+                                            data-te-input-wrapper-init>
+                                            <input
+                                                type="text"
+                                                className="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 peer-focus:text-primary data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:peer-focus:text-primary [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0"
+                                                data-te-toggle="timepicker"
+                                                id="form14" />
+                                            <label
+                                                for="form14"
+                                                className="pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[1.6] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[0.9rem] peer-focus:scale-[0.8] peer-focus:text-primary peer-data-[te-input-state-active]:-translate-y-[0.9rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none dark:text-neutral-200 dark:peer-focus:text-primary"
+                                            >Hora</label
+                                            >
+                                        </div> */}
+                                    </div>
+                                    <div className="mb-3">
+                                        <div className="flex items-center mb-4">
+                                            <input onChange={updateField} name="diaInteiro" id="default-checkbox" type="checkbox" value="" className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 dark:bg-gray-700 " />
+                                            <label for="default-checkbox" className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Dia inteiro</label>
+                                        </div>
+                                    </div>
+                                    <div className="mb-3">
+                                        <textarea
+                                            className="relative m-0 -mr-0.5 block w-full flex-auto rounded-l border border-solid border-neutral-300 bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary focus:text-neutral-700 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none dark:border-neutral-400 dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:focus:border-primary"
+                                            id="message-text"
+                                            placeholder="Observações"
+                                            onChange={updateField}
+                                            name="observacoes"
+                                        ></textarea>
+                                    </div>
+                                </form>
+                            </div>
+                            <div
+                                className="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
+
+                                <button
+                                    type="button"
+                                    className="inline-block rounded bg-purple-100 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-primary-700 transition duration-150 ease-in-out hover:bg-primary-accent-100 focus:bg-primary-accent-100 focus:outline-none focus:ring-0 active:bg-primary-accent-200"
+                                    data-te-modal-dismiss
+                                    data-te-ripple-init
+                                    data-te-ripple-color="light"
+                                    onClick={() => setModal(false)}
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    type="button"
+                                    className="ml-1 inline-block rounded bg-purple-600 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_#3b71ca] transition duration-150 ease-in-out hover:bg-primary-600 hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:bg-primary-600 focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:outline-none focus:ring-0 active:bg-primary-700 active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] dark:shadow-[0_4px_9px_-4px_rgba(59,113,202,0.5)] dark:hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)]"
+                                    data-te-ripple-init
+                                    data-te-ripple-color="light">
+                                    Salvar Agendamento
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+
+            {/* <div
+                data-te-modal-init
+                data-te-backdrop="false"
+                className="static left-0 top-0 z-[1055] block h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+                id="exampleModalComponents"
+                tabindex="-1"
+                aria-labelledby="exampleModalComponentsLabel"
+                aria-hidden="true">
+                <div
+                    data-te-modal-dialog-ref
+                    className="pointer-events-none relative w-auto opacity-100 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:my-7 min-[576px]:max-w-[500px]">
+                    <div
+                        className="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none dark:bg-neutral-600">
+                        <div
+                            className="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
+                            <h5
+                                className="text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200"
+                                id="exampleModalComponentsLabel">
+                                Modal title
+                            </h5>
+                            <button
+                                type="button"
+                                className="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
+                                data-te-modal-dismiss
+                                aria-label="Close">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke-width="1.5"
+                                    stroke="currentColor"
+                                    className="h-6 w-6">
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div className="relative flex-auto p-4" data-te-modal-body-ref>
+                            Modal body text goes here.
+                        </div>
+                        <div
+                            className="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
+                            <button
+                                type="button"
+                                className="inline-block rounded bg-primary-100 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-primary-700 transition duration-150 ease-in-out hover:bg-primary-accent-100 focus:bg-primary-accent-100 focus:outline-none focus:ring-0 active:bg-primary-accent-200"
+                                data-te-modal-dismiss
+                                data-te-ripple-init
+                                data-te-ripple-color="light">
+                                Close
+                            </button>
+                            <button
+                                type="button"
+                                className="ml-1 inline-block rounded bg-primary px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_#3b71ca] transition duration-150 ease-in-out hover:bg-primary-600 hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:bg-primary-600 focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:outline-none focus:ring-0 active:bg-primary-700 active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] dark:shadow-[0_4px_9px_-4px_rgba(59,113,202,0.5)] dark:hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)]"
+                                data-te-ripple-init
+                                data-te-ripple-color="light">
+                                Save changes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div> */}
+        </>
     );
 };
 

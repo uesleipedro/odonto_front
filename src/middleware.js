@@ -42,14 +42,14 @@ import { authRoutes, protectedRoutes } from './router/routes'
 import { jwtVerify } from "jose"
 
 export async function middleware(request) {
-    console.log('TESE TESTE TESTE')
+    // console.log('TESE TESTE TESTE')
     const jwt = request.cookies.get("jwt")
     const SECRET_KEY = 'your-secret-key-here'
 
     // if (request.nextUrl.pathname !== "/login" && !currentUser) {
     //     return NextResponse.redirect(new URL("/login", request.url))
     // }
-    console.log('jwt-----', jwt)
+    // console.log('jwt-----', jwt)
     // if (jwt) {
     //     const { payload, protectedHeader } =
     //         await jwtVerify(jwt, new TextEncoder().encode(SECRET_KEY))
@@ -63,9 +63,9 @@ export async function middleware(request) {
         (!request.cookies.has('jwt'))
         // /*|| Date.now() > payload.expe*/)
     ) {
-        console.log('mmmmm', request.cookies.get('jwt'))
+        // console.log('mmmmm', request.cookies.get('jwt'))
         request.cookies.delete("jwt")
-        return NextResponse.redirect(new URL("/login", request.url))
+        return NextResponse.rewrite(new URL("/login", request.url))
         // return NextResponse.rewrite(new URL('/login', request.url))
         // request.cookies.delete("jwt")
 
