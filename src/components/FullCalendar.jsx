@@ -9,7 +9,7 @@ import api from '../utils/Api';
 import Cookies from "js-cookie"
 import ModalCadastroCliente from './ModalCadastroCliente';
 import Select from 'react-select'
-
+import moment from 'moment'
 
 const FullCalendar = () => {
 
@@ -18,7 +18,8 @@ const FullCalendar = () => {
     const [token, setToken] = useState(Cookies.get("token"))
     const [modal, setModal] = useState(false)
     const [options, setOptions] = useState([])
-    const [agendamento, setAgendamento] = useState({})
+    const [agendamento, setAgendamento] = useState({ status: "pendente", diaInteiro: false })
+    const [dataHora, setDataHora] = useState({})
 
     const authHeader = () => {
         return {
@@ -29,6 +30,21 @@ const FullCalendar = () => {
     };
 
     const updateField = e => {
+
+        if (typeof e?.target?.name === 'undefined')
+            return
+
+        if (e.target.name === "diaInteiro") {
+            let check = e.target.checked ? true : false
+
+            setAgendamento(existingValues => ({
+                ...existingValues,
+                ["diaInteiro"]: check,
+            }))
+
+            return
+        }
+
 
         const fieldName = e.target.name
         setAgendamento(existingValues => ({
@@ -69,31 +85,47 @@ const FullCalendar = () => {
             })
     }
 
+    // useEffect(() => {
+    //     const init = async () => {
+    //         const {
+    //             Modal,
+    //             Ripple,
+    //             Datepicker,
+    //             Input,
+    //             Datetimepicker,
+    //             initTE
+    //         } = await import("tw-elements");
+    //         initTE({
+    //             Modal,
+    //             Ripple,
+    //             Datepicker,
+    //             Input,
+    //             Datetimepicker
+    //         });
+    //     };
+    //     init();
+    // }, [])
+
     useEffect(() => {
+
         const init = async () => {
             const {
                 Modal,
                 Ripple,
-                initTE,
                 Datepicker,
                 Input,
-                Timepicker,
+                Datetimepicker,
+                initTE
             } = await import("tw-elements");
             initTE({
                 Modal,
                 Ripple,
-                initTE,
                 Datepicker,
                 Input,
-                Timepicker,
+                Datetimepicker
             });
         };
         init();
-    }, [])
-
-    useEffect(() => {
-        const picker = document.querySelector("#timepicker-format");
-        //const tpFormat24 = new Timepicker(picker, { format24: true, });
 
         const calendar = new Calendar(calendarRef.current, {
             locales: [ptBr],
@@ -112,21 +144,24 @@ const FullCalendar = () => {
             editable: true,
             dayMaxEvents: true,
 
-            dateClick: function (info) {
-                alert('Clicked on: ' + info.dateStr);
-                alert('Coordinates: ' + info.jsEvent.pageX + ',' + info.jsEvent.pageY);
-                alert('Current view: ' + info.view.type);
-                // change the day's background color just for fun
-                info.dayEl.style.backgroundColor = 'red';
+            // dateClick: function (info) {
+            //     alert('Clicked on: ' + info.dateStr);
+            //     alert('Coordinates: ' + info.jsEvent.pageX + ',' + info.jsEvent.pageY);
+            //     alert('Current view: ' + info.view.type);
+            //     // change the day's background color just for fun
+            //     info.dayEl.style.backgroundColor = 'red';
 
 
-            },
+            // },
 
             // //Create new event
-            select: async function (arg) {
+            select: async function (info) {
+
+                setDataHora({ inicio: moment(info.startStr).format('DD MM YYYY, h:mm:ss a'), fim: moment(info.endStr).format('DD MM YYYY, h:mm:ss a') })
 
                 setModal(true)
                 handleGetPacientList()
+
                 // Swal.fire({
                 //     html: `
                 //     <input id="nome" name="nome" className="swal2-input" placeholder="Nome" />
@@ -152,7 +187,7 @@ const FullCalendar = () => {
                 //             })
 
                 //             const data = {
-                //                 id_empresa: 1,
+                //   initTE              id_empresa: 1,
                 //                 id_paciente: 1,
                 //                 id_profissional: 1,
                 //                 obs: "asdf",
@@ -303,27 +338,38 @@ const FullCalendar = () => {
                                             name="paciente"
                                             options={options}
                                             placeholder="Paciente"
-                                             />
+                                            onChange={(e) => {
+                                                updateField({
+                                                    target: {
+                                                        name: 'paciente',
+                                                        value: e.value
+                                                    }
+                                                })
+                                            }}
+                                        />
                                     </div>
                                     <div className="mb-3 flex flex-row items-center justify-center gap-2">
                                         <h3 className="text-sm font-medium text-gray-900 dark:text-gray-300">Status</h3>
-                                        <ul className="items-center w-full text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg sm:flex dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                                            <li className="w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600">
+                                        <ul className="items-center w-full text-sm font-medium text-gray-900 bg-white  rounded-lg sm:flex"
+                                            name="status"
+                                            onChange={updateField}
+                                        >
+                                            <li className="w-full">
                                                 <div className="flex items-center pl-3">
-                                                    <input id="horizontal-list-radio-license" type="radio" value="" name="list-radio" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500" />
-                                                    <label for="horizontal-list-radio-license" className="w-full py-3 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Confirmado </label>
+                                                    <input id="status1" type="radio" value="confirmado" name="status" className="w-4 h-4" />
+                                                    <label for="status1" className="w-full py-3 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Confirmado </label>
                                                 </div>
                                             </li>
-                                            <li className="w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600">
+                                            <li className="w-full">
                                                 <div className="flex items-center pl-3">
-                                                    <input id="horizontal-list-radio-id" type="radio" value="" name="list-radio" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500" />
-                                                    <label for="horizontal-list-radio-id" className="w-full py-3 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Cancelado</label>
+                                                    <input id="status2" type="radio" value="cancelado" name="status" className="w-4 h-4" />
+                                                    <label for="status2" className="w-full py-3 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Cancelado</label>
                                                 </div>
                                             </li>
-                                            <li className="w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600">
+                                            <li className="w-full">
                                                 <div className="flex items-center pl-3">
-                                                    <input id="horizontal-list-radio-millitary" type="radio" value="" name="list-radio" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500" />
-                                                    <label for="horizontal-list-radio-millitary" className="w-full py-3 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Pendente</label>
+                                                    <input id="status3" checked="checked" type="radio" value="pendente" name="status" className="w-4 h-4" />
+                                                    <label for="status3" className="w-full py-3 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Pendente</label>
                                                 </div>
                                             </li>
                                         </ul>
@@ -331,7 +377,7 @@ const FullCalendar = () => {
                                     <div className="mb-3">
                                         <input
                                             type="text"
-                                            className="relative m-0 -mr-0.5 block w-full flex-auto rounded-l border border-solid border-neutral-300 bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary focus:text-neutral-700 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none dark:border-neutral-400 dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:focus:border-primary"
+                                            className="relative m-0 -mr-0.5 block w-full flex-auto rounded border border-solid border-neutral-300 bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary focus:text-neutral-700 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none"
                                             name="evento"
                                             id="recipient-name"
                                             placeholder="Evento"
@@ -341,46 +387,60 @@ const FullCalendar = () => {
                                         <Select
                                             options={options}
                                             placeholder="Dentista"
-                                            name="dentista" />
+                                            name="dentista"
+                                            onChange={(e) => {
+                                                updateField({
+                                                    target: {
+                                                        name: 'dentista',
+                                                        value: e.value
+                                                    }
+                                                })
+                                            }}
+                                        />
                                     </div>
-                                    <div className="mb-3 flex flex-row">
+                                    <div className="mb-3 flex flex-row gap-1">
+
                                         <div
-                                            className="relative mb-3"
-                                            data-te-datepicker-init
+                                            class="relative mb-3"
+                                            data-te-date-timepicker-init
                                             data-te-input-wrapper-init>
                                             <input
                                                 type="text"
-                                                className="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 peer-focus:text-primary data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:peer-focus:text-primary [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0"
-                                                placeholder="Selecione a data"
-                                                onChange={updateField}
-                                                name="data"
+                                                class="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear"
+                                                id="form1"
+                                                value={dataHora.inicio}
+                                                name="dataInicio"
+                                                onChange={setDataHora}
                                             />
                                             <label
-                                                for="floatingInput"
-                                                className="pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[1.6] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[0.9rem] peer-focus:scale-[0.8] peer-focus:text-primary peer-data-[te-input-state-active]:-translate-y-[0.9rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none dark:text-neutral-200 dark:peer-focus:text-primary"
-                                            >Data</label
+                                                for="form1"
+                                                class="pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[1.6] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[0.9rem] peer-focus:scale-[0.8] peer-focus:text-primary peer-data-[te-input-state-active]:-translate-y-[0.9rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none dark:text-neutral-200 dark:peer-focus:text-primary"
+                                            >Data e hora início</label
                                             >
                                         </div>
-                                        {/* <div
-                                            className="relative"
-                                            data-te-format24="true"
-                                            id="timepicker-format"
+
+                                        <div
+                                            class="relative mb-3"
+                                            data-te-date-timepicker-init
                                             data-te-input-wrapper-init>
                                             <input
                                                 type="text"
-                                                className="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 peer-focus:text-primary data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:peer-focus:text-primary [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0"
-                                                data-te-toggle="timepicker"
-                                                id="form14" />
+                                                class="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear"
+                                                id="form2"
+                                                value={dataHora.fim}
+                                                onChange={setDataHora}
+                                            />
                                             <label
-                                                for="form14"
-                                                className="pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[1.6] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[0.9rem] peer-focus:scale-[0.8] peer-focus:text-primary peer-data-[te-input-state-active]:-translate-y-[0.9rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none dark:text-neutral-200 dark:peer-focus:text-primary"
-                                            >Hora</label
+                                                for="form2"
+                                                class="pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[1.6] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[0.9rem] peer-focus:scale-[0.8] peer-focus:text-primary peer-data-[te-input-state-active]:-translate-y-[0.9rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none dark:text-neutral-200 dark:peer-focus:text-primary"
+                                            >Data e hora final</label
                                             >
-                                        </div> */}
+                                        </div>
+
                                     </div>
                                     <div className="mb-3">
                                         <div className="flex items-center mb-4">
-                                            <input onChange={updateField} name="diaInteiro" id="default-checkbox" type="checkbox" value="" className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 dark:bg-gray-700 " />
+                                            <input onChange={updateField} name="diaInteiro" id="default-checkbox" type="checkbox" value="" className="w-4 h-4 rounded" />
                                             <label for="default-checkbox" className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Dia inteiro</label>
                                         </div>
                                     </div>
