@@ -18,8 +18,13 @@ const FullCalendar = () => {
     const [token, setToken] = useState(Cookies.get("token"))
     const [modal, setModal] = useState(false)
     const [options, setOptions] = useState([])
-    const [agendamento, setAgendamento] = useState({ status: "pendente", diaInteiro: false })
-    const [dataHora, setDataHora] = useState({})
+    const [agenda, setAgenda] = useState([])
+    const [agendamento, setAgendamento] =
+        useState({
+            id_empresa: 1,
+            status: 3,
+            dia_inteiro: false
+        })
 
     const authHeader = () => {
         return {
@@ -34,12 +39,12 @@ const FullCalendar = () => {
         if (typeof e?.target?.name === 'undefined')
             return
 
-        if (e.target.name === "diaInteiro") {
+        if (e.target.name === "dia_inteiro") {
             let check = e.target.checked ? true : false
 
             setAgendamento(existingValues => ({
                 ...existingValues,
-                ["diaInteiro"]: check,
+                ["dia_inteiro"]: check,
             }))
 
             return
@@ -53,6 +58,47 @@ const FullCalendar = () => {
         }))
         console.log(agendamento)
     }
+
+    const sendAgendaData = () => {
+
+        api.post('agenda', agendamento)
+            .then(function (response) {
+                if (response.status === 201) {
+                    alert("Salvo com sucesso")
+                    setModal(false)
+                }
+            })
+            .catch(e => {
+                alert(e)
+            })
+    }
+
+
+    useEffect(() => {
+        const getAgenda = async () => {
+            console.log('iniciou ------------')
+            await api.get('agenda', authHeader()
+            )
+                .then(response => {
+                    //setAgenda([...agenda, ...response.data])
+
+
+                    let temp = response.data.map((e) => {
+                        return ({
+                            title: e.descricao,
+                            start: moment(e.start_date_time).format('YYYY-MM-DDTh:mm:ss'),
+                            end: moment(e.end_date_time).format('YYYY-MM-DDTh:mm:ss'),
+                        })
+                    })
+                    setAgenda(temp)
+                })
+                .catch(function (error) {
+                    console.error(error);
+                })
+        }
+        getAgenda()
+        console.log('<><><><><>', agenda)
+    }, []);
 
     useEffect(() => {
         let testet = []
@@ -85,28 +131,8 @@ const FullCalendar = () => {
             })
     }
 
-    // useEffect(() => {
-    //     const init = async () => {
-    //         const {
-    //             Modal,
-    //             Ripple,
-    //             Datepicker,
-    //             Input,
-    //             Datetimepicker,
-    //             initTE
-    //         } = await import("tw-elements");
-    //         initTE({
-    //             Modal,
-    //             Ripple,
-    //             Datepicker,
-    //             Input,
-    //             Datetimepicker
-    //         });
-    //     };
-    //     init();
-    // }, [])
-
     useEffect(() => {
+        console.log('ageneda>>', agenda)
 
         const init = async () => {
             const {
@@ -144,6 +170,8 @@ const FullCalendar = () => {
             editable: true,
             dayMaxEvents: true,
 
+            events: agenda,
+
             // dateClick: function (info) {
             //     alert('Clicked on: ' + info.dateStr);
             //     alert('Coordinates: ' + info.jsEvent.pageX + ',' + info.jsEvent.pageY);
@@ -156,57 +184,22 @@ const FullCalendar = () => {
 
             // //Create new event
             select: async function (info) {
-
-                setDataHora({ inicio: moment(info.startStr).format('DD MM YYYY, h:mm:ss a'), fim: moment(info.endStr).format('DD MM YYYY, h:mm:ss a') })
-
+                // setDataHora({ inicio: moment(info.startStr).format('DD MM YYYY, h:mm:ss a'), fim: moment(info.endStr).format('DD MM YYYY, h:mm:ss a') })
+                updateField({
+                    target: {
+                        name: 'start_date_time',
+                        value: moment(info.startStr).format('DD MM YYYY, h:mm:ss a')
+                    }
+                })
+                updateField({
+                    target: {
+                        name: 'end_date_time',
+                        value: moment(info.endStr).format('DD MM YYYY, h:mm:ss a')
+                    }
+                })
                 setModal(true)
                 handleGetPacientList()
-
-                // Swal.fire({
-                //     html: `
-                //     <input id="nome" name="nome" className="swal2-input" placeholder="Nome" />
-                //     <select name="cars" id="cars" className="swal2-input" >
-                //         ${paciente.map((data) => (
-                //         `<option value="">${data.nome}</option>`
-                //     ))}        
-                //     </select>`,
-                //     //icon: "info",
-                //     showCancelButton: true,
-                //     buttonsStyling: true,
-                //     confirmButtonText: "Criar agenda",
-                //     cancelButtonText: "Cancelar",
-                // }).then(function (result) {
-                //     if (result.value) {
-                //         let title = document.getElementById('nome').value;
-                //         if (title) {
-                //             calendar.addEvent({
-                //                 title: title,
-                //                 start: arg.start,
-                //                 end: arg.end,
-                //                 allDay: arg.allDay
-                //             })
-
-                //             const data = {
-                //   initTE              id_empresa: 1,
-                //                 id_paciente: 1,
-                //                 id_profissional: 1,
-                //                 obs: "asdf",
-                //                 id_metodo_pagamento: 1,
-                //                 total_pagamento_servico: 100.0,
-                //       timepicker-inline-          desconto: 10.0,
-                //                 status: 1
-                //             }
-                //         }
-                //         calendar.unselect()
-                //     } else if (result.dismiss === "cancel") {
-                //         Swal.fire({
-                //             text: "Nenhuma alteração foi realizada",
-                //             icon: "error",
-                //             buttonsStyling: true,
-                //             confirmButtonText: "Ok",
-                //         });
-                //     }
-                // });
+                info.jsEvent
             },
 
             // // Delete event
@@ -257,42 +250,81 @@ const FullCalendar = () => {
             //     //     }
             //     // });
             // },
-            events: [
-                {
-                    title: 'Antônio',
-                    date: '2023-10-28',
-                    extendedProps: {
-                        department: 'BioChemistry'
-                    },
-                    description: 'Lecture'
-                },
-                { title: 'Eduardo', date: '2023-10-09' },
-                { title: 'Maria', date: '2023-10-09' },
-                { title: 'Estevam', date: '2023-10-09' }
-            ]
+
+            // events: [
+
+            //     //     //     // agenda.map(a => {
+            //     //     //     //     return ({
+            //     //     //     //         title: a.descricao,
+            //     //     //     //         start: moment(a.start_date_time).format('YYYY-MM-DDTh:mm:ss'),
+            //     //     //     //         end: moment(a.end_date_time).format('YYYY-MM-DDTh:mm:ss'),
+            //     //     //     //     })
+            //     //     //     // })
+            //     {
+            //         title: 'My Event',
+            //         start: '2023-11-05T07:30:00',
+            //         end: '2023-11-05T07:30:00',
+            //         allDay: false
+            //     }
+            //     //     // // other events here...
+            // ],
+            // events: (function () {
+            //     let dataFormFullCalendar = agenda.map(a => {
+            //         return {
+            //             // title: a.descricao,
+            //             // start: moment(a.start_date_time).format('YYYY-MM-DDTh:mm:ss'),
+            //             // end: moment(a.end_date_time).format('YYYY-MM-DDTh:mm:ss'),
+            //             title: 'My Event',
+            //             start: '2023-11-05T07:30:00',
+            //             end: '2023-11-05T07:30:00',
+            //             allDay: false
+            //         }
+            //     })
+
+            //     return dataFormFullCalendar
+            // }),
+            eventTimeFormat: { // like '14:30:00'
+                hour: '2-digit',
+                minute: '2-digit',
+                // second: '0-digit',
+                meridiem: false
+            }
         });
 
         calendar.render();
+
+
+        // var dateStr = '2023-11-07';
+        // var date = new Date(dateStr + 'T10:00:00');
+        // var endDate = new Date(dateStr + 'T10:30:00')
+        // calendar.addEvent({
+        //     title: 'dynamic event',
+        //     start: date,
+        //     end: endDate,
+        //     allDay: false
+        // });
+
+
+        agenda.map((e) => {
+            var dateStr = '2023-11-07';
+            var date = new Date(dateStr + 'T10:00:00');
+            var endDate = new Date(dateStr + 'T10:30:00')
+            calendar.addEvent({
+                title: e.title,
+                start: new Date(e.start),
+                end: new Date(e.end),
+                allDay: false
+            });
+        })
+
     }, [paciente]);
 
     return (
         <>
             <div ref={calendarRef}></div>
-
-            {/* <button
-                type="button"
-                className="inline-block rounded bg-primary px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_#3b71ca] transition duration-150 ease-in-out hover:bg-primary-600 hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:bg-primary-600 focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:outline-none focus:ring-0 active:bg-primary-700 active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] dark:shadow-[0_4px_9px_-4px_rgba(59,113,202,0.5)] dark:hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)]"
-                data-te-toggle="modal"
-                data-te-target="#exampleModalVarying"
-                data-te-ripple-init
-                data-te-ripple-color="light">
-                Launch demo modal
-            </button> */}
             {modal &&
                 <div
                     data-te-modal-init
-                    // data-te-backdrop="false"
-                    // className="fixed left-0 top-0 z-[1055] block h-full w-full overflow-y-auto overflow-x-hidden outline-none bg-color:grey-700"
                     className="fixed left-0 top-0 z-[1055] block h-full w-full overflow-y-auto overflow-x-hidden outline-none bg-black/[.8]"
                     id="exampleModalVarying"
                     tabindex="-1"
@@ -300,7 +332,6 @@ const FullCalendar = () => {
                 >
                     <div
                         data-te-modal-dialog-ref
-                        // className="pointer-events-none relative w-auto translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
                         className=" pointer-events-none relative w-auto opacity-100 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:my-7 min-[576px]:max-w-[500px]">
                         <div
                             className=" block min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none dark:bg-neutral-600">
@@ -341,7 +372,7 @@ const FullCalendar = () => {
                                             onChange={(e) => {
                                                 updateField({
                                                     target: {
-                                                        name: 'paciente',
+                                                        name: 'id_paciente',
                                                         value: e.value
                                                     }
                                                 })
@@ -356,19 +387,19 @@ const FullCalendar = () => {
                                         >
                                             <li className="w-full">
                                                 <div className="flex items-center pl-3">
-                                                    <input id="status1" type="radio" value="confirmado" name="status" className="w-4 h-4" />
+                                                    <input id="status1" type="radio" value="1" name="status" className="w-4 h-4" />
                                                     <label for="status1" className="w-full py-3 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Confirmado </label>
                                                 </div>
                                             </li>
                                             <li className="w-full">
                                                 <div className="flex items-center pl-3">
-                                                    <input id="status2" type="radio" value="cancelado" name="status" className="w-4 h-4" />
+                                                    <input id="status2" type="radio" value="2" name="status" className="w-4 h-4" />
                                                     <label for="status2" className="w-full py-3 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Cancelado</label>
                                                 </div>
                                             </li>
                                             <li className="w-full">
                                                 <div className="flex items-center pl-3">
-                                                    <input id="status3" checked="checked" type="radio" value="pendente" name="status" className="w-4 h-4" />
+                                                    <input id="status3" checked="checked" type="radio" value="3" name="status" className="w-4 h-4" />
                                                     <label for="status3" className="w-full py-3 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Pendente</label>
                                                 </div>
                                             </li>
@@ -378,7 +409,7 @@ const FullCalendar = () => {
                                         <input
                                             type="text"
                                             className="relative m-0 -mr-0.5 block w-full flex-auto rounded border border-solid border-neutral-300 bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary focus:text-neutral-700 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none"
-                                            name="evento"
+                                            name="descricao"
                                             id="recipient-name"
                                             placeholder="Evento"
                                             onChange={updateField} />
@@ -391,7 +422,7 @@ const FullCalendar = () => {
                                             onChange={(e) => {
                                                 updateField({
                                                     target: {
-                                                        name: 'dentista',
+                                                        name: 'id_profissional',
                                                         value: e.value
                                                     }
                                                 })
@@ -408,9 +439,9 @@ const FullCalendar = () => {
                                                 type="text"
                                                 class="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear"
                                                 id="form1"
-                                                value={dataHora.inicio}
-                                                name="dataInicio"
-                                                onChange={setDataHora}
+                                                value={agendamento.start_date_time}
+                                                name="start_date_time"
+                                                onChange={updateField}
                                             />
                                             <label
                                                 for="form1"
@@ -427,8 +458,9 @@ const FullCalendar = () => {
                                                 type="text"
                                                 class="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear"
                                                 id="form2"
-                                                value={dataHora.fim}
-                                                onChange={setDataHora}
+                                                name='end_date_time'
+                                                value={agendamento.end_date_time}
+                                                onChange={updateField}
                                             />
                                             <label
                                                 for="form2"
@@ -440,7 +472,7 @@ const FullCalendar = () => {
                                     </div>
                                     <div className="mb-3">
                                         <div className="flex items-center mb-4">
-                                            <input onChange={updateField} name="diaInteiro" id="default-checkbox" type="checkbox" value="" className="w-4 h-4 rounded" />
+                                            <input onChange={updateField} name="dia_inteiro" id="default-checkbox" type="checkbox" value="" className="w-4 h-4 rounded" />
                                             <label for="default-checkbox" className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Dia inteiro</label>
                                         </div>
                                     </div>
@@ -450,7 +482,7 @@ const FullCalendar = () => {
                                             id="message-text"
                                             placeholder="Observações"
                                             onChange={updateField}
-                                            name="observacoes"
+                                            name="obs"
                                         ></textarea>
                                     </div>
                                 </form>
@@ -472,79 +504,15 @@ const FullCalendar = () => {
                                     type="button"
                                     className="ml-1 inline-block rounded bg-purple-600 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_#3b71ca] transition duration-150 ease-in-out hover:bg-primary-600 hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:bg-primary-600 focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:outline-none focus:ring-0 active:bg-primary-700 active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] dark:shadow-[0_4px_9px_-4px_rgba(59,113,202,0.5)] dark:hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)]"
                                     data-te-ripple-init
-                                    data-te-ripple-color="light">
+                                    data-te-ripple-color="light"
+                                    onClick={sendAgendaData}
+                                >
                                     Salvar Agendamento
                                 </button>
                             </div>
                         </div>
                     </div>
-                </div>
-            }
-
-
-            {/* <div
-                data-te-modal-init
-                data-te-backdrop="false"
-                className="static left-0 top-0 z-[1055] block h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-                id="exampleModalComponents"
-                tabindex="-1"
-                aria-labelledby="exampleModalComponentsLabel"
-                aria-hidden="true">
-                <div
-                    data-te-modal-dialog-ref
-                    className="pointer-events-none relative w-auto opacity-100 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:my-7 min-[576px]:max-w-[500px]">
-                    <div
-                        className="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none dark:bg-neutral-600">
-                        <div
-                            className="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
-                            <h5
-                                className="text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200"
-                                id="exampleModalComponentsLabel">
-                                Modal title
-                            </h5>
-                            <button
-                                type="button"
-                                className="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
-                                data-te-modal-dismiss
-                                aria-label="Close">
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke-width="1.5"
-                                    stroke="currentColor"
-                                    className="h-6 w-6">
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
-                        </div>
-                        <div className="relative flex-auto p-4" data-te-modal-body-ref>
-                            Modal body text goes here.
-                        </div>
-                        <div
-                            className="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
-                            <button
-                                type="button"
-                                className="inline-block rounded bg-primary-100 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-primary-700 transition duration-150 ease-in-out hover:bg-primary-accent-100 focus:bg-primary-accent-100 focus:outline-none focus:ring-0 active:bg-primary-accent-200"
-                                data-te-modal-dismiss
-                                data-te-ripple-init
-                                data-te-ripple-color="light">
-                                Close
-                            </button>
-                            <button
-                                type="button"
-                                className="ml-1 inline-block rounded bg-primary px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_#3b71ca] transition duration-150 ease-in-out hover:bg-primary-600 hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:bg-primary-600 focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:outline-none focus:ring-0 active:bg-primary-700 active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] dark:shadow-[0_4px_9px_-4px_rgba(59,113,202,0.5)] dark:hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)]"
-                                data-te-ripple-init
-                                data-te-ripple-color="light">
-                                Save changes
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div> */}
+                </div>}
         </>
     );
 };

@@ -43,7 +43,7 @@ import { jwtVerify } from "jose"
 
 export async function middleware(request) {
     // console.log('TESE TESTE TESTE')
-    const jwt = request.cookies.get("jwt")
+    // const jwt = request.cookies.get("user").token
     const SECRET_KEY = 'your-secret-key-here'
 
     // if (request.nextUrl.pathname !== "/login" && !currentUser) {
@@ -60,11 +60,11 @@ export async function middleware(request) {
 
     if (
         protectedRoutes.includes(request.nextUrl.pathname) &&
-        (!request.cookies.has('jwt'))
+        (!request.cookies.has('user'))
         // /*|| Date.now() > payload.expe*/)
     ) {
         // console.log('mmmmm', request.cookies.get('jwt'))
-        request.cookies.delete("jwt")
+        request.cookies.delete("user")
         return NextResponse.rewrite(new URL("/login", request.url))
         // return NextResponse.rewrite(new URL('/login', request.url))
         // request.cookies.delete("jwt")

@@ -1,6 +1,6 @@
 import React, { useEffect } from "react"
 import { FiSettings, FiHelpCircle, FiPhone } from "react-icons/fi"
-import UseAuth from "../auth/useAuth";
+// import UseAuth from "../auth/useAuth";
 import { useRouter } from 'next/navigation'
 
 const Header = () => {
@@ -31,7 +31,7 @@ const Header = () => {
                 <span
                     className="cursor-pointer hover:underline"
                     onClick={() => {
-                        UseAuth.logout()
+                        // UseAuth.logout()
                         router.push("/login")
                     }}
                 >

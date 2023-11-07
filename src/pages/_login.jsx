@@ -1,22 +1,21 @@
 import React, { useState } from "react"
 // import UseAuth from "../auth/useAuth"
-import { useAuth } from "../auth/useAuth"
+import UseAuth from "../auth/_UseAuth"
 import { useRouter } from 'next/navigation'
 
 const login = () => {
-    const [usuario, setUsuario] = useState("")
+    const [user, setUser] = useState("")
     const [passwd, setPasswd] = useState("")
     const router = new useRouter()
-    const { user, login, logout } = useAuth()
 
     const access = async () => {
-        const authorized = await login({ usuario, passwd })
-       
+
+        const authorized = await UseAuth.login({ user, passwd })
         if (!authorized) {
             alert(`Erro na autenticação`)
             return
         }
-        console.log("user>> ", JSON.parse(user).token)
+
         router.push("/")
     }
 
@@ -27,7 +26,7 @@ const login = () => {
                     <label className="block text-gray-700 text-sm font-bold mb-2">
                         Usuário
                     </label>
-                    <input onChange={() => setUsuario(event.target.value)} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="username" type="text" placeholder="Username" />
+                    <input onChange={() => setUser(event.target.value)} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="username" type="text" placeholder="Username" />
                 </div>
                 <div className="mb-6">
                     <label className="block text-gray-700 text-sm font-bold mb-2">

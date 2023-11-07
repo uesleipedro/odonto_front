@@ -1,20 +1,55 @@
+import React, { createContext, useState, useContext, useEffect } from 'react'
 import api from "../utils/Api"
-import Cookie from 'js-cookie'
+import Cookies from 'js-cookie'
 
-export default class UseAuth {
-    static async login({ user, passwd }) {
-        if (typeof user !== "string" || typeof passwd !== "string") {
+const authContextDefaultValues = {
+    user: null,
+    login: () => { },
+    logout: () => { },
+}
+
+const AuthContext = createContext(authContextDefaultValues);
+
+export function useAuth() {
+    return useContext(AuthContext);
+}
+
+export function AuthProvider({ children }) {
+
+    useEffect(() => {
+        async function loadUserFromCookies() {
+            const data = Cookies.get('user')
+            const token = 'asdf'
+            if (data) {
+                // console.log("Got a token in the cookies, let's see if it is valid")
+                api.defaults.headers.Authorization = `Bearer ${token}`
+                // const { data: user } = await api.get('user/me')
+                if (data) setUser(JSON.parse(data));
+            }
+            setUser(data)
+        }
+        loadUserFromCookies()
+    }, [])
+
+    const [user, setUser] = useState(true);
+
+    const login = async ({ usuario, passwd }) => {
+        if (typeof usuario !== "string" || typeof passwd !== "string") {
             alert(`preencha os campos corretamente`)
             return
         }
 
-        const response = await api.post('user/login', { email: user, senha: passwd })
-            .then((response) => {
+        const response = await api.post('user/login', { email: usuario, senha: passwd })
+            .then(async (response) => {
                 if (response.status === 201) {
-                    Cookie.set("jwt", response.data.token)
-
+                    // api.defaults.headers.Authorization = `Bearer ${token}`
+                    console.log('response  ', response.data)
+                    Cookies.set("user", JSON.stringify(response.data))
+                    setUser(response.data)
                     return true
                 } else if (response.status === 500) {
+                    Cookies.remove("user")
+                    setUser(null)
                     return false
                 }
 
@@ -24,10 +59,23 @@ export default class UseAuth {
                 return false
             })
         return response
-    }
+    };
 
-    static async logout() {
-        Cookie.remove("jwt")
-    }
+    const logout = () => {
+        setUser(false);
+    };
 
+    const value = {
+        user,
+        login,
+        logout,
+    };
+
+    return (
+        <>
+            <AuthContext.Provider value={value}>
+                {children}
+            </AuthContext.Provider>
+        </>
+    );
 }
