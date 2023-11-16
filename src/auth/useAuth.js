@@ -15,23 +15,24 @@ export function useAuth() {
 }
 
 export function AuthProvider({ children }) {
+    const [user, setUser] = useState(null)
 
     useEffect(() => {
         async function loadUserFromCookies() {
             const data = Cookies.get('user')
-            const token = 'asdf'
+            // const token = JSON.parse(data)?.token || ''
+            const token = 'asdf' 
             if (data) {
                 // console.log("Got a token in the cookies, let's see if it is valid")
                 api.defaults.headers.Authorization = `Bearer ${token}`
                 // const { data: user } = await api.get('user/me')
-                if (data) setUser(JSON.parse(data));
+                if (data) setUser(JSON.parse(data))
             }
-            setUser(data)
+            // setUser(data)
         }
         loadUserFromCookies()
     }, [])
 
-    const [user, setUser] = useState(true);
 
     const login = async ({ usuario, passwd }) => {
         if (typeof usuario !== "string" || typeof passwd !== "string") {
@@ -44,6 +45,7 @@ export function AuthProvider({ children }) {
                 if (response.status === 201) {
                     // api.defaults.headers.Authorization = `Bearer ${token}`
                     console.log('response  ', response.data)
+                    api.defaults.headers.Authorization = `Bearer ${JSON.stringify(response.data).token}`
                     Cookies.set("user", JSON.stringify(response.data))
                     setUser(response.data)
                     return true
@@ -62,7 +64,8 @@ export function AuthProvider({ children }) {
     };
 
     const logout = () => {
-        setUser(false);
+        setUser(null)
+        Cookies.remove("user")
     };
 
     const value = {

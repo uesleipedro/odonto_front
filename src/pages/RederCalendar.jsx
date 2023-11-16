@@ -1,24 +1,18 @@
-import React, { useRef, useEffect, useState } from 'react';
-import { Calendar } from '@fullcalendar/core';
-import ptBr from '@fullcalendar/core/locales/pt-br';
+import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import Swal from 'sweetalert2'
-import api from '../utils/Api';
-import Cookies from "js-cookie"
-import ModalCadastroCliente from './ModalCadastroCliente';
-import Select from 'react-select'
+import ptBr from '@fullcalendar/core/locales/pt-br';
 import moment from 'moment'
+import { useEffect, useState } from 'react';
+import Select from 'react-select'
+import api from '../utils/Api';
 
-const FullCalendar = () => {
-
-    const calendarRef = useRef(null);
-    const [paciente, setPaciente] = useState([])
-    const [token, setToken] = useState(Cookies.get("token"))
+const RenderCalendar = () => {
+    const [events, setEvents] = useState([])
     const [modal, setModal] = useState(false)
     const [options, setOptions] = useState([])
-    const [agenda, setAgenda] = useState([])
+    const [paciente, setPaciente] = useState([])
     const [agendamento, setAgendamento] =
         useState({
             id_empresa: 1,
@@ -26,13 +20,68 @@ const FullCalendar = () => {
             dia_inteiro: false
         })
 
-    const authHeader = () => {
-        return {
-            headers: {
-                Authorization: "Bearer " + token,
-            },
-        };
-    };
+    useEffect(() => {
+        let testet = []
+        paciente.map(x => {
+            // return x.nome
+            testet.push({ value: x.id_paciente, label: x.nome })
+        })
+        setOptions([...testet])
+        console.log(testet)
+    }, [paciente])
+
+    useEffect(() => {
+        const getEvents = async () => {
+            await api.get('agenda')
+                .then(response => {
+
+                    //  setEvents([...events, ...response.data])
+                    setEvents([events, ...response.data,])
+                })
+                .catch(function (error) {
+                    console.error(error);
+                })
+        }
+
+        setTimeout(() => { getEvents() }, 200)
+    }, [])
+
+    // useEffect(async () => {
+    //     console.log('state', events)
+
+    // })
+    const handleSelect = (info) => {
+        // const { start, end } = info;
+        // const eventNamePrompt = prompt("Enter, event name");
+        // if (eventNamePrompt) {
+        //     setEvents([
+        //         ...events,
+        //         {
+        //             start,
+        //             end,
+        //             title: eventNamePrompt,
+        //             id: 1,
+        //         },
+        //     ]);
+        // }
+
+        // setDataHora({ inicio: moment(info.startStr).format('DD MM YYYY, h:mm:ss a'), fim: moment(info.endStr).format('DD MM YYYY, h:mm:ss a') })
+        updateField({
+            target: {
+                name: 'start_date_time',
+                value: moment(info.startStr).format('DD MM YYYY, h:mm:ss a')
+            }
+        })
+        updateField({
+            target: {
+                name: 'end_date_time',
+                value: moment(info.endStr).format('DD MM YYYY, h:mm:ss a')
+            }
+        })
+        setModal(true)
+        handleGetPacientList()
+        info.jsEvent
+    }
 
     const updateField = e => {
 
@@ -74,43 +123,6 @@ const FullCalendar = () => {
     }
 
 
-    // useEffect(() => {
-    const getAgenda = async () => {
-        console.log('iniciou ------------')
-        await api.get('agenda')
-            .then(response => {
-                //setAgenda([...agenda, ...response.data])
-
-
-                let temp = response.data.map((e) => {
-                    console.log('-----', moment(e.start_date_time).format('YYYY-MM-DDThh:mm:ss'))
-                    return ({
-                        title: e.descricao,
-                        start: moment(e.start_date_time).format('YYYY-MM-DDThh:mm:ss'),
-                        end: moment(e.end_date_time).format('YYYY-MM-DDThh:mm:ss'),
-                        allDay: false
-                    })
-                })
-                setAgenda(temp)
-                // return temp
-            })
-            .catch(function (error) {
-                console.error(error);
-            })
-    }
-    //     getAgenda()
-    // }, []);
-
-    useEffect(() => {
-        let testet = []
-        paciente.map(x => {
-            // return x.nome
-            testet.push({ value: x.id_paciente, label: x.nome })
-        })
-        setOptions([...testet])
-        console.log(testet)
-    }, [paciente])
-
     const handleGetPacientList = async () => {
         await api.get('paciente')
             .then(response => {
@@ -131,182 +143,37 @@ const FullCalendar = () => {
             })
     }
 
-    useEffect(() => {
-
-        const init = async () => {
-            const {
-                Modal,
-                Ripple,
-                Datepicker,
-                Input,
-                Datetimepicker,
-                initTE
-            } = await import("tw-elements");
-            initTE({
-                Modal,
-                Ripple,
-                Datepicker,
-                Input,
-                Datetimepicker
-            });
-        };
-        init();
-
-        const calendar = new Calendar(calendarRef.current, {
-            locales: [ptBr],
-            locale: 'pt-br',
-            plugins: [dayGridPlugin, interactionPlugin, timeGridPlugin],
-            initialView: 'timeGridWeek',
-            selectable: true,
-            headerToolbar: {
-                left: "prev,next,today",
-                center: "title",
-                right: "dayGridMonth,timeGridWeek,timeGridDay"
-            },
-            navLinks: true, // can click day/week names to navigate views
-            selectable: true,
-            selectMirror: true,
-            editable: true,
-            dayMaxEvents: true,
-
-            events: getAgenda(),
-
-            // dateClick: function (info) {
-            //     alert('Clicked on: ' + info.dateStr);
-            //     alert('Coordinates: ' + info.jsEvent.pageX + ',' + info.jsEvent.pageY);
-            //     alert('Current view: ' + info.view.type);
-            //     // change the day's background color just for fun
-            //     info.dayEl.style.backgroundColor = 'red';
-
-
-            // },
-
-            // //Create new event
-            select: async function (info) {
-                // setDataHora({ inicio: moment(info.startStr).format('DD MM YYYY, h:mm:ss a'), fim: moment(info.endStr).format('DD MM YYYY, h:mm:ss a') })
-                updateField({
-                    target: {
-                        name: 'start_date_time',
-                        value: moment(info.startStr).format('DD MM YYYY, h:mm:ss a')
-                    }
-                })
-                updateField({
-                    target: {
-                        name: 'end_date_time',
-                        value: moment(info.endStr).format('DD MM YYYY, h:mm:ss a')
-                    }
-                })
-                setModal(true)
-                handleGetPacientList()
-                info.jsEvent
-            },
-
-            // // Delete event
-            // eventClick: async function (arg) {
-
-            //     const { value: formValues } = await Swal.fire({
-            //         title: 'Multiple inputs',
-            //         html:
-            //             '<input id="swal-input1" className="swal2-input">' +
-            //             '<input id="swal-input2" className="swal2-input">',
-            //         focusConfirm: false,
-            //         preConfirm: () => {
-            //             return [
-            //                 document.getElementById('swal-input1').value,
-            //                 document.getElementById('swal-input2').value
-            //             ]
-            //         }
-            //     })
-
-            //     if (formValues) {
-            //         Swal.fire(JSON.stringify(formValues))
-            //     }
-
-            //     // Swal.fire({
-            //     //     text: "Are you sure you want to delete this event?",
-            //     //     icon: "warning",
-            //     //     showCancelButton: true,
-            //     //     buttonsStyling: false,
-            //     //     confirmButtonText: "Yes, delete it!",
-            //     //     cancelButtonText: "No, return",
-            //     //     customClass: {
-            //     //         confirmButton: "btn btn-primary",
-            //     //         cancelButton: "btn btn-active-light"
-            //     //     }
-            //     // }).then(function (result) {
-            //     //     if (result.value) {
-            //     //         arg.event.remove()
-            //     //     } else if (result.dismiss === "cancel") {
-            //     //         Swal.fire({
-            //     //             text: "Event was not deleted!.",
-            //     //             icon: "error",
-            //     //             buttonsStyling: false,
-            //     //             confirmButtonText: "Ok, got it!",
-            //     //             customClass: {
-            //     //                 confirmButton: "btn btn-primary",
-            //     //             }
-            //     //         });
-            //     //     }
-            //     // });
-            // },
-
-            // events: [
-
-            //     //     //     //     // agenda.map(a => {
-            //     //     //     //     //     return ({
-            //     //     //     //     //         title: a.descricao,
-            //     //     //     //     //         start: moment(a.start_date_time).format('YYYY-MM-DDTh:mm:ss'),
-            //     //     //     //     //         end: moment(a.end_date_time).format('YYYY-MM-DDTh:mm:ss'),
-            //     //     //     //     //     })
-            //     //     //     //     // })
-            //     {
-            //         title: 'My Event',
-            //         start: '2023-11-16T07:30:00',
-            //         end: '2023-11-16T07:30:00',
-            //         allDay: false
-            //     }
-            //     //     //     // // other events here...
-            // ],
-            // events: (function () {
-            //     let dataFormFullCalendar = agenda.map(a => {
-            //         return {
-            //             // title: a.descricao,
-            //             // start: moment(a.start_date_time).format('YYYY-MM-DDTh:mm:ss'),
-            //             // end: moment(a.end_date_time).format('YYYY-MM-DDTh:mm:ss'),
-            //             title: 'My Event',
-            //             start: '2023-11-05T07:30:00',
-            //             end: '2023-11-05T07:30:00',
-            //             allDay: false
-            //         }
-            //     })
-
-            //     return dataFormFullCalendar
-            // }),
-            eventTimeFormat: { // like '14:30:00'
-                hour: '2-digit',
-                minute: '2-digit',
-                // second: '0-digit',
-                meridiem: false
-            }
-        });
-
-        agenda.map((e) => {
-            console.log('start', e.start)
-            calendar.addEvent({
-                title: e.title,
-                start: new Date(e.start),
-                end: new Date(e.end),
-                allDay: false
-            });
-        })
-
-        calendar.render();
-
-    }, [paciente]);
 
     return (
         <>
-            <div ref={calendarRef}></div>
+            <FullCalendar
+                locales={[ptBr]}
+                locale="pt-br"
+                plugins={[dayGridPlugin, interactionPlugin, timeGridPlugin]}
+                initialView="timeGridWeek"
+                headerToolbar={{
+                    left: "prev,next,today",
+                    center: "title",
+                    right: "dayGridMonth,timeGridWeek,timeGridDay"
+                }
+                }
+                selectable
+                editable
+                events={events}
+                select={handleSelect}
+            // events={agenda
+            //     // [
+            //     //     {
+            //     //         title: 'My Event',
+            //     //         start: '2023-11-16T07:30:00',
+            //     //         end: '2023-11-16T07:30:00',
+            //     //         allDay: false
+            //     //     },
+            //     //     { title: 'event 2', date: '2019-04-02' }
+            //     // ]
+            // }
+            />
+
             {modal &&
                 <div
                     data-te-modal-init
@@ -499,7 +366,8 @@ const FullCalendar = () => {
                     </div>
                 </div>}
         </>
-    );
-};
+    )
 
-export default FullCalendar;
+}
+
+export default RenderCalendar

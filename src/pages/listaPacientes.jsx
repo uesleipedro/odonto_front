@@ -9,6 +9,7 @@ import withReactContent from 'sweetalert2-react-content'
 import api from "../utils/Api"
 import BasicModal from "../components/BasicModal"
 import Cookies from "js-cookie"
+import { useAuth } from "../auth/useAuth"
 
 // const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub21lIjoiRGFydGhWYWRlciIsImlhdCI6MTY5NjU5ODI2MCwiZXhwIjoxNjk2NzcxMDYwfQ.GakWs7gLYzD1iAnIIS8p9Wu26i1aVi7PZAehATyzEuQ"
 const token = Cookies.get("jwt")
@@ -21,14 +22,16 @@ const ListaPacientes = () => {
     const [idToDelete, setIdToDelete] = useState(0)
     const router = useRouter()
 
-    const authHeader = () => {
-        //const token = getTokenFromCookies();
-        return {
-            headers: {
-                Authorization: "Bearer " + Cookies.get("jwt"),
-            },
-        };
-    };
+    const { user } = useAuth()
+
+    // const authHeader = () => {
+    //     //const token = getTokenFromCookies();
+    //     return {
+    //         headers: {
+    //             Authorization: "Bearer " + Cookies.get("jwt"),
+    //         },
+    //     };
+    // };
 
     useEffect(() => {
         const init = async () => {
@@ -41,8 +44,7 @@ const ListaPacientes = () => {
 
     useEffect(() => {
         const getPacientList = async () => {
-            await api.get('paciente', authHeader()
-            )
+            await api.get('paciente')
                 .then(response => {
                     setPaciente([...paciente, ...response.data])
                 })

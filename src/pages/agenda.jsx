@@ -1,9 +1,9 @@
-import FullCalendar from '../components/FullCalendar';
+import RenderCalendar from './RederCalendar';
 
 const agenda = () => {
   return (
     <div>
-      <FullCalendar />
+      <RenderCalendar />
     </div>
   );
 };

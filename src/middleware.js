@@ -40,12 +40,14 @@
 import { NextResponse } from 'next/server'
 import { authRoutes, protectedRoutes } from './router/routes'
 import { jwtVerify } from "jose"
+import Cookies from 'js-cookie'
 
 export async function middleware(request) {
-    // console.log('TESE TESTE TESTE')
-    // const jwt = request.cookies.get("user").token
-    const SECRET_KEY = 'your-secret-key-here'
 
+    // const token = request.cookies.get("user")?.token
+
+    const SECRET_KEY = 'your-secret-key-here'
+    // console.log('////////////////', user)
     // if (request.nextUrl.pathname !== "/login" && !currentUser) {
     //     return NextResponse.redirect(new URL("/login", request.url))
     // }

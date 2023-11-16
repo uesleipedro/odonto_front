@@ -2,9 +2,11 @@ import React, { useEffect } from "react"
 import { FiSettings, FiHelpCircle, FiPhone } from "react-icons/fi"
 // import UseAuth from "../auth/useAuth";
 import { useRouter } from 'next/navigation'
+import { useAuth } from "../auth/useAuth"
 
 const Header = () => {
     const router = new useRouter()
+    const { logout, user } = useAuth()
 
     useEffect(() => {
         const init = async () => {
@@ -25,20 +27,20 @@ const Header = () => {
         <div className='flex items-center justify-between px-4 pt-4 pb-4 font-bold text-gray-600 text-white bg-purple-800 rounded-lg m-1'>
             <h2 className="text-3xl">OdonTIC</h2>
             <div className="flex gap-4 items-center text-lg text-white">
+                <h2>Bem-vindo, {user?.user?.foundUser?.nome}</h2>
                 <FiPhone className="cursor-pointer" />
                 <FiHelpCircle className="cursor-pointer" />
                 <FiSettings className="cursor-pointer" />
                 <span
                     className="cursor-pointer hover:underline"
                     onClick={() => {
-                        // UseAuth.logout()
+                        logout()
                         router.push("/login")
                     }}
                 >
                     Sair
                 </span>
                 {/* <DropMenu /> */}
-                {/* <h2>Bem-vindo, José Carlos</h2> */}
             </div>
         </div>
     )
