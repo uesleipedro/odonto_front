@@ -7,6 +7,7 @@ import moment from 'moment'
 import { useEffect, useState } from 'react';
 import Select from 'react-select'
 import api from '../utils/Api';
+import { useRouter } from "next/navigation"
 
 const RenderCalendar = () => {
     const [events, setEvents] = useState([])
@@ -19,6 +20,8 @@ const RenderCalendar = () => {
             status: 3,
             dia_inteiro: false
         })
+
+    const router = useRouter()
 
     useEffect(() => {
         let testet = []
@@ -115,6 +118,7 @@ const RenderCalendar = () => {
                 if (response.status === 201) {
                     alert("Salvo com sucesso")
                     setModal(false)
+                    router.refresh()
                 }
             })
             .catch(e => {
