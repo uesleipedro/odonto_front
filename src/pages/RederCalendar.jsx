@@ -46,7 +46,7 @@ const RenderCalendar = () => {
                 })
         }
 
-        setTimeout(() => { getEvents() }, 200)
+        setTimeout(() => { getEvents() }, 500)
     }, [])
 
     // useEffect(async () => {
