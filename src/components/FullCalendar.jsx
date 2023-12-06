@@ -4,10 +4,8 @@ import ptBr from '@fullcalendar/core/locales/pt-br';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import Swal from 'sweetalert2'
 import api from '../utils/Api';
 import Cookies from "js-cookie"
-import ModalCadastroCliente from './ModalCadastroCliente';
 import Select from 'react-select'
 import moment from 'moment'
 
@@ -83,7 +81,6 @@ const FullCalendar = () => {
 
 
                 let temp = response.data.map((e) => {
-                    console.log('-----', moment(e.start_date_time).format('YYYY-MM-DDThh:mm:ss'))
                     return ({
                         title: e.descricao,
                         start: moment(e.start_date_time).format('YYYY-MM-DDThh:mm:ss'),
@@ -183,7 +180,6 @@ const FullCalendar = () => {
 
             // //Create new event
             select: async function (info) {
-                // setDataHora({ inicio: moment(info.startStr).format('DD MM YYYY, h:mm:ss a'), fim: moment(info.endStr).format('DD MM YYYY, h:mm:ss a') })
                 updateField({
                     target: {
                         name: 'start_date_time',
