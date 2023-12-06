@@ -20,10 +20,10 @@ const token = Cookies.get("jwt")
 const ListaProcedimento = () => {
 
     const [procedimento, setProcedimento] = useState([])
+    const [procedimentoList, setProcedimentoList] = useState([])
     const [searchVal, setSearchVal] = useState('')
     const [idToDelete, setIdToDelete] = useState(0)
     const [modal, setModal] = useState(false)
-    const [procedimentoToSend, setProcedimentoToSend] = useState(false)
     const [post, setPost] = useState({
         face_dente: '',
         estado: 'A realizar',
@@ -77,6 +77,15 @@ const ListaProcedimento = () => {
                 .then(response => {
                     console.log('procedimento ', response.data)
                     setProcedimento([...procedimento, ...response.data])
+                })
+                .catch(function (error) {
+                    console.error(error);
+                })
+
+            await api.get('procedimento_list')
+                .then(response => {
+                    console.log('procedimento_list ', response.data)
+                    setProcedimentoList([...procedimentoList, ...response.data])
                 })
                 .catch(function (error) {
                     console.error(error);
@@ -175,7 +184,7 @@ const ListaProcedimento = () => {
 
 
     return (
-        <div className="m-5 p-5  rounded-lg shadow-lg">
+        <div className=" p-5  rounded-lg shadow-lg">
             <div className="mb-5 flex flex-row flex-wrap w-full justify-between items-center">
                 {/* <input type="text" onChange={e => setSearchVal(e.target.value)} className="form-input mr-4 rounded-lg text-gray-600" placeholder="Buscar paciente" /> */}
                 {/* <Link href="/cadastroPacientes"> */}
@@ -205,7 +214,7 @@ const ListaProcedimento = () => {
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{moment(data.adicionado).format('DD/MM/YYYY')}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.dente}{data.face_dente}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.estado}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.id_procedimento}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.procedimento}</td>
                                             <td className="flex flex-row gap-3 px-6 py-4 whitespace-nowrap text-right text-md font-medium">
                                                 <a className="text-purple-800 hover:text-purple-900" href="#"
                                                     onClick={() => showSwalWithLink(data.id_procedimento)}
@@ -271,29 +280,20 @@ const ListaProcedimento = () => {
                             </div>
                             <div className="relative flex-auto p-4" data-te-modal-body-ref>
                                 <form>
-                                    {/* <div className="mb-3">
+                                    <div className="mb-3">
                                         <Select
-                                            name="paciente"
-                                            options={options}
-                                            placeholder="Paciente"
+                                            name="id_procedimento"
+                                            options={procedimentoList}
+                                            placeholder="Procedimento"
                                             onChange={(e) => {
                                                 updateField({
                                                     target: {
-                                                        name: 'id_paciente',
+                                                        name: 'id_procedimento',
                                                         value: e.value
                                                     }
                                                 })
                                             }}
                                         />
-                                    </div> */}
-                                    <div className="mb-3">
-                                        <input
-                                            type="text"
-                                            className="relative m-0 -mr-0.5 block w-full flex-auto rounded border border-solid border-neutral-300 bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary focus:text-neutral-700 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none"
-                                            name="procedimento"
-                                            id="recipient-name"
-                                            placeholder="Procedimento"
-                                            onChange={updateField} />
                                     </div>
 
                                     <div className="mb-3">
@@ -316,8 +316,13 @@ const ListaProcedimento = () => {
                                         <h3 className="text-sm font-medium text-gray-900 dark:text-gray-300">Faces do dente</h3>
                                         <div className="flex flex-row items-center mb-4 gap-5">
                                             <div className="flex items-center gap-1 ">
-                                                <label for="default-checkbox" className="ml-2 text-sm font-medium text-gray-900 text-bold dark:text-gray-300">C</label>
-                                                <input onChange={updateField} name="face_dente" id="default-checkbox" type="checkbox" value="C" className="w-4 h-4 rounded" />
+                                                <label for="default-checkbox" className="ml-2 text-sm font-medium text-gray-900 text-bold dark:text-gray-300">M</label>
+                                                <input onChange={updateField} name="face_dente" id="default-checkbox" type="checkbox" value="M" className="w-4 h-4 rounded" />
+                                            </div>
+
+                                            <div className="flex items-center gap-1 ">
+                                                <label for="default-checkbox" className="ml-2 text-sm font-medium text-gray-900 text-bold dark:text-gray-300">O/I</label>
+                                                <input onChange={updateField} name="face_dente" id="default-checkbox" type="checkbox" value="O/I" className="w-4 h-4 rounded" />
                                             </div>
 
                                             <div className="flex items-center gap-1 ">
@@ -326,8 +331,18 @@ const ListaProcedimento = () => {
                                             </div>
 
                                             <div className="flex items-center gap-1 ">
-                                                <label for="default-checkbox" className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">I</label>
-                                                <input onChange={updateField} name="face_dente" id="default-checkbox" type="checkbox" value="I" className="w-4 h-4 rounded" />
+                                                <label for="default-checkbox" className="ml-2 text-sm font-medium text-gray-900 text-bold dark:text-gray-300">V</label>
+                                                <input onChange={updateField} name="face_dente" id="default-checkbox" type="checkbox" value="V" className="w-4 h-4 rounded" />
+                                            </div>
+
+                                            <div className="flex items-center gap-1 ">
+                                                <label for="default-checkbox" className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">L/P</label>
+                                                <input onChange={updateField} name="face_dente" id="default-checkbox" type="checkbox" value="L/P" className="w-4 h-4 rounded" />
+                                            </div>
+
+                                            <div className="flex items-center gap-1 ">
+                                                <label for="default-checkbox" className="ml-2 text-sm font-medium text-gray-900 text-bold dark:text-gray-300">T</label>
+                                                <input onChange={updateField} name="face_dente" id="default-checkbox" type="checkbox" value="T" className="w-4 h-4 rounded" />
                                             </div>
                                         </div>
                                     </div>

@@ -10,7 +10,7 @@ const Sidebar = ({ children }) => {
 					<Menu />
 				</div>
 			</div>
-			<main className="ml-20 w-full">{children}</main>
+			<main className="ml-2 mr-2 w-full">{children}</main>
 		</div>
 	)
 }
