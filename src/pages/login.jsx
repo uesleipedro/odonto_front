@@ -24,9 +24,14 @@ const login = () => {
         <div className="w-full h-screen justify-items-center items-center flex">
             <div className="w-1/2 items-center justify-center flex ">
                 <form className="w-2/3 h-full">
-                    <div className="flex items-center justify-center">
-                        <p className="inline-block align-baseline font-bold text-5xl text-purple-500">
+                    <div className="flex mb-10">
+                        <p className="inline-block align-baseline font-bold text-3xl text-purple-500">
                             Odonto
+                        </p>
+                    </div>
+                    <div className="flex items-center justify-center">
+                        <p className="inline-block align-baseline text-lg text-grey-100">
+                            Olá novamente!
                         </p>
                     </div>
                     <div className="mb-4">
@@ -43,7 +48,7 @@ const login = () => {
                         <p className="text-red-500 text-xs italic">Please choose a password.</p>
                     </div>
                     <div className="flex items-center justify-between">
-                        <button onClick={() => access()} className="bg-purple-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+                        <button onClick={() => access()} className="bg-purple-600 hover:bg-purple-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                             Entrar
                         </button>
                     </div>

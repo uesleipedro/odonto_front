@@ -33,6 +33,19 @@ const RenderCalendar = () => {
   }, [paciente]);
 
   useEffect(() => {
+    const init = async () => {
+      const { Modal, Ripple, Datepicker, Input, Datetimepicker, initTE } =
+        await import("tw-elements");
+      initTE({
+        Modal,
+        Ripple,
+        Datepicker,
+        Input,
+        Datetimepicker,
+      });
+    };
+    init();
+
     const getEvents = async () => {
       await api
         .get("agenda")
