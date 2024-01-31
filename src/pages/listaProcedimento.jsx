@@ -10,6 +10,7 @@ import api from "../utils/Api"
 import BasicModal from "../components/BasicModal"
 import Cookies from "js-cookie"
 import { useAuth } from "../auth/useAuth"
+import { moneyMask } from "../utils/mask"
 import moment from 'moment'
 import Select from 'react-select'
 
@@ -23,22 +24,16 @@ const ListaProcedimento = () => {
     const [procedimentoList, setProcedimentoList] = useState([])
     const [searchVal, setSearchVal] = useState('')
     const [idToDelete, setIdToDelete] = useState(0)
+    const [facesDente, setFacesDente] = useState([])
+    const [toggleInsertUpdate, setToggleInsertUpdate] = useState('insert')
+    const [preco, setPreco] = useState("0")
     const [modal, setModal] = useState(false)
     const [post, setPost] = useState({
         face_dente: '',
         estado: 'A realizar',
         adicionado: moment(Date()).format('YYYY-MM-DD')
     })
-    const [options, setOptions] = useState([
-        {
-            value: 11,
-            label: 11
-        },
-        {
-            value: 12,
-            label: 12
-        }
-    ])
+    const [options, setOptions] = useState([])
     const [profissional, setProfissional] = useState([
         {
             value: 1,
@@ -90,10 +85,49 @@ const ListaProcedimento = () => {
                 .catch(function (error) {
                     console.error(error);
                 })
+
         }
+
+        const getDentes = async () => {
+            await api.get('dentes')
+                .then(response => {
+                    console.log('dentes ', response.data)
+                    setOptions([...options, ...response.data])
+                })
+                .catch(function (error) {
+                    console.error(error);
+                })
+        }
+
         getProcedimentoList()
+        getDentes();
     }, []);
 
+    // const selectAction = (action) => {
+    //     if (action === 'insert')
+    //         sendProcedimentoData()
+    //     else if (action === 'update')
+    //         sendUpdateData()
+    // }
+
+    const getSetFacesDente = (dente) => {
+        api.get(`faceDente/${dente}`)
+            .then(response => {
+                console.log('response', response.data)
+                setFacesDente([...response.data])
+            })
+            .catch(function (error) {
+                console.error(error);
+            })
+
+        console.log('facesDente', facesDente)
+    }
+
+    const updateProcedimento = (id_procedimento) => {
+        let procedimentoFiltrado = procedimento.filter(dataItem => dataItem.id_procedimento === id_procedimento)
+        setPost(procedimentoFiltrado[0])
+        setModal(true)
+    }
 
     const updateField = e => {
 
@@ -118,6 +152,12 @@ const ListaProcedimento = () => {
             return
         }
 
+        if (e.target.name === "preco") {
+            setPost(existingValues => ({
+                ...existingValues,
+                ["preco"]: parseFloat(e.target.value),
+            }))
+        }
 
         const fieldName = e.target.name
         setPost(existingValues => ({
@@ -149,18 +189,39 @@ const ListaProcedimento = () => {
 
     const sendProcedimentoData = () => {
 
-        api.post('procedimento', post)
-            .then(function (response) {
-                if (response.status === 201) {
-                    alert("Salvo com sucesso")
-                    setModal(false)
-                }
-            })
-            .catch(e => {
-                alert(e)
-            })
+        switch (toggleInsertUpdate) {
+            case 'insert':
+                api.post('procedimento', post)
+                    .then(function (response) {
+                        if (response.status === 201) {
+                            alert("Salvo com sucesso")
+                        }
+                    })
+                    .catch(e => {
+                        alert(e)
+                    })
 
+            case 'update':
+                api.put('procedimento', post)
+                    .then(function (response) {
+                        if (response.status === 201) {
+                            alert("Salvo com sucesso")
+                        }
+                    })
+                    .catch(e => {
+                        alert(e)
+                    })
+        }
+        setModal(false)
         router.refresh()
+    }
+
+    const getLabelSelect = (arr, id) => {
+        if (!arr || !id) return
+
+        let a = arr.filter(dataItem => dataItem.value === id)
+        return a[0].label
+
     }
 
 
@@ -188,7 +249,15 @@ const ListaProcedimento = () => {
             <div className="mb-5 flex flex-row flex-wrap w-full justify-between items-center">
                 {/* <input type="text" onChange={e => setSearchVal(e.target.value)} className="form-input mr-4 rounded-lg text-gray-600" placeholder="Buscar paciente" /> */}
                 {/* <Link href="/cadastroPacientes"> */}
-                <button onClick={() => setModal(true)} className="bg-purple-800 hover:bg-purple-500 rounded-lg p-2 text-white font-bold">
+                <button onClick={() => {
+                    setPost({
+                        face_dente: '',
+                        estado: 'A realizar',
+                        adicionado: moment(Date()).format('YYYY-MM-DD')
+                    })
+                    setToggleInsertUpdate('insert')
+                    setModal(true)
+                }} className="bg-purple-800 hover:bg-purple-500 rounded-lg p-2 text-white font-bold">
                     Novo procedimento
                 </button>
                 {/* </Link> */}
@@ -210,8 +279,12 @@ const ListaProcedimento = () => {
                                 </thead>
                                 <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                                     {filteredData.map((data) => (
-                                        <tr key={data.id_procedimento}>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{moment(data.adicionado).format('DD/MM/YYYY')}</td>
+                                        <tr key={data.id_procedimento} className="cursor-pointer">
+                                            <td onClick={() => {
+                                                setToggleInsertUpdate('update')
+                                                updateProcedimento(data.id_procedimento)
+                                            }}
+                                                className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{moment(data.adicionado).format('DD/MM/YYYY')}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.dente}{data.face_dente}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.estado}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.procedimento}</td>
@@ -281,14 +354,16 @@ const ListaProcedimento = () => {
                             <div className="relative flex-auto p-4" data-te-modal-body-ref>
                                 <form>
                                     <div className="mb-3">
+                                        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Procedimento</h3>
                                         <Select
-                                            name="id_procedimento"
+                                            name="id_procedimento_list"
                                             options={procedimentoList}
                                             placeholder="Procedimento"
+                                            value={{ value: post.id_procedimento, label: getLabelSelect(procedimentoList, post.id_procedimento_list) }}
                                             onChange={(e) => {
                                                 updateField({
                                                     target: {
-                                                        name: 'id_procedimento',
+                                                        name: 'id_procedimento_list',
                                                         value: e.value
                                                     }
                                                 })
@@ -297,10 +372,12 @@ const ListaProcedimento = () => {
                                     </div>
 
                                     <div className="mb-3">
+                                        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Dente</h3>
                                         <Select
                                             options={options}
                                             placeholder="Dente"
                                             name="dente"
+                                            value={{ value: post.dente, label: post.dente }}
                                             onChange={(e) => {
                                                 updateField({
                                                     target: {
@@ -308,18 +385,23 @@ const ListaProcedimento = () => {
                                                         value: e.value
                                                     }
                                                 })
+                                                getSetFacesDente(e.value)
                                             }}
                                         />
                                     </div>
 
                                     <div className="mb-3 flex flex-row text-bold gap-2">
-                                        <h3 className="text-sm font-medium text-gray-900 dark:text-gray-300">Faces do dente</h3>
+                                        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Faces do dente</h3>
                                         <div className="flex flex-row items-center mb-4 gap-5">
-                                            <div className="flex items-center gap-1 ">
-                                                <label for="default-checkbox" className="ml-2 text-sm font-medium text-gray-900 text-bold dark:text-gray-300">M</label>
-                                                <input onChange={updateField} name="face_dente" id="default-checkbox" type="checkbox" value="M" className="w-4 h-4 rounded" />
-                                            </div>
 
+                                            {facesDente.map((data) => (
+                                                < div className="flex items-center gap-1 " >
+                                                    <label for="default-checkbox" className="ml-2 text-sm font-medium text-gray-900 text-bold dark:text-gray-300">{data.face}</label>
+                                                    <input onChange={updateField} name="face_dente" id="default-checkbox" type="checkbox" value={data.face} className="w-4 h-4 rounded" />
+                                                </div>
+                                            ))}
+
+                                            {/* 
                                             <div className="flex items-center gap-1 ">
                                                 <label for="default-checkbox" className="ml-2 text-sm font-medium text-gray-900 text-bold dark:text-gray-300">O/I</label>
                                                 <input onChange={updateField} name="face_dente" id="default-checkbox" type="checkbox" value="O/I" className="w-4 h-4 rounded" />
@@ -343,12 +425,12 @@ const ListaProcedimento = () => {
                                             <div className="flex items-center gap-1 ">
                                                 <label for="default-checkbox" className="ml-2 text-sm font-medium text-gray-900 text-bold dark:text-gray-300">T</label>
                                                 <input onChange={updateField} name="face_dente" id="default-checkbox" type="checkbox" value="T" className="w-4 h-4 rounded" />
-                                            </div>
+                                            </div> */}
                                         </div>
                                     </div>
 
                                     <div className="mb-3 flex flex-row items-center justify-center gap-2">
-                                        <h3 className="text-sm font-medium text-gray-900 dark:text-gray-300">Estado</h3>
+                                        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Estado</h3>
                                         <ul className="items-center w-full text-sm font-medium text-gray-900 bg-white  rounded-lg sm:flex"
                                             name="estado"
                                             onChange={updateField}
@@ -374,20 +456,23 @@ const ListaProcedimento = () => {
                                         </ul>
                                     </div>
                                     <div className="mb-3">
+                                        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Observação</h3>
                                         <textarea
                                             className="relative m-0 -mr-0.5 block w-full flex-auto rounded-l border border-solid border-neutral-300 bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary focus:text-neutral-700 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none dark:border-neutral-400 dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:focus:border-primary"
                                             id="message-text"
-                                            placeholder="Observações"
                                             onChange={updateField}
                                             name="observacao"
+                                            value={post.observacao}
                                         ></textarea>
                                     </div>
 
                                     <div className="mb-3">
+                                        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Profissional</h3>
                                         <Select
                                             options={profissional}
                                             placeholder="Profissional"
                                             name="profissional"
+                                            value={{ value: post.id_profissional, label: getLabelSelect(profissional, post.id_profissional) }}
                                             onChange={(e) => {
                                                 updateField({
                                                     target: {
@@ -396,6 +481,18 @@ const ListaProcedimento = () => {
                                                     }
                                                 })
                                             }}
+                                        />
+                                    </div>
+
+                                    <div className="mb-3">
+                                        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-900">Preço</h3>
+                                        <input
+                                            type="number"
+                                            className="relative m-0 -mr-0.5 block w-full flex-auto rounded-l border border-solid border-neutral-300 bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary focus:text-neutral-700 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none dark:border-neutral-400 dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:focus:border-primary"
+                                            id="message-text"
+                                            value={post.preco}
+                                            onChange={updateField}
+                                            name="preco"
                                         />
                                     </div>
                                 </form>
@@ -425,8 +522,8 @@ const ListaProcedimento = () => {
                             </div>
                         </div>
                     </div>
-                </div>}
-        </div>
+                </div >}
+        </div >
     )
 }
 
