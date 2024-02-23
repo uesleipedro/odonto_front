@@ -1,5 +1,7 @@
 import React, { useEffect } from "react"
 import ListaProcedimento from "./listaProcedimento"
+import ListaOrcamento from "./listaOrcamento";
+import Pagamento from "./pagamento";
 
 const fichaClinica = () => {
 
@@ -71,15 +73,14 @@ const fichaClinica = () => {
                         role="tab"
                         aria-controls="tabs-procedimento"
                         aria-selected="true"
-                    >Procedimento</a
-                    >
+                    >Procedimento</a>
                 </li>
                 <li role="presentation">
                     <a
-                        href="#tabs-profile"
+                        href="#tabs-financeiro"
                         className="my-2 block border-x-0 border-b-2 border-t-0 border-transparent px-7 pb-3.5 pt-4 text-xs font-medium uppercase leading-tight text-neutral-500 hover:isolate hover:border-transparent hover:bg-neutral-100 focus:isolate focus:border-transparent data-[te-nav-active]:border-primary data-[te-nav-active]:text-primary dark:text-neutral-400 dark:hover:bg-transparent dark:data-[te-nav-active]:border-primary-400 dark:data-[te-nav-active]:text-primary-400"
                         data-te-toggle="pill"
-                        data-te-target="#tabs-profile"
+                        data-te-target="#tabs-financeiro"
                         role="tab"
                         aria-controls="tabs-profile"
                         aria-selected="false"
@@ -123,25 +124,62 @@ const fichaClinica = () => {
                 </div>
                 <div
                     className="hidden opacity-0 transition-opacity duration-150 ease-linear data-[te-tab-active]:block"
-                    id="tabs-profile"
+                    id="tabs-financeiro"
                     role="tabpanel"
-                    aria-labelledby="tabs-profile-tab">
-                    Tab 2 content
+                    aria-labelledby="tabs-financeiro-tab">
+
+                    {/* TESTE */}
+                    <ul
+                        className="mb-5 flex list-none flex-row flex-wrap border-b-0 pl-0"
+                        role="tablist"
+                        data-te-nav-ref>
+                        <li role="presentation">
+                            <a
+                                href="#tabs-orcamento"
+                                className="my-2 block border-x-0 border-b-2 border-t-0 border-transparent px-7 pb-3.5 pt-4 text-xs font-medium uppercase leading-tight text-neutral-500 hover:isolate hover:border-transparent hover:bg-neutral-100 focus:isolate focus:border-transparent data-[te-nav-active]:border-primary data-[te-nav-active]:text-primary dark:text-neutral-400 dark:hover:bg-transparent dark:data-[te-nav-active]:border-primary-400 dark:data-[te-nav-active]:text-primary-400"
+                                data-te-toggle="pill"
+                                data-te-target="#tabs-orcamento"
+                                data-te-nav-active
+                                role="tab"
+                                aria-controls="tabs-orcamento"
+                                aria-selected="true"
+                            >Orçamento</a>
+                        </li>
+                        <li role="presentation">
+                            <a
+                                href="#tabs-pagamento"
+                                className="my-2 block border-x-0 border-b-2 border-t-0 border-transparent px-7 pb-3.5 pt-4 text-xs font-medium uppercase leading-tight text-neutral-500 hover:isolate hover:border-transparent hover:bg-neutral-100 focus:isolate focus:border-transparent data-[te-nav-active]:border-primary data-[te-nav-active]:text-primary dark:text-neutral-400 dark:hover:bg-transparent dark:data-[te-nav-active]:border-primary-400 dark:data-[te-nav-active]:text-primary-400"
+                                data-te-toggle="pill"
+                                data-te-target="#tabs-pagamento"
+                                role="tab"
+                                aria-controls="tabs-pagamento"
+                                aria-selected="false"
+                            >Pagamento</a
+                            >
+                        </li>
+                    </ul>
+                    <div className="mb-6">
+                        <div
+                            className="hidden opacity-100 transition-opacity duration-150 ease-linear data-[te-tab-active]:block"
+                            id="tabs-orcamento"
+                            role="tabpanel"
+                            aria-labelledby="tabs-orcamento-tab"
+                            data-te-tab-active>
+                            <ListaOrcamento />
+                        </div>
+                        <div
+                            className="hidden opacity-0 transition-opacity duration-150 ease-linear data-[te-tab-active]:block"
+                            id="tabs-pagamento"
+                            role="tabpanel"
+                            aria-labelledby="tabs-pagamento-tab">
+                            <Pagamento />
+                        </div>
+                    </div>
+
+                    {/* TESTE */}
+
+
                 </div>
-                {/* <div
-                    className="hidden opacity-0 transition-opacity duration-150 ease-linear data-[te-tab-active]:block"
-                    id="tabs-messages"
-                    role="tabpanel"
-                    aria-labelledby="tabs-profile-tab">
-                    Tab 3 content
-                </div>
-                <div
-                    className="hidden opacity-0 transition-opacity duration-150 ease-linear data-[te-tab-active]:block"
-                    id="tabs-contact"
-                    role="tabpanel"
-                    aria-labelledby="tabs-contact-tab">
-                    Tab 4 content
-                </div> */}
             </div>
 
         </section >

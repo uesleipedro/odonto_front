@@ -81,7 +81,7 @@ const CadastroAnamnese = () => {
         await api.put('anamnese', anamnese)
             .then(function (response) {
                 if (response.status === 201)
-                    alert("Salvo com sucesso")
+                    alert("Atualizado com sucesso")
 
             })
             .catch(function (error) {
@@ -290,8 +290,8 @@ const CadastroAnamnese = () => {
                         >Já foi operado?</label>
                     </>
                     <div className="w-full md:w-1/2 pr-2 pt-3">
-                        <label className="text-gray-700 ">Descrição da operação?</label>
-                        <input required type="text" id="descricao_operacao" name="descricao_operacao" onChange={updateField} className="form-input rounded-lg text-gray-600 w-full" placeholder="" />
+                        <label className="text-gray-700 ">Descrição da operação</label>
+                        <input value={anamnese.descricao_operacao} type="text" id="descricao_operacao" name="descricao_operacao" onChange={updateField} className="form-input rounded-lg text-gray-600 w-full" placeholder="" />
                     </div>
                 </div>
 
