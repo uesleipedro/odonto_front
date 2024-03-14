@@ -3,7 +3,7 @@ import api from '../utils/Api'
 import moment from 'moment'
 import Select from "react-select";
 
-const GeraOrcamento = () => {
+const GeraOrcamento = ({ id_paciente }) => {
 
     const [procedimentos, setProcedimentos] = useState([])
     const [valorOrcamento, setValorOrcamento] = useState(0)
@@ -18,20 +18,17 @@ const GeraOrcamento = () => {
             await api.get('procedimento')
                 .then(response => {
                     setProcedimentos([...response.data])
-                    console.log('response Procedimento  ', response.data)
                 })
                 .catch(function (error) {
                     console.error(error);
                 })
         }
         getProcedimentoList()
-        console.log('procedimento->', procedimentos)
     }, [])
 
     const handleToggleCheck = (index) => (e) => {
         const newArray = procedimentos.map((item, i) => {
             if (index === i) {
-                if (e.target.name === "check") console.log('>>>>>', e.target.name, index, i, e.target.checked)
                 let value = e.target.name === "check"
                     ? e.target.checked
                     : e.target.value
@@ -43,7 +40,6 @@ const GeraOrcamento = () => {
         })
 
         setProcedimentos(newArray)
-        console.log('procedimentosss', procedimentos)
     }
 
     const updatePrice = (index) => (e) => {
@@ -56,7 +52,6 @@ const GeraOrcamento = () => {
         })
 
         setProcedimentos(newArray)
-        console.log('price', procedimentos)
     }
 
     const sendOrcamentoData = async () => {
@@ -66,14 +61,14 @@ const GeraOrcamento = () => {
             id_paciente: 1,
             preco: valorOrcamento,
             date: moment().toDate(),
-            status: 'pendente'
+            status: 'pendente',
+            id_paciente: id_paciente
         })
             .then(async (response) => {
                 if (response.status === 201)
                     alert("Salvo com sucesso")
                 return response.data.id_orcamento
             }).then((e) => {
-                console.log('----------------------', e)
                 sendProcedimentoOrcamento(e)
             })
             .catch(e => {
@@ -108,7 +103,6 @@ const GeraOrcamento = () => {
                     value += Number(e.preco)
             })
 
-            console.log('orçamento', value)
             setValorOrcamento(value)
         }
 

@@ -1,9 +1,16 @@
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import ListaProcedimento from "./listaProcedimento"
 import ListaOrcamento from "./listaOrcamento";
-import Pagamento from "./pagamento";
+import ListaPagamento from "./listaPagamento";
+import { useRouter } from "next/router";
+import api from "../utils/Api";
 
 const fichaClinica = () => {
+    const router = useRouter();
+    const data = router.query;
+    const [id_paciente, setId_paciente] = useState(data.id_paciente)
+    const [paciente, setPaciente] = useState({})
+
 
     useEffect(() => {
         const init = async () => {
@@ -12,6 +19,20 @@ const fichaClinica = () => {
         };
         init();
     }, [])
+
+    useEffect(() => {
+        const getPaciente = async () => {
+            await api.get(`paciente/${id_paciente}`)
+                .then(response => {
+                    setPaciente(response.data)
+                })
+                .catch(function (error) {
+                    console.error(error);
+                })
+        }
+        getPaciente()
+        console.log('paciente', paciente)
+    }, []);
 
 
     return (
@@ -30,29 +51,29 @@ const fichaClinica = () => {
                 <div className="w-full shrink-0 grow-0 basis-auto ">
                     <div className="px-2 py-2 md:px-2">
                         <h2 className="pb-2 text-3xl font-bold">
-                            Ueslei Pedro Rangel
+                            {paciente?.nome}
                         </h2>
 
                         <div className="flex flex-wrap">
                             <div className="mb-4 w-full md:w-4/12">
                                 <p className="font-bold">Telefone:</p>
-                                <p> (61)9999-99999</p>
+                                <p> {paciente?.telefone_movel}</p>
                             </div>
                             <div className="mb-4 w-full md:w-4/12">
                                 <p className="font-bold">email:</p>
-                                <p>teste@teste.com</p>
+                                <p>{paciente?.email}</p>
                             </div>
                             <div className="mb-4 w-full md:w-4/12">
                                 <p className="font-bold">Idade:</p>
-                                <p>32</p>
+                                <p>{paciente?.dt_nascimento}</p>
                             </div>
                             <div className="mb-4 w-full md:w-4/12">
                                 <p className="font-bold">Paciente desde:</p>
-                                <p> 04/06/2023</p>
+                                <p> ... </p>
                             </div>
                             <div className="mb-4 w-full md:w-4/12">
                                 <p className="font-bold">Dentista responsável:</p>
-                                <p>Dr. Estranho</p>
+                                <p>...</p>
                             </div>
                         </div>
                     </div>
@@ -120,7 +141,7 @@ const fichaClinica = () => {
                     role="tabpanel"
                     aria-labelledby="tabs-home-tab"
                     data-te-tab-active>
-                    <ListaProcedimento />
+                    <ListaProcedimento id_paciente={id_paciente} />
                 </div>
                 <div
                     className="hidden opacity-0 transition-opacity duration-150 ease-linear data-[te-tab-active]:block"
@@ -165,14 +186,14 @@ const fichaClinica = () => {
                             role="tabpanel"
                             aria-labelledby="tabs-orcamento-tab"
                             data-te-tab-active>
-                            <ListaOrcamento />
+                            <ListaOrcamento id_paciente={data.id_paciente} />
                         </div>
                         <div
                             className="hidden opacity-0 transition-opacity duration-150 ease-linear data-[te-tab-active]:block"
                             id="tabs-pagamento"
                             role="tabpanel"
                             aria-labelledby="tabs-pagamento-tab">
-                            <Pagamento />
+                            <ListaPagamento id_paciente={data.id_paciente} />
                         </div>
                     </div>
 

@@ -18,7 +18,7 @@ import Select from 'react-select'
 const token = Cookies.get("jwt")
 // const token = JSON.parse(user).token
 
-const ListaProcedimento = () => {
+const ListaProcedimento = ({ id_paciente }) => {
 
     const [procedimento, setProcedimento] = useState([])
     const [procedimentoList, setProcedimentoList] = useState([])
@@ -28,11 +28,7 @@ const ListaProcedimento = () => {
     const [toggleInsertUpdate, setToggleInsertUpdate] = useState('insert')
     const [preco, setPreco] = useState("0")
     const [modal, setModal] = useState(false)
-    const [post, setPost] = useState({
-        face_dente: '',
-        estado: 'A realizar',
-        adicionado: moment(Date()).format('YYYY-MM-DD')
-    })
+    const [post, setPost] = useState({})
     const [options, setOptions] = useState([])
     const [profissional, setProfissional] = useState([
         {
@@ -68,7 +64,7 @@ const ListaProcedimento = () => {
 
     useEffect(() => {
         const getProcedimentoList = async () => {
-            await api.get('procedimento')
+            await api.get(`procedimento/paciente/${id_paciente}`)
                 .then(response => {
                     console.log('procedimento ', response.data)
                     setProcedimento([...procedimento, ...response.data])
@@ -85,6 +81,8 @@ const ListaProcedimento = () => {
                 .catch(function (error) {
                     console.error(error);
                 })
+
+            console.log('post init', post)
 
         }
 
@@ -155,7 +153,7 @@ const ListaProcedimento = () => {
         if (e.target.name === "preco") {
             setPost(existingValues => ({
                 ...existingValues,
-                ["preco"]: parseFloat(e.target.value),
+                ...{ ["preco"]: parseFloat(e.target.value) },
             }))
         }
 
@@ -164,7 +162,7 @@ const ListaProcedimento = () => {
             ...existingValues,
             [fieldName]: e.target.value,
         }))
-        console.log(post)
+        console.log('post', post)
     }
 
 
@@ -188,7 +186,6 @@ const ListaProcedimento = () => {
     }, [procedimento, searchVal])
 
     const sendProcedimentoData = () => {
-
         switch (toggleInsertUpdate) {
             case 'insert':
                 api.post('procedimento', post)
@@ -253,7 +250,8 @@ const ListaProcedimento = () => {
                     setPost({
                         face_dente: '',
                         estado: 'A realizar',
-                        adicionado: moment(Date()).format('YYYY-MM-DD')
+                        adicionado: moment(Date()).format('YYYY-MM-DD'),
+                        id_paciente: Number(id_paciente)
                     })
                     setToggleInsertUpdate('insert')
                     setModal(true)
@@ -517,7 +515,7 @@ const ListaProcedimento = () => {
                                     data-te-ripple-color="light"
                                     onClick={sendProcedimentoData}
                                 >
-                                    Salvar Agendamento
+                                    Salvar Procedimento
                                 </button>
                             </div>
                         </div>

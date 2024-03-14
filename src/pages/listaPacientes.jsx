@@ -127,7 +127,13 @@ const ListaPacientes = () => {
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.cpf}</td>
                                             <td className="flex flex-row gap-3 px-6 py-4 whitespace-nowrap text-right text-md font-medium">
 
-                                                <Link href="/fichaClinica" className="text-purple-800 hover:text-purple-900">
+                                                <Link
+                                                    href={{
+                                                        pathname: "/fichaClinica",
+                                                        query: { id_paciente: data.id_paciente }
+                                                    }}
+                                                    className="text-purple-800 hover:text-purple-900"
+                                                >
                                                     <FaTooth />
                                                 </Link>
                                                 <Link href="/cadastroAnamnese" className="text-purple-800 hover:text-purple-900">
@@ -160,7 +166,7 @@ const ListaPacientes = () => {
                 doIt={(event) => handleDeletePaciente(idToDelete)}
 
             />
-        </div>
+        </div >
     )
 }
 

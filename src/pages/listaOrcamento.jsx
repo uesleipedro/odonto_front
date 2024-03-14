@@ -17,12 +17,13 @@ import Pagamento from "./pagamento";
 const token = Cookies.get("jwt")
 // const token = JSON.parse(user).token
 
-const ListaOrcamento = ({ pagamento }) => {
+const ListaOrcamento = ({ id_paciente }) => {
 
     const [orcamento, setOrcamento] = useState([])
     const [searchVal, setSearchVal] = useState('')
     const [idToDelete, setIdToDelete] = useState(0)
     const [geraOrcamento, setGeraOrcamento] = useState(false)
+    const [selectedOrcamento, setSelectedOrcamento] = useState(0)
     const [screen, setScreen] = useState("listaOrcamento")
     const router = useRouter()
 
@@ -48,7 +49,7 @@ const ListaOrcamento = ({ pagamento }) => {
 
     useEffect(() => {
         const getOrcamentoList = async () => {
-            await api.get('orcamento')
+            await api.get(`orcamento/paciente/${id_paciente}`)
                 .then(response => {
                     setOrcamento([...orcamento, ...response.data])
                 })
@@ -89,6 +90,21 @@ const ListaOrcamento = ({ pagamento }) => {
 
         setProcedimentos(newArray)
         console.log('procedimentosss', procedimentos)
+    }
+
+    const toDecimalNumeric = (num) => {
+        return Number((num
+            .toString()
+            .replace(',', '.')
+            .replace(/\D/g, '') / 100
+        ).toFixed(2))
+    }
+
+    const toCurrency = (num) => {
+        return ('R$ ' + num
+            .toString()
+            .replace('.', ','))
+
     }
 
 
@@ -139,11 +155,11 @@ const ListaOrcamento = ({ pagamento }) => {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                                        {orcamento.map((data) => (
+                                        {orcamento.map((data, index) => (
                                             <tr key={data.cpf}>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{moment(data.date).format('DD/MM/YYYY')}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.id_profissional}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.preco}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{toCurrency(data.preco)}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.status}</td>
                                                 <td className="flex flex-row gap-3 px-6 py-4 whitespace-nowrap text-right text-md font-medium">
 
@@ -160,7 +176,10 @@ const ListaOrcamento = ({ pagamento }) => {
                                                     {/* <Link href="/fichaClinica" className="flex-1 text-purple-800 hover:text-purple-900"> */}
                                                     <a
                                                         className="pointer"
-                                                        onClick={() => setScreen("pagamento")}
+                                                        onClick={() => {
+                                                            setSelectedOrcamento(index)
+                                                            setScreen("pagamento")
+                                                        }}
                                                     >
                                                         <FaMoneyBillAlt /> Ir para pagamento
                                                     </a>
@@ -176,11 +195,11 @@ const ListaOrcamento = ({ pagamento }) => {
                 </div>
             }
             {screen === "geraOrcamento" &&
-                <GeraOrcamento />
+                <GeraOrcamento id_paciente={id_paciente} />
             }
 
             {screen === "pagamento" &&
-                <Pagamento />
+                <Pagamento orcamento={orcamento[selectedOrcamento]} />
             }
 
             <BasicModal
