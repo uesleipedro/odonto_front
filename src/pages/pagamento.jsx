@@ -40,10 +40,9 @@ const Pagamento = ({ orcamento }) => {
             });
         };
         init();
-        console.log('entrada', dados.entrada)
-        setTimeout(() => {
-            console.log("===orcamento==", orcamento?.id_orcamento ?? 0);
-        }, 1000);
+
+        console.log("===orcamento==", orcamento);
+
     })
 
     const moneyMask = (value) => {
@@ -62,10 +61,22 @@ const Pagamento = ({ orcamento }) => {
 
     const toDecimalNumeric = (num) => {
         return Number((num
-            .toString()
+            ?.toString()
             .replace(',', '.')
             .replace(/\D/g, '') / 100
         ).toFixed(2))
+    }
+
+    const updateStatusOrcamento = async (id_orcamento) => {
+        alert("update status entrou")
+        await api.put('orcamento/status', {
+            id_orcamento: id_orcamento,
+            orcado: 'finalizado'
+        }).then((response) => {
+            alert("response", response.status)
+        })
+
+        return
     }
 
 
@@ -74,7 +85,7 @@ const Pagamento = ({ orcamento }) => {
         await api.post('pagamento',
             {
                 id_orcamento: orcamento?.id_orcamento,
-                tipo_desconto: "real",
+                tipo_desconto: dados.tipo_desconto,
                 valor_desconto: toDecimalNumeric(dados.desconto),
                 quantidade_parcelas: dados.quantidade_parcelas,
                 data_primeiro_vencimento: dados.primeiro_vencimento,
@@ -83,17 +94,19 @@ const Pagamento = ({ orcamento }) => {
                 id_empresa: 1,
                 valor_total: toDecimalNumeric(orcamento?.preco),
                 status: "pendente",
-                id_paciente: dados.id_paciente
+                id_paciente: orcamento?.id_paciente,
+                valor_total: orcamento?.preco
             }
         )
-            .then(function (response) {
-                if (response.status === 201)
-                    alert("Salvo com sucesso")
-
+            .then(async function (response) {
+                if (response.status === 201) {
+                    alert('gerou pagamento')
+                }
             })
             .catch(function (error) {
                 console.log(error)
             })
+        await updateStatusOrcamento(orcamento?.id_orcamento)
         // router.push('/listaPacientes')
     }
 
@@ -210,9 +223,10 @@ const Pagamento = ({ orcamento }) => {
                                             <input
                                                 id="status1"
                                                 type="radio"
-                                                value="1"
-                                                name="status"
+                                                value="porcentagem"
+                                                name="tipo_desconto"
                                                 className="w-4 h-4"
+                                                onChange={updateField}
                                             />
                                             <label
                                                 for="status1"
@@ -227,9 +241,10 @@ const Pagamento = ({ orcamento }) => {
                                             <input
                                                 id="status2"
                                                 type="radio"
-                                                value="2"
-                                                name="status"
+                                                value="real"
+                                                name="tipo_desconto"
                                                 className="w-4 h-4"
+                                                onChange={updateField}
                                             />
                                             <label
                                                 for="status2"
@@ -322,7 +337,7 @@ const Pagamento = ({ orcamento }) => {
 
                                 <div className="w-6/12 pt-3">
                                     <label className="text-gray-500" >Data do 1º vencimento</label>
-                                    <input type="text" id="primeiro_vencimento" name="primeiro_vencimento" onChange={updateField} className="form-input rounded-lg text-gray-500 w-full" />
+                                    <input type="date" id="primeiro_vencimento" name="primeiro_vencimento" onChange={updateField} className="form-input rounded-lg text-gray-500 w-full" />
                                 </div>
 
                             </div>
@@ -349,7 +364,7 @@ const Pagamento = ({ orcamento }) => {
 
                                 <div className="w-6/12 pt-3">
                                     <label className="text-gray-500 ">Data do pagamento</label>
-                                    <input type="text" id="data_pagamento" name="data_pagamento" onChange={updateField} className="form-input rounded-lg text-gray-500 w-full" />
+                                    <input type="date" id="data_pagamento" name="data_pagamento" onChange={updateField} className="form-input rounded-lg text-gray-500 w-full" />
                                 </div>
 
                             </div>

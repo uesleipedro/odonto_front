@@ -10,7 +10,7 @@ import api from "../utils/Api"
 import BasicModal from "../components/BasicModal"
 import Cookies from "js-cookie"
 import { useAuth } from "../auth/useAuth"
-import { moneyMask } from "../utils/mask"
+import { moneyMask, toDecimalNumeric } from "../utils/mask"
 import moment from 'moment'
 import Select from 'react-select'
 
@@ -186,9 +186,13 @@ const ListaProcedimento = ({ id_paciente }) => {
     }, [procedimento, searchVal])
 
     const sendProcedimentoData = () => {
+
+        let dados = post
+        dados.preco = Number(toDecimalNumeric(post.preco))
+
         switch (toggleInsertUpdate) {
             case 'insert':
-                api.post('procedimento', post)
+                api.post('procedimento', dados)
                     .then(function (response) {
                         if (response.status === 201) {
                             alert("Salvo com sucesso")
@@ -485,11 +489,19 @@ const ListaProcedimento = ({ id_paciente }) => {
                                     <div className="mb-3">
                                         <h3 className="text-sm font-medium text-gray-700 dark:text-gray-900">Preço</h3>
                                         <input
-                                            type="number"
+                                            type="text"
                                             className="relative m-0 -mr-0.5 block w-full flex-auto rounded-l border border-solid border-neutral-300 bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary focus:text-neutral-700 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none dark:border-neutral-400 dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:focus:border-primary"
                                             id="message-text"
                                             value={post.preco}
-                                            onChange={updateField}
+                                            // onChange={updateField}
+                                            onChange={(e) => {
+                                                updateField({
+                                                    target: {
+                                                        name: "preco",
+                                                        value: moneyMask(e.target.value),
+                                                    },
+                                                });
+                                            }}
                                             name="preco"
                                         />
                                     </div>

@@ -76,6 +76,15 @@ const GeraOrcamento = ({ id_paciente }) => {
             })
     }
 
+    const updateStatusProcedimento = (id_procedimento) => {
+        api.put('procedimento/status', {
+            id_procedimento: id_procedimento,
+            orcado: true
+        })
+
+        return
+    }
+
     const sendProcedimentoOrcamento = (id_orcamento) => {
         procedimentos.map(e => {
             if (!e.check) return
@@ -87,7 +96,8 @@ const GeraOrcamento = ({ id_paciente }) => {
             })
                 .then(function (response) {
                     if (response.status === 201)
-                        alert("Salvo com sucesso")
+                        updateStatusProcedimento(e.id_procedimento)
+                    // alert("Salvo com sucesso")
                 })
                 .catch(e => {
                     alert(e)

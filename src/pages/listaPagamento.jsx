@@ -22,6 +22,10 @@ const ListaPagamento = ({ id_paciente }) => {
     const [searchVal, setSearchVal] = useState('')
     const [idToDelete, setIdToDelete] = useState(0)
     const [geraOrcamento, setGeraOrcamento] = useState(false)
+    const [modal, setModal] = useState(false)
+    const [dataPagamento, setDataPagamento] = useState(new Date())
+    const [dadosPagamento, setDadosPagamento] = useState({ "status": "finalizado" })
+
     const router = useRouter()
 
     const { user } = useAuth()
@@ -43,7 +47,6 @@ const ListaPagamento = ({ id_paciente }) => {
         init();
     }, [])
 
-
     useEffect(() => {
         const getPagamentoList = async () => {
             await api.get(`pagamento/paciente/${id_paciente}`)
@@ -64,38 +67,17 @@ const ListaPagamento = ({ id_paciente }) => {
 
     }
 
-
-    const handleDeleteOrcamenot = async (id_orcamento) => {
-        await api.delete(`paciente/${id_orcamento}`)
-            .then(response => {
-                if (response.status === 204)
-                    return
+    const finalizarPagamento = () => {
+        api.put('pagamento/finalizar', dadosPagamento)
+            .then(function (response) {
+                if (response.status === 201) {
+                    alert("Salvo com sucesso")
+                }
             })
-            .catch(error => {
-                console.error(error);
+            .catch(e => {
+                alert(e)
             })
-        router.refresh()
     }
-
-
-    const MySwal = withReactContent(Swal)
-    const showSwalWithLink = (id_orcamento) => {
-        MySwal.fire({
-            title: 'Deseja realmente excluir?',
-            showDenyButton: true,
-            // showCancelButton: true,
-            confirmButtonText: 'Excluir',
-            denyButtonText: `Cancelar`,
-        }).then((result) => {
-            if (result.isConfirmed) {
-                handleDeleteOrcamento(id_orcamento)
-                Swal.fire('Excluído!', '', 'success')
-            } else if (result.isDenied) {
-                Swal.fire('Nenhuma alteração foi realizada', '', 'info')
-            }
-        })
-    }
-
 
     return (
         <div className="m-5 p-5  rounded-lg shadow-lg">
@@ -136,58 +118,20 @@ const ListaPagamento = ({ id_paciente }) => {
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.status}</td>
                                                 <td className="flex flex-row gap-3 px-6 py-4 whitespace-nowrap text-right text-md font-medium">
 
-                                                    <div class="relative" data-te-dropdown-ref>
-                                                        <button
-                                                            class="flex items-center whitespace-nowrap rounded bg-neutral-50 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-neutral-800 shadow-[0_4px_9px_-4px_#fbfbfb] transition duration-150 ease-in-out hover:bg-neutral-100 hover:shadow-[0_8px_9px_-4px_rgba(251,251,251,0.3),0_4px_18px_0_rgba(251,251,251,0.2)] focus:bg-neutral-100 focus:shadow-[0_8px_9px_-4px_rgba(251,251,251,0.3),0_4px_18px_0_rgba(251,251,251,0.2)] focus:outline-none focus:ring-0 active:bg-neutral-200 active:shadow-[0_8px_9px_-4px_rgba(251,251,251,0.3),0_4px_18px_0_rgba(251,251,251,0.2)] motion-reduce:transition-none"
-                                                            type="button"
-                                                            id="dropdownMenuButton9"
-                                                            data-te-dropdown-toggle-ref
-                                                            aria-expanded="false"
-                                                            data-te-ripple-init>
-                                                            Light
-                                                            <span class="ml-2 w-2">
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    viewBox="0 0 20 20"
-                                                                    fill="currentColor"
-                                                                    class="h-5 w-5">
-                                                                    <path
-                                                                        fill-rule="evenodd"
-                                                                        d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
-                                                                        clip-rule="evenodd" />
-                                                                </svg>
-                                                            </span>
-                                                        </button>
-                                                        <ul
-                                                            class="absolute z-[1000] float-left m-0 hidden min-w-max list-none overflow-hidden rounded-lg border-none bg-white bg-clip-padding text-left text-base shadow-lg dark:bg-neutral-700 [&[data-te-dropdown-show]]:block"
-                                                            aria-labelledby="dropdownMenuButton9"
-                                                            data-te-dropdown-menu-ref>
-                                                            <li>
-                                                                <a
-                                                                    class="block w-full whitespace-nowrap bg-transparent px-4 py-2 text-sm font-normal text-neutral-700 hover:bg-neutral-100 active:text-neutral-800 active:no-underline disabled:pointer-events-none disabled:bg-transparent disabled:text-neutral-400 dark:text-neutral-200 dark:hover:bg-neutral-600"
-                                                                    href="#"
-                                                                    data-te-dropdown-item-ref
-                                                                >Action</a
-                                                                >
-                                                            </li>
-                                                            <li>
-                                                                <a
-                                                                    class="block w-full whitespace-nowrap bg-transparent px-4 py-2 text-sm font-normal text-neutral-700 hover:bg-neutral-100 active:text-neutral-800 active:no-underline disabled:pointer-events-none disabled:bg-transparent disabled:text-neutral-400 dark:text-neutral-200 dark:hover:bg-neutral-600"
-                                                                    href="#"
-                                                                    data-te-dropdown-item-ref
-                                                                >Another action</a
-                                                                >
-                                                            </li>
-                                                            <li>
-                                                                <a
-                                                                    class="block w-full whitespace-nowrap bg-transparent px-4 py-2 text-sm font-normal text-neutral-700 hover:bg-neutral-100 active:text-neutral-800 active:no-underline disabled:pointer-events-none disabled:bg-transparent disabled:text-neutral-400 dark:text-neutral-200 dark:hover:bg-neutral-600"
-                                                                    href="#"
-                                                                    data-te-dropdown-item-ref
-                                                                >Something else here</a
-                                                                >
-                                                            </li>
-                                                        </ul>
-                                                    </div>
+                                                    <button
+                                                        onClick={() => {
+                                                            setModal(true)
+                                                            setDadosPagamento(existingValues => ({
+                                                                ...existingValues,
+                                                                ["id_pagamento"]: data.id_pagamento,
+                                                            }))
+                                                        }}
+
+                                                        type="button"
+                                                        className="inline-block rounded bg-neutral-100 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-neutral-600 shadow-light-3 transition duration-150 ease-in-out hover:bg-neutral-200 hover:shadow-light-2 focus:bg-neutral-200 focus:shadow-light-2 focus:outline-none focus:ring-0 active:bg-neutral-200 active:shadow-light-2 motion-reduce:transition-none dark:shadow-black/30 dark:hover:shadow-dark-strong dark:focus:shadow-dark-strong dark:active:shadow-dark-strong">
+                                                        Finalizar pagamento
+                                                    </button>
+
                                                 </td>
                                             </tr>
                                         ))}
@@ -198,14 +142,112 @@ const ListaPagamento = ({ id_paciente }) => {
                     </div>
                 </div>
             }
-            {geraOrcamento &&
+            {
+                geraOrcamento &&
                 <GeraOrcamento />
+            }
+
+            {
+                modal &&
+                <div
+                    data-te-modal-init
+                    className="fixed left-0 top-0 z-[1055] block h-full w-full overflow-y-auto overflow-x-hidden outline-none bg-black/[.8]"
+                    id="exampleModalVarying"
+                    tabindex="-1"
+                    aria-labelledby="exampleModalVaryingLabel"
+                >
+                    <div
+                        data-te-modal-dialog-ref
+                        className=" pointer-events-none relative w-auto opacity-100 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:my-7 min-[576px]:max-w-[500px]">
+                        <div
+                            className=" block min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none dark:bg-neutral-600">
+                            <div
+                                className="bg-purple-600 flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
+                                <h5
+                                    className="text-white text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200"
+                                    id="exampleModalVaryingLabel">
+                                    Realizar pagamento
+                                </h5>
+                                <button
+                                    type="button"
+                                    className="text-white box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
+                                    data-te-modal-dismiss
+                                    aria-label="Close"
+                                    onClick={() => setModal(false)}>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke-width="1.5"
+                                        stroke="currentColor"
+                                        className="h-6 w-6">
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <div className="relative flex-auto p-4" data-te-modal-body-ref>
+                                <form>
+
+                                    <div className="mb-3 flex flex-row text-bold gap-2">
+                                        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Data do pagamento</h3>
+                                        <div className="flex flex-row items-center mb-4 gap-5">
+
+                                            < div className="flex items-center gap-1 " >
+                                                <input
+                                                    name="data"
+                                                    id="data"
+                                                    type="date"
+                                                    value={dadosPagamento.data_pagamento}
+                                                    onChange={(e) =>
+                                                        setDadosPagamento(existingValues => ({
+                                                            ...existingValues,
+                                                            ["data_pagamento"]: e.target.value,
+                                                        }))
+                                                    }
+                                                    className="w-full h-full rounded" />
+                                                <label for="data" className="ml-2 text-sm font-medium text-gray-900 text-bold dark:text-gray-300"></label>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                </form>
+                            </div>
+                            <div
+                                className="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
+
+                                <button
+                                    type="button"
+                                    className="inline-block rounded bg-purple-100 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-primary-700 transition duration-150 ease-in-out hover:bg-primary-accent-100 focus:bg-primary-accent-100 focus:outline-none focus:ring-0 active:bg-primary-accent-200"
+                                    data-te-modal-dismiss
+                                    data-te-ripple-init
+                                    data-te-ripple-color="light"
+                                    onClick={() => { setModal(false) }}
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    type="button"
+                                    className="ml-1 inline-block rounded bg-purple-600 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_#3b71ca] transition duration-150 ease-in-out hover:bg-primary-600 hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:bg-primary-600 focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:outline-none focus:ring-0 active:bg-primary-700 active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] dark:shadow-[0_4px_9px_-4px_rgba(59,113,202,0.5)] dark:hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)]"
+                                    data-te-ripple-init
+                                    data-te-ripple-color="light"
+                                    onClick={() => { finalizarPagamento() }}
+                                >
+                                    Salvar Pagamento
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div >
             }
 
             <BasicModal
                 title="Excluir Paciente"
                 body="Deseja realmente excluir esse paciente?"
-                doIt={(event) => handleDeletePaciente(idToDelete)}
+                doIt={(event) => handleDeletePaciente()}
 
             />
         </div >
