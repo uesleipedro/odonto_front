@@ -136,7 +136,13 @@ const ListaPacientes = () => {
                                                 >
                                                     <FaTooth />
                                                 </Link>
-                                                <Link href="/cadastroAnamnese" className="text-purple-800 hover:text-purple-900">
+                                                <Link
+                                                    href={{
+                                                        pathname: "/cadastroAnamnese",
+                                                        query: { id_paciente: data.id_paciente }
+                                                    }}
+                                                    className="text-purple-800 hover:text-purple-900"
+                                                >
                                                     <FaBookMedical />
                                                 </Link>
                                                 <a className="text-purple-800 hover:text-purple-900" href="#">

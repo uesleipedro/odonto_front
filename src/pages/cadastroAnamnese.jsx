@@ -1,27 +1,46 @@
 import React, { useEffect, useState } from "react"
 import Link from "next/link"
 import api from "../utils/Api"
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/router";
 
-const CadastroAnamnese = () => {
+const cadastroAnamnese = () => {
 
-    const [anamnese, setAnamnese] = useState({ id_paciente: 1 })
-    const router = useRouter()
+    const router = useRouter();
+    const data = router.query;
+    const [id_paciente, setId_paciente] = useState(data.id_paciente)
+    const [anamnese, setAnamnese] = useState({})
+
 
     useEffect(() => {
-        const getAnamneseList = async () => {
-            await api.get(`anamnese/${1}`)
+        const getAnamnese = async () => {
+            await api.get(`anamnese/${id_paciente}`)
                 .then(response => {
-                    console.log('response.data', response.data)
                     setAnamnese(response.data)
                 })
                 .catch(function (error) {
                     console.error(error);
                 })
         }
-        getAnamneseList()
+        getAnamnese()
         console.log('anamnese', anamnese)
     }, []);
+
+    // useEffect(() => {
+
+    //     console.log("data", data)
+    //     const getAnamneseList = async () => {
+    //         await api.get(`anamnese/${id_paciente}`)
+    //             .then(response => {
+    //                 console.log('response.data', response.data)
+    //                 setAnamnese(response.data)
+    //             })
+    //             .catch(function (error) {
+    //                 console.error(error);
+    //             })
+    //     }
+    //     getAnamneseList()
+    //     console.log('anamnese', anamnese)
+    // }, []);
 
     const updateField = e => {
 
@@ -66,6 +85,7 @@ const CadastroAnamnese = () => {
 
     const cadastroAnamnese = async () => {
         await api.post('anamnese', anamnese)
+        console.log("-------------------------", anamnese)
             .then(function (response) {
                 if (response.status === 201)
                     alert("Salvo com sucesso")
@@ -92,7 +112,7 @@ const CadastroAnamnese = () => {
 
     const sendAnamneseData = async () => {
 
-        await api.get(`anamnese/${1}`)
+        await api.get(`anamnese/${id_paciente}`)
             .then(response => {
                 if (response.data.id_paciente)
                     updateAnamnese()
@@ -520,4 +540,4 @@ const CadastroAnamnese = () => {
     )
 }
 
-export default CadastroAnamnese
+export default cadastroAnamnese

@@ -114,7 +114,7 @@ const ListaPagamento = ({ id_paciente }) => {
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{moment(data.data_primeiro_vencimento).format('DD/MM/YYYY')}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.quantidade_parcelas}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{toCurrency(data.valor_total)}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">-</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{moment(data.data_pagamento).format('DD/MM/YYYY')}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.status}</td>
                                                 <td className="flex flex-row gap-3 px-6 py-4 whitespace-nowrap text-right text-md font-medium">
 
