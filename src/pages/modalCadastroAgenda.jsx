@@ -211,7 +211,7 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData }) => {
                                     type="text"
                                     className="relative m-0 -mr-0.5 block w-full flex-auto rounded border border-solid border-neutral-300 bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary focus:text-neutral-700 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none"
                                     name="descricao"
-                                    value={agendamento.title}
+                                    value={agendamento?.title}
                                     id="recipient-name"
                                     placeholder="Evento"
                                     onChange={updateField}
@@ -249,7 +249,7 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData }) => {
                                         type="text"
                                         className="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6]  transition-all duration-200 ease-linear"
                                         id="form1"
-                                        value={moment(agendamento.start_date_time).format(
+                                        value={moment(agendamento?.start_date_time).format(
                                             "DD MM YYYY, hh:mm",
                                         )}
                                         name="start_date_time"
@@ -273,7 +273,7 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData }) => {
                                         className="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear"
                                         id="form2"
                                         name="end_date_time"
-                                        value={moment(agendamento.end_date_time).format(
+                                        value={moment(agendamento?.end_date_time).format(
                                             "DD MM YYYY, hh:mm",
                                         )}
                                         onChange={updateField}
@@ -302,7 +302,7 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData }) => {
                                 <textarea
                                     className="relative m-0 -mr-0.5 block w-full flex-auto rounded-l border border-solid border-neutral-300 bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary focus:text-neutral-700 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none dark:border-neutral-400 dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:focus:border-primary"
                                     id="message-text"
-                                    value={agendamento.obs}
+                                    value={agendamento?.obs}
                                     placeholder="Observações"
                                     onChange={updateField}
                                     name="obs"
