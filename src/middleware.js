@@ -47,17 +47,17 @@ export async function middleware(request) {
     // const token = request.cookies.get("user")?.token
 
     const SECRET_KEY = 'your-secret-key-here'
-    // console.log('////////////////', user)
+    // 
     // if (request.nextUrl.pathname !== "/login" && !currentUser) {
     //     return NextResponse.redirect(new URL("/login", request.url))
     // }
-    // console.log('jwt-----', jwt)
+    // 
     // if (jwt) {
     //     const { payload, protectedHeader } =
     //         await jwtVerify(jwt, new TextEncoder().encode(SECRET_KEY))
 
-    //     console.log("<<<<<<<<<>>>>>>>", protectedHeader)
-    //     console.log("-------------------=====", payload)
+    //     
+    //     
     // }
 
     if (
@@ -65,7 +65,7 @@ export async function middleware(request) {
         (!request.cookies.has('user'))
         // /*|| Date.now() > payload.expe*/)
     ) {
-        // console.log('mmmmm', request.cookies.get('jwt'))
+        // 
         request.cookies.delete("user")
         return NextResponse.rewrite(new URL("/login", request.url))
         // return NextResponse.rewrite(new URL('/login', request.url))
@@ -73,7 +73,7 @@ export async function middleware(request) {
 
         // return response
     } else {
-        //console.log('>>>>>>>>>>.', jwt.value)
+        //
     }
 
     // if (authRoutes.includes(request.nextUrl.pathname) && currentUser)

@@ -58,13 +58,15 @@ const ListaOrcamento = ({ id_paciente }) => {
                 })
         }
         getOrcamentoList()
-        console.log('orcamento', orcamento)
+        console.log('id_paciente', id_paciente)
     }, []);
 
 
-    const handleDeleteOrcamenot = async (id_orcamento) => {
-        await api.delete(`paciente/${id_orcamento}`)
+    const handleDeleteOrcamento = async (id_orcamento, id_paciente) => {
+        await api.delete(`orcamento/${id_orcamento}`)
             .then(response => {
+                estornaProcedimento(id_orcamento)
+
                 if (response.status === 204)
                     return
             })
@@ -72,6 +74,10 @@ const ListaOrcamento = ({ id_paciente }) => {
                 console.error(error);
             })
         router.refresh()
+    }
+
+    const estornaProcedimento = async (id_orcamento) => {
+        await api.put(`procedimento/estorno/${id_orcamento}`)
     }
 
     const handleToggleCheck = (index) => (e) => {
@@ -108,8 +114,10 @@ const ListaOrcamento = ({ id_paciente }) => {
     }
 
 
+
     const MySwal = withReactContent(Swal)
-    const showSwalWithLink = (id_orcamento) => {
+    const showSwalWithLink = (id_paciente, id_orcamento) => {
+        console.log('..<<<<...', id_orcamento, id_paciente)
         MySwal.fire({
             title: 'Deseja realmente excluir?',
             showDenyButton: true,
@@ -118,7 +126,7 @@ const ListaOrcamento = ({ id_paciente }) => {
             denyButtonText: `Cancelar`,
         }).then((result) => {
             if (result.isConfirmed) {
-                handleDeleteOrcamento(id_orcamento)
+                handleDeleteOrcamento(id_orcamento, id_paciente)
                 Swal.fire('Excluído!', '', 'success')
             } else if (result.isDenied) {
                 Swal.fire('Nenhuma alteração foi realizada', '', 'info')
@@ -167,13 +175,12 @@ const ListaOrcamento = ({ id_paciente }) => {
                                                         <IoEyeSharp />
                                                     </Link>
                                                     <a className="text-purple-800 hover:text-purple-900" href="#"
-                                                        onClick={() => showSwalWithLink(data.id_paciente)}
+                                                        onClick={() => showSwalWithLink(data.id_paciente, data.id_orcamento)}
                                                     >
                                                         <FaTrashAlt />
                                                     </a>
                                                 </td>
                                                 <td className="px-6 py-4 text-sm text-purple-900 font-bold">
-                                                    {/* <Link href="/fichaClinica" className="flex-1 text-purple-800 hover:text-purple-900"> */}
                                                     <a
                                                         className="pointer"
                                                         onClick={() => {
@@ -181,7 +188,9 @@ const ListaOrcamento = ({ id_paciente }) => {
                                                             setScreen("pagamento")
                                                         }}
                                                     >
-                                                        <FaMoneyBillAlt /> Ir para pagamento
+                                                        {data.status === 'finalizado'
+                                                            ? <></>
+                                                            : <><FaMoneyBillAlt /> Ir para pagamento</>}
                                                     </a>
                                                     {/* </Link> */}
                                                 </td>

@@ -1,6 +1,6 @@
 import React, { use, useEffect, useState, useMemo } from "react"
-import { FaTooth, FaBookMedical, FaTrashAlt } from "react-icons/fa"
-import { IoEyeSharp } from "react-icons/io5";
+import { FaCheck, FaTrashAlt, FaEye } from "react-icons/fa";
+import { ImCancelCircle } from "react-icons/im";
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import Swal from 'sweetalert2'
@@ -24,20 +24,11 @@ const ListaPagamento = ({ id_paciente }) => {
     const [geraOrcamento, setGeraOrcamento] = useState(false)
     const [modal, setModal] = useState(false)
     const [dataPagamento, setDataPagamento] = useState(new Date())
-    const [dadosPagamento, setDadosPagamento] = useState({ "status": "finalizado" })
+    const [dadosPagamento, setDadosPagamento] = useState({ "status": "Pago" })
 
     const router = useRouter()
 
     const { user } = useAuth()
-
-    // const authHeader = () => {
-    //     //const token = getTokenFromCookies();
-    //     return {
-    //         headers: {
-    //             Authorization: "Bearer " + Cookies.get("jwt"),
-    //         },
-    //     };
-    // };
 
     useEffect(() => {
         const init = async () => {
@@ -49,9 +40,10 @@ const ListaPagamento = ({ id_paciente }) => {
 
     useEffect(() => {
         const getPagamentoList = async () => {
-            await api.get(`pagamento/paciente/${id_paciente}`)
+            await api.get(`contas_receber/paciente/${id_paciente}`)
                 .then(response => {
                     setPagamento([...pagamento, ...response.data])
+                    
                 })
                 .catch(function (error) {
                     console.error(error);
@@ -68,7 +60,8 @@ const ListaPagamento = ({ id_paciente }) => {
     }
 
     const finalizarPagamento = () => {
-        api.put('pagamento/finalizar', dadosPagamento)
+        
+        api.put('contas_receber/finalizar', dadosPagamento)
             .then(function (response) {
                 if (response.status === 201) {
                     alert("Salvo com sucesso")
@@ -79,16 +72,42 @@ const ListaPagamento = ({ id_paciente }) => {
             })
     }
 
+    const estornarPagamento = async (id_pagamento, nr_parcela, id_orcamento) => {
+        //await api.put(`pagamento/estornar/${id_pagamento}`)
+        //await estornarOrcamento(id_orcamento)
+        await api.put(`contas_receber/estornar`,
+            {
+                'id_pagamento': id_pagamento,
+                'nr_parcela': nr_parcela
+            }).then()
+    }
+
+    const estornarOrcamento = async (id_orcamento) => {
+        await api.put(`orcamento/estornar/${id_orcamento}`)
+    }
+
+    const MySwal = withReactContent(Swal)
+    const showSwalWithLink = (id_pagamento, id_parcela, id_orcamento) => {
+        MySwal.fire({
+            title: 'Deseja realmente estornar?',
+            showDenyButton: true,
+            // showCancelButton: true,
+            confirmButtonText: 'Estornar',
+            denyButtonText: `Cancelar`,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                estornarPagamento(id_pagamento, id_parcela, id_orcamento)
+                Swal.fire('Estornado!', '', 'success')
+            } else if (result.isDenied) {
+                Swal.fire('Nenhuma alteração foi realizada', '', 'info')
+            }
+        })
+    }
+
     return (
         <div className="m-5 p-5  rounded-lg shadow-lg">
             <div className="mb-5 flex flex-row flex-wrap w-full justify-between items-center">
-                {/* <Link href="#tabs-procedimento"> */}
-                <button
-                    onClick={() => setGeraOrcamento(true)}
-                    className="bg-purple-800 hover:bg-purple-500 rounded-lg p-2 text-white font-bold">
-                    Novo Orçamento
-                </button>
-                {/* </Link> */}
+
             </div>
             {!geraOrcamento &&
                 < div className="flex flex-col">
@@ -99,8 +118,8 @@ const ListaPagamento = ({ id_paciente }) => {
                                     <thead className="bg-purple-800 dark:bg-purple-700">
                                         <tr className="text-white text-left font-medium">
                                             <th scope="col" className="px-6 py-3">Id</th>
-                                            <th scope="col" className="px-6 py-3 ">Vencimento</th>
                                             <th scope="col" className="px-6 py-3">Parcela</th>
+                                            <th scope="col" className="px-6 py-3 ">Vencimento</th>
                                             <th scope="col" className="px-6 py-3">Valor</th>
                                             <th scope="col" className="px-6 py-3">Recebimento</th>
                                             <th scope="col" className="px-6 py-3">Status</th>
@@ -111,28 +130,57 @@ const ListaPagamento = ({ id_paciente }) => {
                                         {pagamento.map((data) => (
                                             <tr key={data.id_pagamento}>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.id_pagamento}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{moment(data.data_primeiro_vencimento).format('DD/MM/YYYY')}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.quantidade_parcelas}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{toCurrency(data.valor_total)}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.nr_parcela}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{moment(data.dt_vencimento).format('DD/MM/YYYY')}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{toCurrency(data.valor)}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{moment(data.data_pagamento).format('DD/MM/YYYY')}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.status}</td>
                                                 <td className="flex flex-row gap-3 px-6 py-4 whitespace-nowrap text-right text-md font-medium">
 
-                                                    <button
+                                                    <a className="text-purple-800 hover:text-purple-900" title="Visualizar" href="#"
                                                         onClick={() => {
                                                             setModal(true)
                                                             setDadosPagamento(existingValues => ({
                                                                 ...existingValues,
                                                                 ["id_pagamento"]: data.id_pagamento,
+                                                                ["nr_parcela"]: data.nr_parcela
                                                             }))
                                                         }}
-
-                                                        type="button"
-                                                        className="inline-block rounded bg-neutral-100 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-neutral-600 shadow-light-3 transition duration-150 ease-in-out hover:bg-neutral-200 hover:shadow-light-2 focus:bg-neutral-200 focus:shadow-light-2 focus:outline-none focus:ring-0 active:bg-neutral-200 active:shadow-light-2 motion-reduce:transition-none dark:shadow-black/30 dark:hover:shadow-dark-strong dark:focus:shadow-dark-strong dark:active:shadow-dark-strong">
-                                                        Finalizar pagamento
-                                                    </button>
-
+                                                    >
+                                                        <FaCheck />
+                                                    </a>
+                                                    <a className="text-purple-800 hover:text-purple-900" title="Visualizar" href="#"
+                                                        onClick={() => { }}
+                                                    >
+                                                        <FaEye />
+                                                    </a>
+                                                    <a className="text-purple-800 hover:text-purple-900" title="Cancelar Pagamento" href="#"
+                                                        onClick={() => {
+                                                            showSwalWithLink(data.id_pagamento, data.nr_parcela, data.id_orcamento)
+                                                        }}
+                                                    >
+                                                        <ImCancelCircle />
+                                                    </a>
                                                 </td>
+                                                {/* <td className="flex flex-row gap-3 px-6 py-4 whitespace-nowrap text-right text-md font-medium">
+                                                    {data.status !== 'finalizado' ?
+                                                        <button
+                                                            onClick={() => {
+                                                                setModal(true)
+                                                                setDadosPagamento(existingValues => ({
+                                                                    ...existingValues,
+                                                                    ["id_pagamento"]: data.id_pagamento,
+                                                                }))
+                                                            }}
+
+                                                            type="button"
+                                                            className="inline-block rounded bg-neutral-100 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-neutral-600 shadow-light-3 transition duration-150 ease-in-out hover:bg-neutral-200 hover:shadow-light-2 focus:bg-neutral-200 focus:shadow-light-2 focus:outline-none focus:ring-0 active:bg-neutral-200 active:shadow-light-2 motion-reduce:transition-none dark:shadow-black/30 dark:hover:shadow-dark-strong dark:focus:shadow-dark-strong dark:active:shadow-dark-strong">
+                                                            Finalizar pagamento
+                                                        </button>
+                                                        : <p>Finalizado</p>
+                                                    }
+
+                                                </td> */}
                                             </tr>
                                         ))}
                                     </tbody>
@@ -200,11 +248,11 @@ const ListaPagamento = ({ id_paciente }) => {
                                                     name="data"
                                                     id="data"
                                                     type="date"
-                                                    value={dadosPagamento.data_pagamento}
+                                                    value={dadosPagamento.dt_recebimento}
                                                     onChange={(e) =>
                                                         setDadosPagamento(existingValues => ({
                                                             ...existingValues,
-                                                            ["data_pagamento"]: e.target.value,
+                                                            ["dt_recebimento"]: e.target.value,
                                                         }))
                                                     }
                                                     className="w-full h-full rounded" />

@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
         async function loadUserFromCookies() {
             const token = Cookies.get('token')
             if (token) {
-                console.log("Got a token in the cookies, let's see if it is valid")
+                
                 api.defaults.headers.Authorization = `Bearer ${token}`
                 const { data: user } = await api.get('user/me')
                 if (user) setUser(user);
@@ -30,12 +30,12 @@ export const AuthProvider = ({ children }) => {
     const login = async (email, senha) => {
         const { data: token } = await api.post('user/login', { email, senha })
         if (token) {
-            console.log("Got token")
+            
             Cookies.set('token', token, { expires: 60 })
             api.defaults.headers.Authorization = `Bearer ${token.token}`
             const { data: user } = await api.get('users/me')
             setUser(user)
-            console.log("Got user", user)
+            
         }
     }
 

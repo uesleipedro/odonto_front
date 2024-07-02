@@ -13,6 +13,7 @@ import { useAuth } from "../auth/useAuth"
 import { moneyMask, toDecimalNumeric } from "../utils/mask"
 import moment from 'moment'
 import Select from 'react-select'
+import fichaClinica from "./fichaClinica"
 
 // const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub21lIjoiRGFydGhWYWRlciIsImlhdCI6MTY5NjU5ODI2MCwiZXhwIjoxNjk2NzcxMDYwfQ.GakWs7gLYzD1iAnIIS8p9Wu26i1aVi7PZAehATyzEuQ"
 const token = Cookies.get("jwt")
@@ -63,29 +64,6 @@ const ListaProcedimento = ({ id_paciente }) => {
 
 
     useEffect(() => {
-        const getProcedimentoList = async () => {
-            await api.get(`procedimento/paciente/${id_paciente}`)
-                .then(response => {
-                    console.log('procedimento ', response.data)
-                    setProcedimento([...procedimento, ...response.data])
-                })
-                .catch(function (error) {
-                    console.error(error);
-                })
-
-            await api.get('procedimento_list')
-                .then(response => {
-                    console.log('procedimento_list ', response.data)
-                    setProcedimentoList([...procedimentoList, ...response.data])
-                })
-                .catch(function (error) {
-                    console.error(error);
-                })
-
-            console.log('post init', post)
-
-        }
-
         const getDentes = async () => {
             await api.get('dentes')
                 .then(response => {
@@ -99,14 +77,27 @@ const ListaProcedimento = ({ id_paciente }) => {
 
         getProcedimentoList()
         getDentes();
-    }, []);
+    }, [])
 
-    // const selectAction = (action) => {
-    //     if (action === 'insert')
-    //         sendProcedimentoData()
-    //     else if (action === 'update')
-    //         sendUpdateData()
-    // }
+    const getProcedimentoList = async () => {
+        await api.get(`procedimento/paciente/${id_paciente}`)
+            .then(response => {
+                console.log('procedimento ', response.data)
+                setProcedimento([...response.data])
+            })
+            .catch(function (error) {
+                console.error(error);
+            })
+
+        await api.get('procedimento_list')
+            .then(response => {
+                console.log('procedimento_list ', response.data)
+                setProcedimentoList([...procedimentoList, ...response.data])
+            })
+            .catch(function (error) {
+                console.error(error);
+            })
+    }
 
     const getSetFacesDente = (dente) => {
         api.get(`faceDente/${dente}`)
@@ -145,7 +136,6 @@ const ListaProcedimento = ({ id_paciente }) => {
                 ...existingValues,
                 ["face_dente"]: estado,
             }))
-            // console.log('estado', e.target.value)
 
             return
         }
@@ -201,6 +191,7 @@ const ListaProcedimento = ({ id_paciente }) => {
                     .catch(e => {
                         alert(e)
                     })
+                router.push('/fichaClinica')
 
             case 'update':
                 api.put('procedimento', post)
@@ -214,13 +205,15 @@ const ListaProcedimento = ({ id_paciente }) => {
                     })
         }
         setModal(false)
-        router.refresh()
+        getProcedimentoList()
+        // router.refresh()
     }
 
     const getLabelSelect = (arr, id) => {
         if (!arr || !id) return
 
         let a = arr.filter(dataItem => dataItem.value === id)
+        console.log('filter:', a)
         return a[0].label
 
     }
@@ -231,7 +224,6 @@ const ListaProcedimento = ({ id_paciente }) => {
         MySwal.fire({
             title: 'Deseja realmente excluir?',
             showDenyButton: true,
-            // showCancelButton: true,
             confirmButtonText: 'Excluir',
             denyButtonText: `Cancelar`,
         }).then((result) => {
@@ -248,8 +240,6 @@ const ListaProcedimento = ({ id_paciente }) => {
     return (
         <div className=" p-5  rounded-lg shadow-lg">
             <div className="mb-5 flex flex-row flex-wrap w-full justify-between items-center">
-                {/* <input type="text" onChange={e => setSearchVal(e.target.value)} className="form-input mr-4 rounded-lg text-gray-600" placeholder="Buscar paciente" /> */}
-                {/* <Link href="/cadastroPacientes"> */}
                 <button onClick={() => {
                     setPost({
                         face_dente: '',
@@ -262,7 +252,7 @@ const ListaProcedimento = ({ id_paciente }) => {
                 }} className="bg-purple-800 hover:bg-purple-500 rounded-lg p-2 text-white font-bold">
                     Novo procedimento
                 </button>
-                {/* </Link> */}
+
             </div>
 
             <div className="flex flex-col">
@@ -361,7 +351,7 @@ const ListaProcedimento = ({ id_paciente }) => {
                                             name="id_procedimento_list"
                                             options={procedimentoList}
                                             placeholder="Procedimento"
-                                            value={{ value: post.id_procedimento, label: getLabelSelect(procedimentoList, post.id_procedimento_list) }}
+                                            value={{ value: post.id_procedimento_list, label: getLabelSelect(procedimentoList, post.id_procedimento_list) }}
                                             onChange={(e) => {
                                                 updateField({
                                                     target: {
@@ -371,6 +361,8 @@ const ListaProcedimento = ({ id_paciente }) => {
                                                 })
                                             }}
                                         />
+                                        {console.log('procedimento:',procedimentoList)}
+                                        {console.log('post:',post)}
                                     </div>
 
                                     <div className="mb-3">
@@ -402,32 +394,6 @@ const ListaProcedimento = ({ id_paciente }) => {
                                                     <input onChange={updateField} name="face_dente" id="default-checkbox" type="checkbox" value={data.face} className="w-4 h-4 rounded" />
                                                 </div>
                                             ))}
-
-                                            {/* 
-                                            <div className="flex items-center gap-1 ">
-                                                <label for="default-checkbox" className="ml-2 text-sm font-medium text-gray-900 text-bold dark:text-gray-300">O/I</label>
-                                                <input onChange={updateField} name="face_dente" id="default-checkbox" type="checkbox" value="O/I" className="w-4 h-4 rounded" />
-                                            </div>
-
-                                            <div className="flex items-center gap-1 ">
-                                                <label for="default-checkbox" className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">D</label>
-                                                <input onChange={updateField} name="face_dente" id="default-checkbox" type="checkbox" value="D" className="w-4 h-4 rounded" />
-                                            </div>
-
-                                            <div className="flex items-center gap-1 ">
-                                                <label for="default-checkbox" className="ml-2 text-sm font-medium text-gray-900 text-bold dark:text-gray-300">V</label>
-                                                <input onChange={updateField} name="face_dente" id="default-checkbox" type="checkbox" value="V" className="w-4 h-4 rounded" />
-                                            </div>
-
-                                            <div className="flex items-center gap-1 ">
-                                                <label for="default-checkbox" className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">L/P</label>
-                                                <input onChange={updateField} name="face_dente" id="default-checkbox" type="checkbox" value="L/P" className="w-4 h-4 rounded" />
-                                            </div>
-
-                                            <div className="flex items-center gap-1 ">
-                                                <label for="default-checkbox" className="ml-2 text-sm font-medium text-gray-900 text-bold dark:text-gray-300">T</label>
-                                                <input onChange={updateField} name="face_dente" id="default-checkbox" type="checkbox" value="T" className="w-4 h-4 rounded" />
-                                            </div> */}
                                         </div>
                                     </div>
 
@@ -493,7 +459,6 @@ const ListaProcedimento = ({ id_paciente }) => {
                                             className="relative m-0 -mr-0.5 block w-full flex-auto rounded-l border border-solid border-neutral-300 bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary focus:text-neutral-700 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none dark:border-neutral-400 dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:focus:border-primary"
                                             id="message-text"
                                             value={post.preco}
-                                            // onChange={updateField}
                                             onChange={(e) => {
                                                 updateField({
                                                     target: {

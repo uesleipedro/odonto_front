@@ -23,7 +23,7 @@ export function AuthProvider({ children }) {
             // const token = JSON.parse(data)?.token || ''
             const token = 'asdf' 
             if (data) {
-                // console.log("Got a token in the cookies, let's see if it is valid")
+                // 
                 api.defaults.headers.Authorization = `Bearer ${token}`
                 // const { data: user } = await api.get('user/me')
                 if (data) setUser(JSON.parse(data))
@@ -44,7 +44,7 @@ export function AuthProvider({ children }) {
             .then(async (response) => {
                 if (response.status === 201) {
                     // api.defaults.headers.Authorization = `Bearer ${token}`
-                    console.log('response  ', response.data)
+                    
                     api.defaults.headers.Authorization = `Bearer ${JSON.stringify(response.data).token}`
                     Cookies.set("user", JSON.stringify(response.data))
                     setUser(response.data)

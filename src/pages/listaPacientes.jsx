@@ -1,5 +1,5 @@
 import React, { use, useEffect, useState, useMemo } from "react"
-import { FaTooth, FaBookMedical, FaTrashAlt } from "react-icons/fa"
+import { FaPencilAlt, FaBookMedical, FaTrashAlt } from "react-icons/fa"
 import { BiSolidFileDoc } from "react-icons/bi"
 import { MdAttachMoney } from "react-icons/md"
 import Link from "next/link"
@@ -23,15 +23,6 @@ const ListaPacientes = () => {
     const router = useRouter()
 
     const { user } = useAuth()
-
-    // const authHeader = () => {
-    //     //const token = getTokenFromCookies();
-    //     return {
-    //         headers: {
-    //             Authorization: "Bearer " + Cookies.get("jwt"),
-    //         },
-    //     };
-    // };
 
     useEffect(() => {
         const init = async () => {
@@ -122,19 +113,26 @@ const ListaPacientes = () => {
                                 <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                                     {filteredData.map((data) => (
                                         <tr key={data.cpf}>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.nome}</td>
+                                            <Link
+                                                href={{
+                                                    pathname: "/fichaClinica",
+                                                    query: { id_paciente: data.id_paciente }
+                                                }}
+
+                                            >
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.nome}</td>
+                                            </Link>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.rg}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.cpf}</td>
                                             <td className="flex flex-row gap-3 px-6 py-4 whitespace-nowrap text-right text-md font-medium">
-
                                                 <Link
                                                     href={{
-                                                        pathname: "/fichaClinica",
-                                                        query: { id_paciente: data.id_paciente }
+                                                        pathname: "/cadastroPacientes",
+                                                        query: data
                                                     }}
                                                     className="text-purple-800 hover:text-purple-900"
                                                 >
-                                                    <FaTooth />
+                                                    <FaPencilAlt />
                                                 </Link>
                                                 <Link
                                                     href={{
@@ -145,12 +143,6 @@ const ListaPacientes = () => {
                                                 >
                                                     <FaBookMedical />
                                                 </Link>
-                                                <a className="text-purple-800 hover:text-purple-900" href="#">
-                                                    <BiSolidFileDoc />
-                                                </a>
-                                                <a className="text-purple-800 hover:text-purple-900" href="#">
-                                                    <MdAttachMoney />
-                                                </a>
                                                 <a className="text-purple-800 hover:text-purple-900" href="#"
                                                     onClick={() => showSwalWithLink(data.id_paciente)}
                                                 >

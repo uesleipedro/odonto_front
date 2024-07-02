@@ -61,7 +61,7 @@ const GeraOrcamento = ({ id_paciente }) => {
             id_paciente: 1,
             preco: valorOrcamento,
             date: moment().toDate(),
-            status: 'pendente',
+            status: 'Pendente pagamento',
             id_paciente: id_paciente
         })
             .then(async (response) => {
@@ -97,7 +97,7 @@ const GeraOrcamento = ({ id_paciente }) => {
                 .then(function (response) {
                     if (response.status === 201)
                         updateStatusProcedimento(e.id_procedimento)
-                    // alert("Salvo com sucesso")
+                    alert("Salvo com sucesso" + JSON.stringify(e.id_procedimento))
                 })
                 .catch(e => {
                     alert(e)

@@ -17,7 +17,7 @@ const login = () => {
             alert(`Erro na autenticação`)
             return
         }
-        //  console.log("user>> ", JSON.parse(user).token)
+        //  
         router.push("/")
     }
 

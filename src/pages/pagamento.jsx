@@ -27,6 +27,7 @@ const Pagamento = ({ orcamento }) => {
     ])
     const [selectedPagamento, setSelectedPagamento] = useState(0)
     const [dados, setDados] = useState({})
+    const [idPagamento, setIdPagamento] = useState(0)
 
     // Initialization for ES Users
 
@@ -40,21 +41,15 @@ const Pagamento = ({ orcamento }) => {
             });
         };
         init();
-
-        console.log("===orcamento==", orcamento);
-
     })
 
     const moneyMask = (value) => {
-        console.log('===========================', value)
         value = value?.replace('.', '').replace(',', '').replace(/\D/g, '')
 
         const options = { minimumFractionDigits: 2 }
         const result = new Intl.NumberFormat('pt-BR', options).format(
             parseFloat(value) / 100
         )
-
-        console.log(result)
 
         return 'R$ ' + result
     }
@@ -71,7 +66,7 @@ const Pagamento = ({ orcamento }) => {
         alert("update status entrou")
         await api.put('orcamento/status', {
             id_orcamento: id_orcamento,
-            orcado: 'finalizado'
+            status: 'finalizado'
         }).then((response) => {
             alert("response", response.status)
         })
@@ -81,8 +76,7 @@ const Pagamento = ({ orcamento }) => {
 
 
     const cadastroPagamento = async () => {
-        console.log('CADASTRO - VALOR', dados.id_paciente)
-        await api.post('pagamento',
+        return await api.post('pagamento',
             {
                 id_orcamento: orcamento?.id_orcamento,
                 tipo_desconto: dados.tipo_desconto,
@@ -93,21 +87,44 @@ const Pagamento = ({ orcamento }) => {
                 data_pagamento: dados.data_pagamento,
                 id_empresa: 1,
                 valor_total: toDecimalNumeric(orcamento?.preco),
-                status: "pendente",
+                status: "Aberto",
                 id_paciente: orcamento?.id_paciente,
                 valor_total: orcamento?.preco
             }
         )
             .then(async function (response) {
                 if (response.status === 201) {
-                    alert('gerou pagamento')
+                    updateStatusOrcamento(orcamento?.id_orcamento)
                 }
+                setIdPagamento(Number(response.data.id_pagamento))
+                //router.push('/listaPacientes')
+                return Number(response.data.id_pagamento)
             })
             .catch(function (error) {
-                console.log(error)
+                console.error(error)
             })
-        await updateStatusOrcamento(orcamento?.id_orcamento)
-        // router.push('/listaPacientes')
+        // await updateStatusOrcamento(orcamento?.id_orcamento)
+
+    }
+
+    const geraContasReceber = async (contas) => {
+        
+        await api.post('contas_receber',
+            {
+                id_pagamento: contas.id_pagamento,
+                nr_parcela: contas.nr_parcela,
+                valor: contas.valor,
+                dt_vencimento: contas.dt_vencimento,
+                status: "Pendente",
+                id_paciente: contas.id_paciente
+            }
+        )
+            .then(async function (response) {
+
+            })
+            .catch(function (error) {
+                console.error(error)
+            })
     }
 
     const updateField = e => {
@@ -116,8 +133,46 @@ const Pagamento = ({ orcamento }) => {
             ...existingValues,
             [fieldName]: e.target.value,
         }))
+    }
 
-        console.log("pagamento--> ", dados)
+    const calculoDesconto = async (total) => {
+        return dados.tipo_desconto === 'porcentagem'
+            ? toDecimalNumeric(total) - toDecimalNumeric(total) * (dados.valor_desconto / 100)
+            : toDecimalNumeric(total) - dados.valor_desconto
+    }
+
+    function calcularDatasPrestacoes(dataPrimeiraPrestacao, numeroPrestacoes) {
+        let data = new Date(dataPrimeiraPrestacao)
+
+        let datasPrestacoes = [];
+
+        for (let i = 0; i < numeroPrestacoes; i++) {
+            let novaData = new Date(data);
+            novaData.setMonth(novaData.getMonth() + i);
+            datasPrestacoes.push(novaData);
+        }
+
+        return datasPrestacoes;
+    }
+
+    const geraParcela = async () => {
+        // let valor_total = calculoDesconto(orcamento?.preco)
+        let valor_parcela = orcamento?.preco / dados.quantidade_parcelas
+        let datas_prestacoes = calcularDatasPrestacoes(dados.primeiro_vencimento, dados.quantidade_parcelas)
+        cadastroPagamento()
+            .then(data => {
+                for (let contador = 1; contador <= dados.quantidade_parcelas; contador++) {
+                    geraContasReceber({
+                        id_pagamento: data,
+                        nr_parcela: contador,
+                        valor: valor_parcela,
+                        dt_vencimento: datas_prestacoes[contador - 1],
+                        id_paciente: Number(orcamento.id_paciente)
+
+                    })
+                }
+            })
+
     }
 
     return (
@@ -378,7 +433,7 @@ const Pagamento = ({ orcamento }) => {
 
             <div className="mb-5 p-3 flex flex-end w-full justify-end items-center">
                 <button
-                    onClick={() => cadastroPagamento()}
+                    onClick={() => geraParcela()}
                     className="bg-purple-800 hover:bg-purple-500 rounded-lg p-2 text-white font-bold">
                     Concluir
                 </button>

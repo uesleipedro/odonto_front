@@ -15,7 +15,7 @@ const CadastroUsuario = () => {
     //     } = router;
 
     //     const dados = JSON.parse(cadastro);
-    //     console.log('>>>> ', dados)
+    //     
     // })
 
     const updateName = e => {

@@ -3,17 +3,19 @@ import Link from "next/link"
 import api from "../utils/Api"
 import { useRouter } from "next/router";
 
-const cadastroAnamnese = () => {
+const cadastroAnamnese = (id_paciente) => {
 
     const router = useRouter();
-    const data = router.query;
-    const [id_paciente, setId_paciente] = useState(data.id_paciente)
-    const [anamnese, setAnamnese] = useState({})
+    // const data = router.query;
+    // const [id_paciente, setId_paciente] = useState(data.id_paciente)
+    const [anamnese, setAnamnese] = useState({ id_paciente: id_paciente.id_paciente })
+
+
 
 
     useEffect(() => {
         const getAnamnese = async () => {
-            await api.get(`anamnese/${id_paciente}`)
+            await api.get(`anamnese/${id_paciente.id_paciente}`)
                 .then(response => {
                     setAnamnese(response.data)
                 })
@@ -22,16 +24,16 @@ const cadastroAnamnese = () => {
                 })
         }
         getAnamnese()
-        console.log('anamnese', anamnese)
+
     }, []);
 
     // useEffect(() => {
 
-    //     console.log("data", data)
+    //     
     //     const getAnamneseList = async () => {
     //         await api.get(`anamnese/${id_paciente}`)
     //             .then(response => {
-    //                 console.log('response.data', response.data)
+    //                 
     //                 setAnamnese(response.data)
     //             })
     //             .catch(function (error) {
@@ -39,7 +41,7 @@ const cadastroAnamnese = () => {
     //             })
     //     }
     //     getAnamneseList()
-    //     console.log('anamnese', anamnese)
+    //     
     // }, []);
 
     const updateField = e => {
@@ -80,24 +82,24 @@ const cadastroAnamnese = () => {
             [fieldName]: value,
         }))
 
-        console.log(anamnese)
+
     }
 
     const cadastroAnamnese = async () => {
         await api.post('anamnese', anamnese)
-        console.log("-------------------------", anamnese)
             .then(function (response) {
                 if (response.status === 201)
                     alert("Salvo com sucesso")
 
             })
             .catch(function (error) {
-                console.log(error)
+
             })
         // router.push('/listaPacientes')
     }
 
     const updateAnamnese = async () => {
+
         await api.put('anamnese', anamnese)
             .then(function (response) {
                 if (response.status === 201)
@@ -105,20 +107,20 @@ const cadastroAnamnese = () => {
 
             })
             .catch(function (error) {
-                console.log(error)
+
             })
         // router.push('/listaPacientes')
     }
 
     const sendAnamneseData = async () => {
 
-        await api.get(`anamnese/${id_paciente}`)
+        await api.get(`anamnese/check_exists/${id_paciente.id_paciente}`)
             .then(response => {
-                if (response.data.id_paciente)
+
+                if (Number(response.data.count) == !0)
                     updateAnamnese()
                 else
                     cadastroAnamnese()
-                //setAnamnese(response.data)
             })
             .catch(function (error) {
                 console.error(error);

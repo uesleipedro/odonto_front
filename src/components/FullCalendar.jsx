@@ -49,7 +49,7 @@ const FullCalendar = () => {
       ...existingValues,
       [fieldName]: e.target.value,
     }));
-    console.log(agendamento);
+    
   };
 
   const sendAgendaData = () => {
@@ -68,7 +68,7 @@ const FullCalendar = () => {
 
   // useEffect(() => {
   const getAgenda = async () => {
-    console.log("iniciou ------------");
+    
     await api
       .get("agenda")
       .then((response) => {
@@ -82,7 +82,7 @@ const FullCalendar = () => {
             allDay: false,
           };
         });
-        console.log("agenda", temp);
+        
         setAgenda(temp);
         // return temp
       })
@@ -100,14 +100,14 @@ const FullCalendar = () => {
       testet.push({ value: x.id_paciente, label: x.nome });
     });
     setOptions([...testet]);
-    console.log(testet);
+    
   }, [paciente]);
 
   const handleGetPacientList = async () => {
     await api
       .get("paciente")
       .then((response) => {
-        console.log(response.data);
+        
         setPaciente([...response.data]);
 
         // let testet = []
@@ -116,7 +116,7 @@ const FullCalendar = () => {
         //     testet.push({ value: x.id_paciente, label: x.nome })
         // })
         // setOptions([...testet])
-        // console.log(testet)
+        // 
       })
       .catch(function (error) {
         console.error(error);
@@ -155,6 +155,7 @@ const FullCalendar = () => {
       dayMaxEvents: true,
 
       events: getAgenda(),
+      
 
       // dateClick: function (info) {
       //     alert('Clicked on: ' + info.dateStr);
@@ -183,6 +184,8 @@ const FullCalendar = () => {
         handleGetPacientList();
         info.jsEvent;
       },
+
+
 
       // // Delete event
       // eventClick: async function (arg) {
@@ -233,38 +236,6 @@ const FullCalendar = () => {
       //     // });
       // },
 
-      // events: [
-
-      //     //     //     //     // agenda.map(a => {
-      //     //     //     //     //     return ({
-      //     //     //     //     //         title: a.descricao,
-      //     //     //     //     //         start: moment(a.start_date_time).format('YYYY-MM-DDTh:mm:ss'),
-      //     //     //     //     //         end: moment(a.end_date_time).format('YYYY-MM-DDTh:mm:ss'),
-      //     //     //     //     //     })
-      //     //     //     //     // })
-      //     {
-      //         title: 'My Event',
-      //         start: '2023-11-16T07:30:00',
-      //         end: '2023-11-16T07:30:00',
-      //         allDay: false
-      //     }
-      //     //     //     // // other events here...
-      // ],
-      // events: (function () {
-      //     let dataFormFullCalendar = agenda.map(a => {
-      //         return {
-      //             // title: a.descricao,
-      //             // start: moment(a.start_date_time).format('YYYY-MM-DDTh:mm:ss'),
-      //             // end: moment(a.end_date_time).format('YYYY-MM-DDTh:mm:ss'),
-      //             title: 'My Event',
-      //             start: '2023-11-05T07:30:00',
-      //             end: '2023-11-05T07:30:00',
-      //             allDay: false
-      //         }
-      //     })
-
-      //     return dataFormFullCalendar
-      // }),
       eventTimeFormat: {
         // like '14:30:00'
         hour: "2-digit",
@@ -275,7 +246,7 @@ const FullCalendar = () => {
     });
     setTimeout(() => {
       agenda.map((e) => {
-        console.log("start", e.start);
+        
         calendar.addEvent({
           title: e.title,
           start: new Date(e.start),
