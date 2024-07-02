@@ -15,7 +15,7 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData }) => {
     useEffect(() => {
         let opt = [];
         paciente.map((x) => {
-            opt.push({ value: x.id_paciente, label: x.nome });
+            opt.push({ value: x?.id_paciente, label: x.nome });
         });
         setOptions([...opt]);
     }, [paciente]);
@@ -75,7 +75,7 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData }) => {
     const getLabelSelect = (arr, id) => {
         
         if (!arr || !id) return
-        let a = arr.filter(dataItem => dataItem.id_paciente == id)
+        let a = arr.filter(dataItem => dataItem?.id_paciente == id)
 
         return a[0]?.nome
     }
@@ -129,7 +129,7 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData }) => {
                                 <Select
                                     name="paciente"
                                     options={options}
-                                    value={{ value: agendamento.id_paciente, label: getLabelSelect(paciente, agendamento.id_paciente) }}
+                                    value={{ value: agendamento?.id_paciente, label: getLabelSelect(paciente, agendamento?.id_paciente) }}
                                     placeholder="Paciente"
                                     onChange={(e) => {
                                         updateField({
@@ -222,7 +222,7 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData }) => {
                                     options={options}
                                     placeholder="Dentista"
                                     name="dentista"
-                                    value={{ value: agendamento.id_paciente, label: getLabelSelect(paciente, agendamento.id_paciente) }}
+                                    value={{ value: agendamento?.id_paciente, label: getLabelSelect(paciente, agendamento?.id_paciente) }}
                                     onChange={(e) => {
                                         updateField({
                                             target: {
