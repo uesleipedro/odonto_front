@@ -154,7 +154,7 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData }) => {
                                         <div className="flex items-center pl-3">
                                             <input
                                                 id="status1"
-                                                checked={agendamento.status == 1 ? 'checked' : ''}
+                                                checked={agendamento?.status == 1 ? 'checked' : ''}
                                                 type="radio"
                                                 value="1"
                                                 name="status"
@@ -172,7 +172,7 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData }) => {
                                         <div className="flex items-center pl-3">
                                             <input
                                                 id="status2"
-                                                checked={agendamento.status == 2 ? 'checked' : ''}
+                                                checked={agendamento?.status == 2 ? 'checked' : ''}
                                                 type="radio"
                                                 value="2"
                                                 name="status"
@@ -190,7 +190,7 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData }) => {
                                         <div className="flex items-center pl-3">
                                             <input
                                                 id="status3"
-                                                checked={agendamento.status == 3 ? 'checked' : ''}
+                                                checked={agendamento?.status == 3 ? 'checked' : ''}
                                                 type="radio"
                                                 value="3"
                                                 name="status"
