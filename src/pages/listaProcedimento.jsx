@@ -3,7 +3,6 @@ import { FaTooth, FaBookMedical, FaTrashAlt } from "react-icons/fa"
 import { BiSolidFileDoc } from "react-icons/bi"
 import { MdAttachMoney } from "react-icons/md"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import api from "../utils/Api"
@@ -14,13 +13,16 @@ import { moneyMask, toDecimalNumeric } from "../utils/mask"
 import moment from 'moment'
 import Select from 'react-select'
 import fichaClinica from "./fichaClinica"
+import { useRouter } from 'next/router'
+import { useTransition } from 'react';
+import { useRouter as uR } from 'next/navigation'
 
-// const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub21lIjoiRGFydGhWYWRlciIsImlhdCI6MTY5NjU5ODI2MCwiZXhwIjoxNjk2NzcxMDYwfQ.GakWs7gLYzD1iAnIIS8p9Wu26i1aVi7PZAehATyzEuQ"
+
 const token = Cookies.get("jwt")
-// const token = JSON.parse(user).token
 
-const ListaProcedimento = ({ id_paciente }) => {
-
+const ListaProcedimento = ({ id_paciente, refresh }) => {
+    const router = useRouter()
+    const data = router.query;
     const [procedimento, setProcedimento] = useState([])
     const [procedimentoList, setProcedimentoList] = useState([])
     const [searchVal, setSearchVal] = useState('')
@@ -31,6 +33,7 @@ const ListaProcedimento = ({ id_paciente }) => {
     const [modal, setModal] = useState(false)
     const [post, setPost] = useState({})
     const [options, setOptions] = useState([])
+    const [checkedFaces, setCheckedFaces] = useState("")
     const [profissional, setProfissional] = useState([
         {
             value: 1,
@@ -41,18 +44,10 @@ const ListaProcedimento = ({ id_paciente }) => {
             label: "Dra. Marcela"
         }
     ])
-    const router = useRouter()
+    const [isPending, startTransition] = useTransition();
+    const router2 = uR()
 
     const { user } = useAuth()
-
-    // const authHeader = () => {
-    //     //const token = getTokenFromCookies();
-    //     return {
-    //         headers: {
-    //             Authorization: "Bearer " + Cookies.get("jwt"),
-    //         },
-    //     };
-    // };
 
     useEffect(() => {
         const init = async () => {
@@ -67,7 +62,6 @@ const ListaProcedimento = ({ id_paciente }) => {
         const getDentes = async () => {
             await api.get('dentes')
                 .then(response => {
-                    console.log('dentes ', response.data)
                     setOptions([...options, ...response.data])
                 })
                 .catch(function (error) {
@@ -76,13 +70,13 @@ const ListaProcedimento = ({ id_paciente }) => {
         }
 
         getProcedimentoList()
-        getDentes();
+        getDentes()
+        getSetFacesDente(post?.dente)
     }, [])
 
     const getProcedimentoList = async () => {
         await api.get(`procedimento/paciente/${id_paciente}`)
             .then(response => {
-                console.log('procedimento ', response.data)
                 setProcedimento([...response.data])
             })
             .catch(function (error) {
@@ -91,7 +85,6 @@ const ListaProcedimento = ({ id_paciente }) => {
 
         await api.get('procedimento_list')
             .then(response => {
-                console.log('procedimento_list ', response.data)
                 setProcedimentoList([...procedimentoList, ...response.data])
             })
             .catch(function (error) {
@@ -99,22 +92,30 @@ const ListaProcedimento = ({ id_paciente }) => {
             })
     }
 
+  const checkControlFacesDentes = (event) => {
+    const { name, checked } = event.target;
+    setCheckedFaces(prevState => ({
+      ...prevState,
+      [name]: checked,
+    }));
+
+  }
+
     const getSetFacesDente = (dente) => {
         api.get(`faceDente/${dente}`)
             .then(response => {
-                console.log('response', response.data)
-                setFacesDente([...response.data])
+              setFacesDente([...response.data])
             })
             .catch(function (error) {
                 console.error(error);
             })
 
-        console.log('facesDente', facesDente)
     }
 
-    const updateProcedimento = (id_procedimento) => {
+    const updateProcedimento = async (id_procedimento) => {
         let procedimentoFiltrado = procedimento.filter(dataItem => dataItem.id_procedimento === id_procedimento)
-        setPost(procedimentoFiltrado[0])
+        await setPost(procedimentoFiltrado[0])
+        await getSetFacesDente(procedimentoFiltrado[0]?.dente)
         setModal(true)
     }
 
@@ -123,36 +124,34 @@ const ListaProcedimento = ({ id_paciente }) => {
         if (typeof e?.target?.name === 'undefined')
             return
 
-        if (e.target.name === "face_dente") {
-            let estado = ''
-
-            if (e.target.checked) {
-                estado = post.face_dente + e.target.value
-            } else {
-                estado = post.face_dente.replace(e.target.value, '');
-            }
-
-            setPost(existingValues => ({
-                ...existingValues,
-                ["face_dente"]: estado,
-            }))
+        let fieldName =  e.target.name
+        if (fieldName.slice(0, -1) === "face_dente") {
+            let faces = post.face_dente
+            let face = fieldName.slice(-1)
+            const { name, checked } = event.target;
+          
+            checked ? faces += face : faces = faces.replace(face, '');
+            setPost(prevState => ({
+              ...prevState,
+              ["face_dente"]: faces,
+            }));
 
             return
         }
 
         if (e.target.name === "preco") {
+            let preco = String(e.target.value).replace("R$ ", "").replace(",", "." );
+            
             setPost(existingValues => ({
                 ...existingValues,
                 ...{ ["preco"]: parseFloat(e.target.value) },
             }))
         }
 
-        const fieldName = e.target.name
         setPost(existingValues => ({
             ...existingValues,
             [fieldName]: e.target.value,
         }))
-        console.log('post', post)
     }
 
 
@@ -165,7 +164,7 @@ const ListaProcedimento = ({ id_paciente }) => {
             .catch(error => {
                 console.error(error);
             })
-        router.refresh()
+        await getProcedimentoList()
     }
 
     const filteredData = useMemo(() => {
@@ -175,10 +174,11 @@ const ListaProcedimento = ({ id_paciente }) => {
         return procedimento.filter(dataItem => dataItem.nome.toLowerCase().includes(searchVal.toLocaleLowerCase()))
     }, [procedimento, searchVal])
 
-    const sendProcedimentoData = () => {
+    const sendProcedimentoData = async () => {
 
         let dados = post
         dados.preco = Number(toDecimalNumeric(post.preco))
+    console.log("dados: ",dados)
 
         switch (toggleInsertUpdate) {
             case 'insert':
@@ -194,10 +194,10 @@ const ListaProcedimento = ({ id_paciente }) => {
                 router.push('/fichaClinica')
 
             case 'update':
-                api.put('procedimento', post)
-                    .then(function (response) {
+                api.put('procedimento', dados)
+                    .then(async function (response) {
                         if (response.status === 201) {
-                            alert("Salvo com sucesso")
+                            await getProcedimentoList()
                         }
                     })
                     .catch(e => {
@@ -205,8 +205,6 @@ const ListaProcedimento = ({ id_paciente }) => {
                     })
         }
         setModal(false)
-        getProcedimentoList()
-        // router.refresh()
     }
 
     const getLabelSelect = (arr, id) => {
@@ -215,7 +213,6 @@ const ListaProcedimento = ({ id_paciente }) => {
         let a = arr.filter(dataItem => dataItem.value === id)
         console.log('filter:', a)
         return a[0].label
-
     }
 
 
@@ -270,7 +267,7 @@ const ListaProcedimento = ({ id_paciente }) => {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                                    {filteredData.map((data) => (
+                                    {procedimento.map((data) => (
                                         <tr key={data.id_procedimento} className="cursor-pointer">
                                             <td onClick={() => {
                                                 setToggleInsertUpdate('update')
@@ -361,8 +358,6 @@ const ListaProcedimento = ({ id_paciente }) => {
                                                 })
                                             }}
                                         />
-                                        {console.log('procedimento:',procedimentoList)}
-                                        {console.log('post:',post)}
                                     </div>
 
                                     <div className="mb-3">
@@ -391,7 +386,7 @@ const ListaProcedimento = ({ id_paciente }) => {
                                             {facesDente.map((data) => (
                                                 < div className="flex items-center gap-1 " >
                                                     <label for="default-checkbox" className="ml-2 text-sm font-medium text-gray-900 text-bold dark:text-gray-300">{data.face}</label>
-                                                    <input onChange={updateField} name="face_dente" id="default-checkbox" type="checkbox" value={data.face} className="w-4 h-4 rounded" />
+                                                    <input onChange={updateField} name={"face_dente" + data.face} defaultChecked={post.face_dente.includes(data.face)} type="checkbox" className="w-4 h-4 rounded" />
                                                 </div>
                                             ))}
                                         </div>
@@ -405,19 +400,40 @@ const ListaProcedimento = ({ id_paciente }) => {
                                         >
                                             <li className="w-full">
                                                 <div className="flex items-center pl-3">
-                                                    <input id="estado1" type="radio" value="Pré-existente" name="estado" className="w-4 h-4" />
+                                                    <input
+                                                        id="estado1"
+                                                        type="radio"
+                                                        value="Pré-existente"
+                                                        checked={post?.estado == "Pré-existente" ? 'checked' : ''}
+                                                        name="estado"
+                                                        className="w-4 h-4"
+                                                    />
                                                     <label for="estado1" className="w-full py-3 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Pré-existente </label>
                                                 </div>
                                             </li>
                                             <li className="w-full">
                                                 <div className="flex items-center pl-3">
-                                                    <input id="estado2" type="radio" value="Realizado" name="estado" className="w-4 h-4" />
+                                                    <input
+                                                        id="estado2"
+                                                        type="radio"
+                                                        value="Realizado"
+                                                        checked={post?.estado == "Realizado" ? 'checked' : ''}
+                                                        name="estado"
+                                                        className="w-4 h-4"
+                                                    />
                                                     <label for="estado2" className="w-full py-3 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Realizado</label>
                                                 </div>
                                             </li>
                                             <li className="w-full">
                                                 <div className="flex items-center pl-3">
-                                                    <input id="estado3" checked="checked" type="radio" value="A realizar" name="estado" className="w-4 h-4" />
+                                                    <input
+                                                        id="estado3"
+                                                        type="radio"
+                                                        value="A realizar"
+                                                        checked={post?.estado == "A realizar" ? 'checked' : ''}
+                                                        name="estado"
+                                                        className="w-4 h-4"
+                                                    />
                                                     <label for="estado3" className="w-full py-3 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">A realizar</label>
                                                 </div>
                                             </li>
@@ -458,7 +474,7 @@ const ListaProcedimento = ({ id_paciente }) => {
                                             type="text"
                                             className="relative m-0 -mr-0.5 block w-full flex-auto rounded-l border border-solid border-neutral-300 bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary focus:text-neutral-700 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none dark:border-neutral-400 dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:focus:border-primary"
                                             id="message-text"
-                                            value={post.preco}
+                                            value={String(post.preco).replace(".", "," )}
                                             onChange={(e) => {
                                                 updateField({
                                                     target: {

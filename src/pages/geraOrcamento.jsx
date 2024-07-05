@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import api from '../utils/Api'
 import moment from 'moment'
-import Select from "react-select";
+import Select from "react-select"
+import { moneyMask } from "../utils/mask.js"
 
 const GeraOrcamento = ({ id_paciente }) => {
 
@@ -185,9 +186,9 @@ const GeraOrcamento = ({ id_paciente }) => {
                                                 <input
                                                     name="preco"
                                                     id={data.id_procedimento}
-                                                    value={data.preco}
+                                                    value={moneyMask(String(data.preco))}
                                                     onChange={updatePrice(index)}
-                                                    type="number" />
+                                                    type="text" />
                                             </td>
                                         </tr>
                                     ))}
