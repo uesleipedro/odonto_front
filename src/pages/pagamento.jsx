@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 import Select from "react-select";
 import api from "../utils/Api";
 
-const Pagamento = ({ orcamento }) => {
+const Pagamento = ({ orcamento, changeScreen }) => {
 
     const [formaPagamento, setFormaPagamento] = useState([
         { label: "Dinheiro", value: 1 },
@@ -431,7 +431,12 @@ const Pagamento = ({ orcamento }) => {
                 </div>
             </div>
 
-            <div className="mb-5 p-3 flex flex-end w-full justify-end items-center">
+            <div className="mb-5 p-3 gap-3 flex flex-end w-full justify-end items-center">
+                <button
+                    onClick={() => changeScreen("listaOrcamento")}
+                    className="bg-red-800 hover:bg-red-500 rounded-lg p-2 text-white font-bold">
+                    Voltar
+                </button>
                 <button
                     onClick={() => geraParcela()}
                     className="bg-purple-800 hover:bg-purple-500 rounded-lg p-2 text-white font-bold">

@@ -29,16 +29,7 @@ const ListaOrcamento = ({ id_paciente }) => {
 
     const { user } = useAuth()
 
-    // const authHeader = () => {
-    //     //const token = getTokenFromCookies();
-    //     return {
-    //         headers: {
-    //             Authorization: "Bearer " + Cookies.get("jwt"),
-    //         },
-    //     };
-    // };
-
-    useEffect(() => {
+       useEffect(() => {
         const init = async () => {
             const { Datepicker, Input, initTE, Modal, Ripple } = await import("tw-elements");
             initTE({ Datepicker, Input, Modal, Ripple });
@@ -47,20 +38,25 @@ const ListaOrcamento = ({ id_paciente }) => {
     }, [])
 
 
+    const getOrcamentoList = async () => {
+      await api.get(`orcamento/paciente/${id_paciente}`)
+        .then(response => {
+          setOrcamento([...response.data])
+        })
+          .catch(function (error) {
+            console.error(error);
+          })
+    }
+    
     useEffect(() => {
-        const getOrcamentoList = async () => {
-            await api.get(`orcamento/paciente/${id_paciente}`)
-                .then(response => {
-                    setOrcamento([...orcamento, ...response.data])
-                })
-                .catch(function (error) {
-                    console.error(error);
-                })
-        }
-        getOrcamentoList()
-        console.log('id_paciente', id_paciente)
+      getOrcamentoList()
     }, []);
 
+    const changeScreen = (value) => {
+      setScreen(value)
+      getOrcamentoList()
+
+    }
 
     const handleDeleteOrcamento = async (id_orcamento, id_paciente) => {
         await api.delete(`orcamento/${id_orcamento}`)
@@ -73,7 +69,7 @@ const ListaOrcamento = ({ id_paciente }) => {
             .catch(error => {
                 console.error(error);
             })
-        router.refresh()
+        getOrcamentoList()
     }
 
     const estornaProcedimento = async (id_orcamento) => {
@@ -180,7 +176,7 @@ const ListaOrcamento = ({ id_paciente }) => {
                                                         <FaTrashAlt />
                                                     </a>
                                                 </td>
-                                                <td className="px-6 py-4 text-sm text-purple-900 font-bold">
+                                                <td className="px-6 py-4 text-sm text-purple-900 font-bold cursor-pointer">
                                                     <a
                                                         className="pointer"
                                                         onClick={() => {
@@ -204,11 +200,11 @@ const ListaOrcamento = ({ id_paciente }) => {
                 </div>
             }
             {screen === "geraOrcamento" &&
-                <GeraOrcamento id_paciente={id_paciente} />
+                <GeraOrcamento id_paciente={id_paciente} changeScreen={changeScreen} />
             }
 
             {screen === "pagamento" &&
-                <Pagamento orcamento={orcamento[selectedOrcamento]} />
+                <Pagamento orcamento={orcamento[selectedOrcamento]} changeScreen={changeScreen}/>
             }
 
             <BasicModal

@@ -4,7 +4,7 @@ import moment from 'moment'
 import Select from "react-select"
 import { moneyMask } from "../utils/mask.js"
 
-const GeraOrcamento = ({ id_paciente }) => {
+const GeraOrcamento = ({ id_paciente, changeScreen }) => {
 
     const [procedimentos, setProcedimentos] = useState([])
     const [valorOrcamento, setValorOrcamento] = useState(0)
@@ -75,6 +75,8 @@ const GeraOrcamento = ({ id_paciente }) => {
             .catch(e => {
                 alert(e)
             })
+
+        changeScreen("listaOrcamento")
     }
 
     const updateStatusProcedimento = (id_procedimento) => {
@@ -98,7 +100,6 @@ const GeraOrcamento = ({ id_paciente }) => {
                 .then(function (response) {
                     if (response.status === 201)
                         updateStatusProcedimento(e.id_procedimento)
-                    alert("Salvo com sucesso" + JSON.stringify(e.id_procedimento))
                 })
                 .catch(e => {
                     alert(e)
@@ -186,7 +187,7 @@ const GeraOrcamento = ({ id_paciente }) => {
                                                 <input
                                                     name="preco"
                                                     id={data.id_procedimento}
-                                                    value={moneyMask(String(data.preco))}
+                                                    value={String(data.preco).replace(".", "," )}
                                                     onChange={updatePrice(index)}
                                                     type="text" />
                                             </td>
@@ -200,14 +201,20 @@ const GeraOrcamento = ({ id_paciente }) => {
                 </div>
             </div>
 
-            <div className="mb-5 p-3 flex flex-end w-full justify-end items-center">
-                <button
-                    onClick={geraOrcamento}
-                    className="bg-purple-800 hover:bg-purple-500 rounded-lg p-2 text-white font-bold">
-                    Gerar Orçamento
-                </button>
+            <div className="mb-5 p-3 gap-3 flex flex-end w-full justify-end items-center">
+              <button
+                onClick={() => {changeScreen("listaOrcamento")}}
+                className="bg-red-800 hover:bg-red-500 rounded-lg p-2 text-white font-bold">
+                Voltar
+              </button>        
+              <button
+                onClick={geraOrcamento}
+                className="bg-purple-800 hover:bg-purple-500 rounded-lg p-2 text-white font-bold">
+                Gerar Orçamento
+              </button>
             </div>
         </div>
+
     )
 }
 
