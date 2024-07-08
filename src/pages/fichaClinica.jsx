@@ -16,6 +16,7 @@ const fichaClinica = () => {
     const [paciente, setPaciente] = useState({})
 
     useEffect(() => {
+    console.log("fichaclinica DATA: ", data.id_paciente )
         const init = async () => {
             const { Input, initTE, Tab } = await import("tw-elements");
             initTE({ Input, Tab });

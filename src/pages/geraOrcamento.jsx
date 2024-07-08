@@ -108,6 +108,7 @@ const GeraOrcamento = ({ id_paciente, changeScreen }) => {
     }
 
     useEffect(() => {
+    console.log('ID_PACIENTE', id_paciente)
         const calculaValorOrcamento = () => {
             let value = 0
             procedimentos.map(e => {

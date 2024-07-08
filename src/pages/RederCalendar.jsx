@@ -8,8 +8,7 @@ import { useEffect, useState } from "react";
 import api from "../utils/Api";
 import ModalCadastroAgenda from "./modalCadastroAgenda";
 
-const RenderCalendar = () => {
-  const [events, setEvents] = useState([]);
+const RenderCalendar = ({events}) => {
   const [modal, setModal] = useState(false);
   const [paciente, setPaciente] = useState([]);
   const [agendamento, setAgendamento] = useState({
@@ -31,22 +30,7 @@ const RenderCalendar = () => {
       });
     };
     init();
-
-    const getEvents = async () => {
-      await api
-        .get("agenda")
-        .then((response) => {
-          setEvents([events, ...response.data]);
-        })
-        .catch(function (error) {
-          console.error(error);
-        });
-    };
-
-    setTimeout(() => {
-      getEvents();
-    }, 500);
-  }, []);
+  }, [])
 
   const deleteAgendamento = () => {
     setAgendamento({
