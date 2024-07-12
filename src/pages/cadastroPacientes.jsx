@@ -2,14 +2,24 @@ import React, { useEffect, useState } from "react"
 import Link from "next/link"
 import api from "../utils/Api"
 import { useRouter } from 'next/router'
+import moment from 'moment'
+import DatePicker from 'react-datepicker'
 
 const CadastroPacientes = () => {
     const router = useRouter()
     const data = router.query;
     const [paciente, setPaciente] = useState(data)
 
+    useEffect(() => {
+          console.log("CADASTRO PACIENTE", paciente)
+    }, [paciente])
+  
     const updateField = e => {
         const fieldName = e.target.name
+        let value = e.target.value
+      
+        //value == "dt_nascimento" ?? moment(value).format("YYYY-MM-DD")
+
         setPaciente(existingValues => ({
             ...existingValues,
             [fieldName]: e.target.value,
@@ -22,7 +32,7 @@ const CadastroPacientes = () => {
             return
         }
 
-        paciente.id_paciente == ! ""
+        paciente.id_paciente == undefined
             ? await cadastroPaciente()
             : await updatePaciente()
 
@@ -78,8 +88,16 @@ const CadastroPacientes = () => {
 
                 <div className="w-full md:w-2/5 pr-2 pt-3">
                     <label className="text-gray-700 ">Data de nascimento</label>
-                    <input value={paciente.dt_nascimento} type="date" id="dt_nascimento" name="dt_nascimento" onChange={updateField} className="form-input rounded-lg text-gray-600 w-full" placeholder="Ex: João da Cunha" />
-                </div>
+                    <input value={moment(paciente.dt_nascimento).format("YYYY-MM-DD")} type="date" id="dt_nascimento" name="dt_nascimento" onChange={updateField} className="form-input rounded-lg text-gray-600 w-full" />
+                                                             <DatePicker
+                                            selected={paciente.dt_nascimento}
+                                            onChange={updateField}
+                                            showTimeSelect
+                                            timeIntervals={15}
+                                            dateFormat="dd/MM/YYYY hh:mm"
+                                            locale="pt"
+                                          />  
+            </div>
 
                 <div className="w-full md:w-1/5 pt-3">
                     <label className="text-gray-700 ">Sexo</label>

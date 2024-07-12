@@ -18,10 +18,7 @@ const agenda = () => {
         .catch(function (error) {
           console.error(error);
         });
-    setTimeout(() => {
-      getEvents();
-    }, 500);
-    console.log("EVENSTS:", events)
+       console.log("EVENSTS:", events)
   };
   
   return (

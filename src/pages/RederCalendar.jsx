@@ -11,6 +11,7 @@ import ModalCadastroAgenda from "./modalCadastroAgenda";
 const RenderCalendar = ({events}) => {
   const [modal, setModal] = useState(false);
   const [paciente, setPaciente] = useState([]);
+  const [insertUpdate, setInsertUpdate] = useState('')
   const [agendamento, setAgendamento] = useState({
     id_empresa: 1,
     status: 3,
@@ -55,6 +56,7 @@ const RenderCalendar = ({events}) => {
         value: moment(info.endStr).format("YYYY-MM-DD hh:mm:ss"),
       },
     });
+    setInsertUpdate('insert')
     setModal(true);
     info.jsEvent;
   };
@@ -87,8 +89,8 @@ const RenderCalendar = ({events}) => {
 
   const eventClickAction = (data) => {
     setAgendamento(filterEventsById(events, data.event.id))
+    setInsertUpdate('update')
     setModal(true)
-
   }
 
   const toogleModal = () => {
@@ -119,7 +121,7 @@ const RenderCalendar = ({events}) => {
           paciente={paciente}
           toogleModal={() => toogleModal()}
           agendamentoData={agendamento}
-
+          insertUpdate={insertUpdate}
         />
       )}
     </>

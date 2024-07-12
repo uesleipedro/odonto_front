@@ -3,17 +3,20 @@ import Select from "react-select"
 import moment from "moment"
 import api from '../utils/Api'
 import { useRouter } from "next/navigation"
+import DatePicker from 'react-datepicker'
+//import ptBr from "date-fns/locale/pt-BR";
+import { registerLocale, setDefaultLocale } from 'react-datepicker'
+import pt from 'date-fns/locale/pt-BR'
+import 'react-datepicker/dist/react-datepicker.css'
 
-const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData }) => {
+const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate }) => {
+    const router = useRouter();
     const [options, setOptions] = useState([])
     const [paciente, setPaciente] = useState([])
     const [agendamento, setAgendamento] = useState(agendamentoData);
 
-    const router = useRouter();
-
-
     useEffect(() => {
-        let opt = [];
+        let opt = []
         paciente.map((x) => {
             opt.push({ value: x?.id_paciente, label: x.nome });
         });
@@ -21,11 +24,14 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData }) => {
     }, [paciente]);
 
     useEffect(() => {
-        handleGetPacientList();
+        registerLocale('pt', pt)
+        setDefaultLocale('pt')
+        handleGetPacientList()
+    console.log(agendamento.start_date_time)
     }, [])
 
     const updateField = (e) => {
-        if (typeof e?.target?.name === "undefined") return;
+        if (typeof e?.target?.name === "undefined") return
 
         if (e.target.name === "dia_inteiro") {
             let check = e.target.checked ? true : false;
@@ -35,7 +41,14 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData }) => {
                 ["dia_inteiro"]: check,
             }));
 
-            return;
+            return
+        }
+
+        if(e.target.name == "start_date_time" || e.target.name == "end_date_time"){
+          setAgendamento((existingValues) => ({
+            ...existingValues,
+            [fieldName]: moment(e).format("YYYY-MM-DD hh:mm:ss"),
+          }));
         }
 
         const fieldName = e.target.name;
@@ -43,9 +56,18 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData }) => {
             ...existingValues,
             [fieldName]: e.target.value,
         }));
-    };
+    console.log('agenda', agendamento)
+    console.log("insertUpdate: ", insertUpdate)
+  }
 
     const sendAgendaData = () => {
+      if(insertUpdate == "insert")
+        insertAgenda()
+      else if(insertUpdate == "update")
+        updateAgenda()
+    }
+
+    const insertAgenda = () => {
         api
             .post("agenda", agendamento)
             .then(function (response) {
@@ -58,7 +80,31 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData }) => {
             .catch((e) => {
                 alert(e);
             });
+        router.refresh()
     };
+
+     const updateAgenda = () => {
+          /*if(e.target.name == "start_date_time" || e.target.name == "end_date_time"){
+            setAgendamento((existingValues) => ({
+              ...existingValues,
+              [fieldName]: new Date(e.target.value)
+            }));
+          }*/
+console.log('entrou updateAgenda')
+        api
+            .put("agenda", agendamento)
+            .then(function (response) {
+        console.log('response update: ', response)
+                if (response.status === 201) {
+                    alert("Salvo com sucesso");
+                    toogleModal()
+                    router.refresh();
+                }
+            })
+            .catch((e) => {
+                console.error(e);
+            });
+    };   
 
     const handleGetPacientList = async () => {
         await api
@@ -211,8 +257,8 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData }) => {
                                     type="text"
                                     className="relative m-0 -mr-0.5 block w-full flex-auto rounded border border-solid border-neutral-300 bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary focus:text-neutral-700 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none"
                                     name="descricao"
-                                    value={agendamento?.title}
-                                    id="recipient-name"
+                                    value={agendamento?.descricao}
+                                    id="descricao"
                                     placeholder="Evento"
                                     onChange={updateField}
                                 />
@@ -235,7 +281,7 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData }) => {
                             </div>
                             <div className="mb-3 flex flex-row gap-1">
                                 <div
-                                    class="relative mb-3"
+                                    class=""
                                     data-te-date-timepicker-init
                                     data-te-input-wrapper-init
                                 >
@@ -245,15 +291,22 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData }) => {
                                     >
                                         Data e hora início
                                     </label>
-                                    <input
-                                        type="text"
-                                        className="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6]  transition-all duration-200 ease-linear"
-                                        id="form1"
-                                        value={moment(agendamento?.start_date_time).format(
-                                            "DD MM YYYY, hh:mm",
+                                    <DatePicker
+                                      selected={new Date(moment(agendamento?.start_date_time).format("YYYY-MM-DD hh:mm:ss"))}
+                                      
+                                      value={new Date(moment(agendamento?.start_date_time).format("YYYY-MM-DD hh:mm:ss"))}
+                                      name="start_date_time"
+                                      onChange={(e) => 
+                                        updateField(
+                                          {target: {
+                                            value: e,
+                                            name: 'start_date_time'
+                                          }}
                                         )}
-                                        name="start_date_time"
-                                        onChange={updateField}
+                                        showTimeSelect
+                                        timeIntervals={15}
+                                        dateFormat="dd/MM/YYYY hh:mm"
+                                        locale="pt"
                                     />
                                 </div>
 
@@ -268,15 +321,20 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData }) => {
                                     >
                                         Data e hora final
                                     </label>
-                                    <input
-                                        type="text"
-                                        className="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear"
-                                        id="form2"
-                                        name="end_date_time"
-                                        value={moment(agendamento?.end_date_time).format(
-                                            "DD MM YYYY, hh:mm",
+                                    <DatePicker
+                                      selected={new Date(moment(agendamento?.end_date_time).format("YYYY-MM-DD hh:mm:ss"))}
+                                      name="start_date_time"
+                                      onChange={(e) => 
+                                         updateField(
+                                          {target: {
+                                            value: e,
+                                            name: 'end_date_time'
+                                          }}
                                         )}
-                                        onChange={updateField}
+                                        showTimeSelect
+                                        timeIntervals={15}
+                                        dateFormat="dd/MM/YYYY hh:mm"
+                                        locale="pt"
                                     />
                                 </div>
                             </div>
