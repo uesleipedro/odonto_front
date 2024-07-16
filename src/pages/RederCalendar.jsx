@@ -21,9 +21,9 @@ const RenderCalendar = ({events}) => {
   useEffect(() => {
     const init = async () => {
       const { Modal, Ripple, Datepicker, Input, Datetimepicker, initTE } =
-        await import("tw-elements");
+      await import("tw-elements");
       initTE({
-        Modal,
+        Modal, 
         Ripple,
         Datepicker,
         Input,
@@ -31,7 +31,6 @@ const RenderCalendar = ({events}) => {
       });
     };
     init();
-    console.log("EVENTS RENDER: ", events)
   }, [])
 
   const deleteAgendamento = () => {
@@ -41,6 +40,23 @@ const RenderCalendar = ({events}) => {
       dia_inteiro: false,
     })
   }
+
+  const updateDataHora = (agendamento) => {
+    console.log('update data hora:', agendamento)
+    api
+      .put("agenda/updateDataHora", agendamento)
+        .then(function (response) {
+          if (response.status === 201) {
+            alert("Salvo com sucesso");
+            toogleModal()
+            router.refresh();
+          }
+        })
+        .catch((e) => {
+          console.error(e);
+         });
+    }
+    
 
   const handleSelect = (info) => {
     deleteAgendamento()
@@ -94,6 +110,16 @@ const RenderCalendar = ({events}) => {
     setModal(true)
   }
 
+  const handleEventDrop = (info) => {
+    updateDataHora({
+      id_agenda: info.event.id,
+      start: info.event.startStr,
+      end: info.event.endStr
+    })
+
+
+  }
+
   const toogleModal = () => {
     setModal(!modal)
   }
@@ -115,6 +141,7 @@ const RenderCalendar = ({events}) => {
         events={events}
         select={handleSelect}
         eventClick={eventClickAction}
+        eventDrop={handleEventDrop}
         eventTimeFormat={{
           hour: '2-digit',
           minute: '2-digit',

@@ -1,6 +1,6 @@
 import React, { use, useEffect, useState, useMemo } from "react"
-import { FaCheck, FaTrashAlt, FaEye } from "react-icons/fa";
-import { ImCancelCircle } from "react-icons/im";
+import { FaCheck, FaTrashAlt, FaEye } from "react-icons/fa"
+import { ImCancelCircle } from "react-icons/im"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import Swal from 'sweetalert2'
@@ -9,22 +9,22 @@ import api from "../utils/Api"
 import BasicModal from "../components/BasicModal"
 import Cookies from "js-cookie"
 import { useAuth } from "../auth/useAuth"
-import moment from "moment";
-import GeraOrcamento from "./geraOrcamento";
-
-// const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub21lIjoiRGFydGhWYWRlciIsImlhdCI6MTY5NjU5ODI2MCwiZXhwIjoxNjk2NzcxMDYwfQ.GakWs7gLYzD1iAnIIS8p9Wu26i1aVi7PZAehATyzEuQ"
-const token = Cookies.get("jwt")
-// const token = JSON.parse(user).token
+import moment from "moment"
+import GeraOrcamento from "./geraOrcamento"
+import { useFichaClinica } from '../context/FichaClinicaContext'
+import ViewPagamento from './viewPagamento'
 
 const ListaPagamento = ({ id_paciente }) => {
 
-    const [pagamento, setPagamento] = useState([])
+    const { pagamento, loading, getPagamentoList } = useFichaClinica();
     const [searchVal, setSearchVal] = useState('')
     const [idToDelete, setIdToDelete] = useState(0)
     const [geraOrcamento, setGeraOrcamento] = useState(false)
     const [modal, setModal] = useState(false)
     const [dataPagamento, setDataPagamento] = useState(new Date())
     const [dadosPagamento, setDadosPagamento] = useState({ "status": "Pago" })
+    const [showPagamento, setShowPagamento] = useState(false)
+    const [a, setA] = useState()
 
     const router = useRouter()
 
@@ -38,33 +38,22 @@ const ListaPagamento = ({ id_paciente }) => {
         init();
     }, [])
 
-    useEffect(() => {
-        const getPagamentoList = async () => {
-            await api.get(`contas_receber/paciente/${id_paciente}`)
-                .then(response => {
-                    setPagamento([...pagamento, ...response.data])
-                    
-                })
-                .catch(function (error) {
-                    console.error(error);
-                })
-        }
-        getPagamentoList()
-    }, []);
+    const handleToogleView = (data) => {
+      
+    }
 
     const toCurrency = (num) => {
-        return ('R$ ' + num
-            .toString()
-            .replace('.', ','))
-
+      return ('R$ ' + num
+        .toString()
+        .replace('.', ','))
     }
 
     const finalizarPagamento = () => {
-        
         api.put('contas_receber/finalizar', dadosPagamento)
             .then(function (response) {
                 if (response.status === 201) {
-                    alert("Salvo com sucesso")
+                  getPagamentoList()
+                  setModal(false)
                 }
             })
             .catch(e => {
@@ -72,12 +61,14 @@ const ListaPagamento = ({ id_paciente }) => {
             })
     }
 
-    const estornarPagamento = async (id_pagamento, nr_parcela, id_orcamento) => {
+    const estornarPagamento = async (id_pagamento, nr_parcela) => {
+        console.log("estornaPagamento-> id_pagamento:",id_pagamento, " nr_parcela:",nr_parcela)
         await api.put(`contas_receber/estornar`,
             {
                 'id_pagamento': id_pagamento,
                 'nr_parcela': nr_parcela
             }).then()
+        getPagamentoList()
     }
 
     const estornarOrcamento = async (id_orcamento) => {
@@ -85,16 +76,15 @@ const ListaPagamento = ({ id_paciente }) => {
     }
 
     const MySwal = withReactContent(Swal)
-    const showSwalWithLink = (id_pagamento, id_parcela, id_orcamento) => {
+    const showSwalWithLink = (id_pagamento, id_parcela) => {
         MySwal.fire({
             title: 'Deseja realmente estornar?',
             showDenyButton: true,
-            // showCancelButton: true,
             confirmButtonText: 'Estornar',
             denyButtonText: `Cancelar`,
         }).then((result) => {
             if (result.isConfirmed) {
-                estornarPagamento(id_pagamento, id_parcela, id_orcamento)
+                estornarPagamento(id_pagamento, id_parcela)
                 Swal.fire('Estornado!', '', 'success')
             } else if (result.isDenied) {
                 Swal.fire('Nenhuma alteração foi realizada', '', 'info')
@@ -125,7 +115,7 @@ const ListaPagamento = ({ id_paciente }) => {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                                        {pagamento.map((data) => (
+                                        {loading ? <p>Loadnig...</p> : pagamento.map((data) => (
                                             <tr key={data.id_pagamento}>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.id_pagamento}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.nr_parcela}</td>
@@ -148,13 +138,16 @@ const ListaPagamento = ({ id_paciente }) => {
                                                         <FaCheck />
                                                     </a>
                                                     <a className="text-purple-800 hover:text-purple-900" title="Visualizar" href="#"
-                                                        onClick={() => { }}
+                                                        onClick={() => {
+                                                          //showPagamento()
+                                                          //setA(data)
+                                                        }}
                                                     >
                                                         <FaEye />
                                                     </a>
                                                     <a className="text-purple-800 hover:text-purple-900" title="Cancelar Pagamento" href="#"
                                                         onClick={() => {
-                                                            showSwalWithLink(data.id_pagamento, data.nr_parcela, data.id_orcamento)
+                                                            showSwalWithLink(data.id_pagamento, data.nr_parcela)
                                                         }}
                                                     >
                                                         <ImCancelCircle />

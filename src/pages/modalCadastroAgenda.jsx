@@ -30,7 +30,6 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate 
     }, [paciente]);
 
     useEffect(() => {
-        console.log("DATA START: ", agendamentoData?.start)
         registerLocale('ptBR', ptBR)
         setDefaultLocale('ptBR')
         handleGetPacientList()

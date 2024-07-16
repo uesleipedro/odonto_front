@@ -4,15 +4,19 @@ import api from "../utils/Api"
 import { useRouter } from 'next/router'
 import moment from 'moment'
 import DatePicker from 'react-datepicker'
+import { registerLocale, setDefaultLocale } from 'react-datepicker'
+import { ptBR } from 'date-fns/locale'
 
 const CadastroPacientes = () => {
     const router = useRouter()
     const data = router.query;
     const [paciente, setPaciente] = useState(data)
+    const [dataNascimento, setDataNascimento] = useState(moment(paciente?.dt_nascimento).toDate())
 
     useEffect(() => {
-          console.log("CADASTRO PACIENTE", paciente)
-    }, [paciente])
+      registerLocale('ptBR', ptBR)
+      setDefaultLocale('ptBR')
+    }, [])
   
     const updateField = e => {
         const fieldName = e.target.name
@@ -88,16 +92,21 @@ const CadastroPacientes = () => {
 
                 <div className="w-full md:w-2/5 pr-2 pt-3">
                     <label className="text-gray-700 ">Data de nascimento</label>
-                    <input value={moment(paciente.dt_nascimento).format("YYYY-MM-DD")} type="date" id="dt_nascimento" name="dt_nascimento" onChange={updateField} className="form-input rounded-lg text-gray-600 w-full" />
-                                                             <DatePicker
-                                            selected={paciente.dt_nascimento}
-                                            onChange={updateField}
-                                            showTimeSelect
-                                            timeIntervals={15}
-                                            dateFormat="dd/MM/YYYY hh:mm"
-                                            locale="pt"
-                                          />  
-            </div>
+                    <DatePicker
+                      selected={dataNascimento}
+                      name="dt_nascimento"
+                      onChange={(e) => 
+                        changeDate(
+                          {target: {
+                            value: e,
+                            name: 'dt_nascimento'
+                          }}
+                      )} 
+                      dateFormat="dd/MM/YYYY"
+                      locale="ptBR"
+                    />
+
+                    </div>
 
                 <div className="w-full md:w-1/5 pt-3">
                     <label className="text-gray-700 ">Sexo</label>

@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react"
 import ListaProcedimento from "./listaProcedimento"
-import ListaOrcamento from "./listaOrcamento";
-import ListaPagamento from "./listaPagamento";
-import CadastroAnamnese from "./cadastroAnamnese";
+import ListaOrcamento from "./listaOrcamento"
+import ListaPagamento from "./listaPagamento"
+import CadastroAnamnese from "./cadastroAnamnese"
 import { useRouter } from 'next/router'
 import { useRouter as uR } from 'next/navigation'
-import api from "../utils/Api";
+import api from "../utils/Api"
 import moment from "moment"
+import { FichaClinicaProvider } from '../context/FichaClinicaContext';
 
 const fichaClinica = () => {
     const router = useRouter();
@@ -46,6 +47,7 @@ const fichaClinica = () => {
 
 
     return (
+        <FichaClinicaProvider>
         <section
             className="w-full rounded-md text-center shadow-lg md:p-5 md:text-left"
         >
@@ -203,6 +205,7 @@ const fichaClinica = () => {
             </div>
 
         </section >
+        </FichaClinicaProvider>
     )
 }
 

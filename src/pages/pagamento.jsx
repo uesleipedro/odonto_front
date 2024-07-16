@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react"
 import Select from "react-select";
-import api from "../utils/Api";
+import api from "../utils/Api"
+import { useFichaClinica } from '../context/FichaClinicaContext'
 
 const Pagamento = ({ orcamento, changeScreen }) => {
 
@@ -28,6 +29,7 @@ const Pagamento = ({ orcamento, changeScreen }) => {
     const [selectedPagamento, setSelectedPagamento] = useState(0)
     const [dados, setDados] = useState({})
     const [idPagamento, setIdPagamento] = useState(0)
+    const { getPagamentoList } = useFichaClinica()
 
     useEffect(() => {
         const init = async () => {
@@ -105,7 +107,6 @@ const Pagamento = ({ orcamento, changeScreen }) => {
     }
 
     const geraContasReceber = async (contas) => {
-        
         await api.post('contas_receber',
             {
                 id_pagamento: contas.id_pagamento,
@@ -117,7 +118,7 @@ const Pagamento = ({ orcamento, changeScreen }) => {
             }
         )
             .then(async function (response) {
-
+              getPagamentoList()
             })
             .catch(function (error) {
                 console.error(error)
@@ -155,7 +156,7 @@ const Pagamento = ({ orcamento, changeScreen }) => {
     const geraParcela = async () => {
         let valor_parcela = orcamento?.preco / dados.quantidade_parcelas
         let datas_prestacoes = calcularDatasPrestacoes(dados.primeiro_vencimento, dados.quantidade_parcelas)
-        let id_pagamento = cadastroPagamento()
+        let id_pagamento = await cadastroPagamento()
             .then(data => {
                 for (let contador = 1; contador <= dados.quantidade_parcelas; contador++) {
                     geraContasReceber({
@@ -164,9 +165,10 @@ const Pagamento = ({ orcamento, changeScreen }) => {
                         valor: valor_parcela,
                         dt_vencimento: datas_prestacoes[contador - 1],
                         id_paciente: Number(orcamento.id_paciente),
-                        id_pagamento: id_pagamento
                     })
                 }
+            }).then(response => {
+              changeScreen("listaOrcamento")
             })
 
     }
