@@ -18,7 +18,6 @@ const agenda = () => {
         .catch(function (error) {
           console.error(error);
         });
-       console.log("EVENSTS:", events)
   };
   
   return (

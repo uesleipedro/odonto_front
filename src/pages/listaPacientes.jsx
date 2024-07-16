@@ -10,6 +10,7 @@ import api from "../utils/Api"
 import BasicModal from "../components/BasicModal"
 import Cookies from "js-cookie"
 import { useAuth } from "../auth/useAuth"
+import moment from "moment"
 
 // const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub21lIjoiRGFydGhWYWRlciIsImlhdCI6MTY5NjU5ODI2MCwiZXhwIjoxNjk2NzcxMDYwfQ.GakWs7gLYzD1iAnIIS8p9Wu26i1aVi7PZAehATyzEuQ"
 const token = Cookies.get("jwt")
@@ -122,8 +123,8 @@ const ListaPacientes = () => {
                                             >
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.nome}</td>
                                             </Link>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.rg}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.cpf}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.id_paciente}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{moment(data?.inserted_at).format("DD/MM/YYYY")}</td>
                                             <td className="flex flex-row gap-3 px-6 py-4 whitespace-nowrap text-right text-md font-medium">
                                                 <Link
                                                     href={{

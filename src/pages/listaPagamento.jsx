@@ -73,8 +73,6 @@ const ListaPagamento = ({ id_paciente }) => {
     }
 
     const estornarPagamento = async (id_pagamento, nr_parcela, id_orcamento) => {
-        //await api.put(`pagamento/estornar/${id_pagamento}`)
-        //await estornarOrcamento(id_orcamento)
         await api.put(`contas_receber/estornar`,
             {
                 'id_pagamento': id_pagamento,
@@ -117,7 +115,7 @@ const ListaPagamento = ({ id_paciente }) => {
                                 <table className="min-w-full">
                                     <thead className="bg-purple-800 dark:bg-purple-700">
                                         <tr className="text-white text-left font-medium">
-                                            <th scope="col" className="px-6 py-3">Id</th>
+                                            <th scope="col" className="px-6 py-3">Nº Pagamento</th>
                                             <th scope="col" className="px-6 py-3">Parcela</th>
                                             <th scope="col" className="px-6 py-3 ">Vencimento</th>
                                             <th scope="col" className="px-6 py-3">Valor</th>
@@ -162,26 +160,7 @@ const ListaPagamento = ({ id_paciente }) => {
                                                         <ImCancelCircle />
                                                     </a>
                                                 </td>
-                                                {/* <td className="flex flex-row gap-3 px-6 py-4 whitespace-nowrap text-right text-md font-medium">
-                                                    {data.status !== 'finalizado' ?
-                                                        <button
-                                                            onClick={() => {
-                                                                setModal(true)
-                                                                setDadosPagamento(existingValues => ({
-                                                                    ...existingValues,
-                                                                    ["id_pagamento"]: data.id_pagamento,
-                                                                }))
-                                                            }}
-
-                                                            type="button"
-                                                            className="inline-block rounded bg-neutral-100 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-neutral-600 shadow-light-3 transition duration-150 ease-in-out hover:bg-neutral-200 hover:shadow-light-2 focus:bg-neutral-200 focus:shadow-light-2 focus:outline-none focus:ring-0 active:bg-neutral-200 active:shadow-light-2 motion-reduce:transition-none dark:shadow-black/30 dark:hover:shadow-dark-strong dark:focus:shadow-dark-strong dark:active:shadow-dark-strong">
-                                                            Finalizar pagamento
-                                                        </button>
-                                                        : <p>Finalizado</p>
-                                                    }
-
-                                                </td> */}
-                                            </tr>
+                                             </tr>
                                         ))}
                                     </tbody>
                                 </table>

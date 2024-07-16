@@ -4,16 +4,22 @@ import moment from "moment"
 import api from '../utils/Api'
 import { useRouter } from "next/navigation"
 import DatePicker from 'react-datepicker'
-//import ptBr from "date-fns/locale/pt-BR";
 import { registerLocale, setDefaultLocale } from 'react-datepicker'
 import pt from 'date-fns/locale/pt-BR'
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 import 'react-datepicker/dist/react-datepicker.css'
 
 const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate }) => {
     const router = useRouter();
     const [options, setOptions] = useState([])
     const [paciente, setPaciente] = useState([])
-    const [agendamento, setAgendamento] = useState(agendamentoData);
+    const [agendamento, setAgendamento] = useState(agendamentoData)
+    const [startDate, setStartDate] = useState(new Date(agendamentoData?.start))
+    const [endDate, setEndDate] = useState(new Date(agendamentoData?.end))
+    const [profissional, setProfissional] = useState([
+      {value: 1, label: 'Padrão'}
+    ])
 
     useEffect(() => {
         let opt = []
@@ -27,38 +33,43 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate 
         registerLocale('pt', pt)
         setDefaultLocale('pt')
         handleGetPacientList()
-    console.log(agendamento.start_date_time)
     }, [])
+
+    const changeDate = (date) => {
+      date.target.name == "start" 
+        ? setStartDate(date.target.value)
+        : setEndDate(date.target.value)
+      updateField(date)
+    }
+    
+    const checkHandler = async (e) => {
+      let ck = e.target.checked
+      await updateField({
+        target: {
+          name: "dia_inteiro",
+          value: e.target.checked
+        }
+      })
+    }
 
     const updateField = (e) => {
         if (typeof e?.target?.name === "undefined") return
+        const fieldName = e.target.name;
 
-        if (e.target.name === "dia_inteiro") {
-            let check = e.target.checked ? true : false;
-
-            setAgendamento((existingValues) => ({
-                ...existingValues,
-                ["dia_inteiro"]: check,
-            }));
-
-            return
-        }
-
-        if(e.target.name == "start_date_time" || e.target.name == "end_date_time"){
+        if(fieldName == "start" || fieldName == "end"){
           setAgendamento((existingValues) => ({
             ...existingValues,
-            [fieldName]: moment(e).format("YYYY-MM-DD hh:mm:ss"),
+            [fieldName]: moment(e.target.value).format("YYYY-MM-DD HH:mm"),
           }));
+
+          return
         }
 
-        const fieldName = e.target.name;
         setAgendamento((existingValues) => ({
             ...existingValues,
             [fieldName]: e.target.value,
-        }));
-    console.log('agenda', agendamento)
-    console.log("insertUpdate: ", insertUpdate)
-  }
+        }))
+    }
 
     const sendAgendaData = () => {
       if(insertUpdate == "insert")
@@ -70,9 +81,8 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate 
     const insertAgenda = () => {
         api
             .post("agenda", agendamento)
-            .then(function (response) {
+            .then(async function (response) {
                 if (response.status === 201) {
-                    alert("Salvo com sucesso");
                     toogleModal()
                     router.refresh();
                 }
@@ -81,20 +91,12 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate 
                 alert(e);
             });
         router.refresh()
-    };
+    }
 
      const updateAgenda = () => {
-          /*if(e.target.name == "start_date_time" || e.target.name == "end_date_time"){
-            setAgendamento((existingValues) => ({
-              ...existingValues,
-              [fieldName]: new Date(e.target.value)
-            }));
-          }*/
-console.log('entrou updateAgenda')
         api
             .put("agenda", agendamento)
             .then(function (response) {
-        console.log('response update: ', response)
                 if (response.status === 201) {
                     alert("Salvo com sucesso");
                     toogleModal()
@@ -104,7 +106,21 @@ console.log('entrou updateAgenda')
             .catch((e) => {
                 console.error(e);
             });
-    };   
+    }
+    
+    const deleteAgendamento = async (id_agenda) => {
+        await api.delete(`agenda/${id_agenda}`)
+            .then(response => {
+                if (response.status === 204){
+                  toogleModal()
+                  router.refresh()
+                  return
+                }
+            })
+            .catch(error => {
+                console.error(error);
+            })
+    }
 
     const handleGetPacientList = async () => {
         await api
@@ -119,11 +135,27 @@ console.log('entrou updateAgenda')
     }
 
     const getLabelSelect = (arr, id) => {
-        
         if (!arr || !id) return
         let a = arr.filter(dataItem => dataItem?.id_paciente == id)
 
         return a[0]?.nome
+    }
+
+    const MySwal = withReactContent(Swal)
+    const showSwalWithLink = (id_agenda) => {
+        MySwal.fire({
+            title: 'Deseja realmente excluir?',
+            showDenyButton: true,
+            confirmButtonText: 'Excluir',
+            denyButtonText: `Cancelar`,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                deleteAgendamento(id_agenda)
+                Swal.fire('Excluído!', '', 'success')
+            } else if (result.isDenied) {
+                Swal.fire('Nenhuma alteração foi realizada', '', 'info')
+            }
+        })
     }
 
     return (
@@ -265,10 +297,10 @@ console.log('entrou updateAgenda')
                             </div>
                             <div className="mb-3">
                                 <Select
-                                    options={options}
-                                    placeholder="Dentista"
-                                    name="dentista"
-                                    value={{ value: agendamento?.id_paciente, label: getLabelSelect(paciente, agendamento?.id_paciente) }}
+                                    options={profissional}
+                                    placeholder="Profissional"
+                                    name="profissional"
+                                    value={{value: 1, label: "Padrão"}}
                                     onChange={(e) => {
                                         updateField({
                                             target: {
@@ -292,20 +324,18 @@ console.log('entrou updateAgenda')
                                         Data e hora início
                                     </label>
                                     <DatePicker
-                                      selected={new Date(moment(agendamento?.start_date_time).format("YYYY-MM-DD hh:mm:ss"))}
-                                      
-                                      value={new Date(moment(agendamento?.start_date_time).format("YYYY-MM-DD hh:mm:ss"))}
-                                      name="start_date_time"
+                                      selected={startDate}
+                                      name="start"
                                       onChange={(e) => 
-                                        updateField(
+                                        changeDate(
                                           {target: {
                                             value: e,
-                                            name: 'start_date_time'
+                                            name: 'start'
                                           }}
-                                        )}
-                                        showTimeSelect
+                                        )} 
                                         timeIntervals={15}
-                                        dateFormat="dd/MM/YYYY hh:mm"
+                                        showTimeSelect
+                                        dateFormat="dd/MM/YYYY HH:mm"
                                         locale="pt"
                                     />
                                 </div>
@@ -322,18 +352,18 @@ console.log('entrou updateAgenda')
                                         Data e hora final
                                     </label>
                                     <DatePicker
-                                      selected={new Date(moment(agendamento?.end_date_time).format("YYYY-MM-DD hh:mm:ss"))}
-                                      name="start_date_time"
+                                      selected={endDate}
+                                      name="end"
                                       onChange={(e) => 
-                                         updateField(
+                                         changeDate(
                                           {target: {
                                             value: e,
-                                            name: 'end_date_time'
+                                            name: 'end'
                                           }}
                                         )}
                                         showTimeSelect
                                         timeIntervals={15}
-                                        dateFormat="dd/MM/YYYY hh:mm"
+                                        dateFormat="dd/MM/YYYY HH:mm"
                                         locale="pt"
                                     />
                                 </div>
@@ -341,11 +371,12 @@ console.log('entrou updateAgenda')
                             <div className="mb-3">
                                 <div className="flex items-center mb-4">
                                     <input
-                                        onChange={updateField}
+                                        onChange={(e) =>
+                                          checkHandler(e)
+                                        }
                                         name="dia_inteiro"
-                                        id="default-checkbox"
                                         type="checkbox"
-                                        value=""
+                                        defaultChecked={agendamento?.dia_inteiro}
                                         className="w-4 h-4 rounded"
                                     />
                                     <label
@@ -369,7 +400,7 @@ console.log('entrou updateAgenda')
                         </form>
                     </div>
                     <div className="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
-                        <button
+                      <button
                             type="button"
                             className="inline-block rounded bg-purple-100 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-primary-700 transition duration-150 ease-in-out hover:bg-primary-accent-100 focus:bg-primary-accent-100 focus:outline-none focus:ring-0 active:bg-primary-accent-200"
                             data-te-modal-dismiss
@@ -379,6 +410,16 @@ console.log('entrou updateAgenda')
                         >
                             Cancelar
                         </button>
+                        <button
+                          type="button"
+                          className="inline-block rounded bg-red-500 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white transition duration-150 ease-in-out hover:bg-red-accent-200 focus:bg-red-accent-100 focus:outline-none focus:ring-0 active:bg-red-accent-200"
+                          data-te-modal-dismiss
+                          data-te-ripple-init
+                          data-te-ripple-color="light"
+                          onClick={() => showSwalWithLink(agendamento?.id)}
+                        >
+                          Excluir
+                        </button>  
                         <button
                             type="button"
                             className="ml-1 inline-block rounded bg-purple-600 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_#3b71ca] transition duration-150 ease-in-out hover:bg-primary-600 hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:bg-primary-600 focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:outline-none focus:ring-0 active:bg-primary-700 active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] dark:shadow-[0_4px_9px_-4px_rgba(59,113,202,0.5)] dark:hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)]"

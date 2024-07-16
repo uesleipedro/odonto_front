@@ -31,6 +31,7 @@ const RenderCalendar = ({events}) => {
       });
     };
     init();
+    console.log("EVENTS RENDER: ", events)
   }, [])
 
   const deleteAgendamento = () => {
@@ -46,14 +47,14 @@ const RenderCalendar = ({events}) => {
 
     updateField({
       target: {
-        name: "start_date_time",
-        value: moment(info.startStr).format("YYYY-MM-DD hh:mm:ss"),
+        name: "start",
+        value: moment(info.startStr).format("YYYY-MM-DD HH:mm"),
       },
     });
     updateField({
       target: {
-        name: "end_date_time",
-        value: moment(info.endStr).format("YYYY-MM-DD hh:mm:ss"),
+        name: "end",
+        value: moment(info.endStr).format("YYYY-MM-DD HH:mm"),
       },
     });
     setInsertUpdate('insert')
@@ -114,6 +115,13 @@ const RenderCalendar = ({events}) => {
         events={events}
         select={handleSelect}
         eventClick={eventClickAction}
+        eventTimeFormat={{
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          meridiem: false,
+          hour12: false
+        }}
       />
 
       {modal && (

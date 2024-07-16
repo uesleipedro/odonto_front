@@ -9,7 +9,7 @@ import api from "../utils/Api"
 import BasicModal from "../components/BasicModal"
 import Cookies from "js-cookie"
 import { useAuth } from "../auth/useAuth"
-import { moneyMask, toDecimalNumeric } from "../utils/mask"
+import { moneyMask, toDecimalNumeric, formatarMoedaBRL } from "../utils/mask"
 import moment from 'moment'
 import Select from 'react-select'
 import fichaClinica from "./fichaClinica"
@@ -242,7 +242,8 @@ const ListaProcedimento = ({ id_paciente, refresh }) => {
                         face_dente: '',
                         estado: 'A realizar',
                         adicionado: moment(Date()).format('YYYY-MM-DD'),
-                        id_paciente: Number(id_paciente)
+                        id_paciente: Number(id_paciente),
+                        preco: "R$ 0,00"
                     })
                     setToggleInsertUpdate('insert')
                     setModal(true)
@@ -474,7 +475,7 @@ const ListaProcedimento = ({ id_paciente, refresh }) => {
                                             type="text"
                                             className="relative m-0 -mr-0.5 block w-full flex-auto rounded-l border border-solid border-neutral-300 bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary focus:text-neutral-700 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none dark:border-neutral-400 dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:focus:border-primary"
                                             id="message-text"
-                                            value={String(post.preco).replace(".", "," )}
+                                            value={formatarMoedaBRL(post?.preco)}
                                             onChange={(e) => {
                                                 updateField({
                                                     target: {

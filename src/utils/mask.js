@@ -1,5 +1,5 @@
 export const moneyMask = (value) => {
-  value = value?.replace('.', '').replace(',', '').replace(/\D/g, '')
+  value = value?.replace('.', '').replace(',', '').replace('R$ ', '').replace(/\D/g, '')
 
   const options = { minimumFractionDigits: 2 }
   const result = new Intl.NumberFormat('pt-BR', options).format(
@@ -9,6 +9,10 @@ export const moneyMask = (value) => {
   
 
   return 'R$ ' + result
+}
+
+export const formatarMoedaBRL = (valor) => {
+    return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
 export const toDecimalNumeric = (num) => {

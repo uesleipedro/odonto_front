@@ -6,7 +6,7 @@ import CadastroAnamnese from "./cadastroAnamnese";
 import { useRouter } from 'next/router'
 import { useRouter as uR } from 'next/navigation'
 import api from "../utils/Api";
-
+import moment from "moment"
 
 const fichaClinica = () => {
     const router = useRouter();
@@ -67,7 +67,7 @@ const fichaClinica = () => {
                             </div>
                             <div className="mb-4 w-full md:w-4/12">
                                 <p className="font-bold">Idade:</p>
-                                <p>{paciente?.dt_nascimento}</p>
+                                <p>{moment(new Date).diff(paciente?.dt_nascimento, "years")}</p>
                             </div>
                             <div className="mb-4 w-full md:w-4/12">
                                 <p className="font-bold">Paciente desde:</p>

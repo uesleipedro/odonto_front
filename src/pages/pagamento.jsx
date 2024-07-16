@@ -29,8 +29,6 @@ const Pagamento = ({ orcamento, changeScreen }) => {
     const [dados, setDados] = useState({})
     const [idPagamento, setIdPagamento] = useState(0)
 
-    // Initialization for ES Users
-
     useEffect(() => {
         const init = async () => {
             const { Collapse, initTE } =
@@ -103,7 +101,6 @@ const Pagamento = ({ orcamento, changeScreen }) => {
             .catch(function (error) {
                 console.error(error)
             })
-        // await updateStatusOrcamento(orcamento?.id_orcamento)
 
     }
 
@@ -156,10 +153,9 @@ const Pagamento = ({ orcamento, changeScreen }) => {
     }
 
     const geraParcela = async () => {
-        // let valor_total = calculoDesconto(orcamento?.preco)
         let valor_parcela = orcamento?.preco / dados.quantidade_parcelas
         let datas_prestacoes = calcularDatasPrestacoes(dados.primeiro_vencimento, dados.quantidade_parcelas)
-        cadastroPagamento()
+        let id_pagamento = cadastroPagamento()
             .then(data => {
                 for (let contador = 1; contador <= dados.quantidade_parcelas; contador++) {
                     geraContasReceber({
@@ -167,8 +163,8 @@ const Pagamento = ({ orcamento, changeScreen }) => {
                         nr_parcela: contador,
                         valor: valor_parcela,
                         dt_vencimento: datas_prestacoes[contador - 1],
-                        id_paciente: Number(orcamento.id_paciente)
-
+                        id_paciente: Number(orcamento.id_paciente),
+                        id_pagamento: id_pagamento
                     })
                 }
             })
@@ -213,7 +209,6 @@ const Pagamento = ({ orcamento, changeScreen }) => {
                         data-te-collapse-show
                         aria-labelledby="headingOne5">
                         <div className="px-5 py-4">
-                            {/* <h1 className='text-gray-500'>Forma de pagamento:</h1> */}
                             <Select
                                 className="text-gray-500 w-6/12"
                                 name="paciente"
@@ -271,7 +266,6 @@ const Pagamento = ({ orcamento, changeScreen }) => {
                                 <ul
                                     className="items-center w-full text-sm font-medium text-gray-900 bg-white  rounded-lg sm:flex"
                                     name="status"
-                                // onChange={updateField}
                                 >
                                     <li className="w-full">
                                         <div className="flex items-center pl-3">
@@ -427,7 +421,6 @@ const Pagamento = ({ orcamento, changeScreen }) => {
                     </div>
                 </div>
                 <div className="mb-5 p-3 flex flex-end w-full justify-end items-center">
-                    {/* Total: {Number(orcamento?.preco) - Number(dados.desconto/100} */}
                 </div>
             </div>
 

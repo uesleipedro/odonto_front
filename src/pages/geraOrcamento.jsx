@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import api from '../utils/Api'
 import moment from 'moment'
 import Select from "react-select"
-import { moneyMask } from "../utils/mask.js"
+import { moneyMask, formatarMoedaBRL, toDecimalNumeric } from "../utils/mask"
 
 const GeraOrcamento = ({ id_paciente, changeScreen }) => {
 
@@ -13,11 +13,11 @@ const GeraOrcamento = ({ id_paciente, changeScreen }) => {
     ])
     const [selectedProfissional, setSelectedProfissional] = useState(0)
 
-
     useEffect(() => {
         const getProcedimentoList = async () => {
             await api.get('procedimento')
                 .then(response => {
+        console.log('start: ', response.data)
                     setProcedimentos([...response.data])
                 })
                 .catch(function (error) {
@@ -44,9 +44,10 @@ const GeraOrcamento = ({ id_paciente, changeScreen }) => {
     }
 
     const updatePrice = (index) => (e) => {
+        console.log('updatePrice: ', index, toDecimalNumeric(e.target.value))
         const newArray = procedimentos.map((item, i) => {
             if (index === i) {
-                return { ...item, [e.target.name]: e.target.value }
+                return { ...item, [e.target.name]: toDecimalNumeric(e.target.value) }
             } else {
                 return item
             }
@@ -108,12 +109,11 @@ const GeraOrcamento = ({ id_paciente, changeScreen }) => {
     }
 
     useEffect(() => {
-    console.log('ID_PACIENTE', id_paciente)
         const calculaValorOrcamento = () => {
             let value = 0
             procedimentos.map(e => {
                 if (e.check)
-                    value += Number(e.preco)
+                    value += Number(String(e.preco).replace('R$ ',''))
             })
 
             setValorOrcamento(value)
@@ -184,17 +184,16 @@ const GeraOrcamento = ({ id_paciente, changeScreen }) => {
                                                 className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.dente}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.procedimento}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">
-                                                <span className="mr-2">R$</span>
                                                 <input
                                                     name="preco"
                                                     id={data.id_procedimento}
-                                                    value={String(data.preco).replace(".", "," )}
+                                                    value={formatarMoedaBRL(data?.preco)}
                                                     onChange={updatePrice(index)}
                                                     type="text" />
                                             </td>
                                         </tr>
                                     ))}
-                                    <span>Total: R$ {valorOrcamento}</span>
+                                    <span className="text-purple-900 text-left font-bold">Total: {formatarMoedaBRL(valorOrcamento)}</span>
                                 </tbody>
                             </table>
                         </div>
@@ -207,7 +206,7 @@ const GeraOrcamento = ({ id_paciente, changeScreen }) => {
                 onClick={() => {changeScreen("listaOrcamento")}}
                 className="bg-red-800 hover:bg-red-500 rounded-lg p-2 text-white font-bold">
                 Voltar
-              </button>        
+              </button>
               <button
                 onClick={geraOrcamento}
                 className="bg-purple-800 hover:bg-purple-500 rounded-lg p-2 text-white font-bold">

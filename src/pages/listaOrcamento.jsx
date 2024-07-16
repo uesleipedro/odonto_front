@@ -10,8 +10,9 @@ import BasicModal from "../components/BasicModal"
 import Cookies from "js-cookie"
 import { useAuth } from "../auth/useAuth"
 import moment from "moment";
-import GeraOrcamento from "./geraOrcamento";
-import Pagamento from "./pagamento";
+import GeraOrcamento from "./geraOrcamento"
+import Pagamento from "./pagamento"
+import { formatarMoedaBRL } from "../utils/mask"
 
 // const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub21lIjoiRGFydGhWYWRlciIsImlhdCI6MTY5NjU5ODI2MCwiZXhwIjoxNjk2NzcxMDYwfQ.GakWs7gLYzD1iAnIIS8p9Wu26i1aVi7PZAehATyzEuQ"
 const token = Cookies.get("jwt")
@@ -60,8 +61,11 @@ const ListaOrcamento = ({ id_paciente }) => {
 
     const handleDeleteOrcamento = async (id_orcamento, id_paciente) => {
         await api.delete(`orcamento/${id_orcamento}`)
-            .then(response => {
-                estornaProcedimento(id_orcamento)
+            .then(async response => {
+                await estornaProcedimento(id_orcamento)
+                let a = await deletePagamento(id_orcamento)
+                console.log('AAAAAA: ', a.data)
+                //await deleteContasReceber()
 
                 if (response.status === 204)
                     return
@@ -70,6 +74,18 @@ const ListaOrcamento = ({ id_paciente }) => {
                 console.error(error);
             })
         getOrcamentoList()
+    }
+
+    const deletePagamento = async (id_orcamento) => {
+      return await api.delete(`pagamento/${id_orcamento}`)
+                      .then(async response => {
+                        console.log('response deletePagamento ', response )
+                        return response.id_pagamento
+                      })
+    }
+
+    const deleteContasReceber = async (id_pagamento) => {
+      await api.delete(`contas_receber/${id_pagamento}`)
     }
 
     const estornaProcedimento = async (id_orcamento) => {
@@ -113,7 +129,6 @@ const ListaOrcamento = ({ id_paciente }) => {
 
     const MySwal = withReactContent(Swal)
     const showSwalWithLink = (id_paciente, id_orcamento) => {
-        console.log('..<<<<...', id_orcamento, id_paciente)
         MySwal.fire({
             title: 'Deseja realmente excluir?',
             showDenyButton: true,
@@ -163,7 +178,7 @@ const ListaOrcamento = ({ id_paciente }) => {
                                             <tr key={data.cpf}>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{moment(data.date).format('DD/MM/YYYY')}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.id_profissional}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{toCurrency(data.preco)}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{formatarMoedaBRL(data?.preco)}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.status}</td>
                                                 <td className="flex flex-row gap-3 px-6 py-4 whitespace-nowrap text-right text-md font-medium">
 
