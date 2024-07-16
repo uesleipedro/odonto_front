@@ -5,7 +5,7 @@ import api from '../utils/Api'
 import { useRouter } from "next/navigation"
 import DatePicker from 'react-datepicker'
 import { registerLocale, setDefaultLocale } from 'react-datepicker'
-import pt from 'date-fns/locale/pt-BR'
+import { ptBR } from 'date-fns/locale'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import 'react-datepicker/dist/react-datepicker.css'
@@ -15,8 +15,8 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate 
     const [options, setOptions] = useState([])
     const [paciente, setPaciente] = useState([])
     const [agendamento, setAgendamento] = useState(agendamentoData)
-    const [startDate, setStartDate] = useState(new Date(agendamentoData?.start))
-    const [endDate, setEndDate] = useState(new Date(agendamentoData?.end))
+    const [startDate, setStartDate] = useState(moment(agendamentoData?.start).toDate())
+    const [endDate, setEndDate] = useState(moment(agendamentoData?.end).toDate())
     const [profissional, setProfissional] = useState([
       {value: 1, label: 'Padrão'}
     ])
@@ -30,8 +30,9 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate 
     }, [paciente]);
 
     useEffect(() => {
-        registerLocale('pt', pt)
-        setDefaultLocale('pt')
+        console.log("DATA START: ", agendamentoData?.start)
+        registerLocale('ptBR', ptBR)
+        setDefaultLocale('ptBR')
         handleGetPacientList()
     }, [])
 
@@ -336,7 +337,7 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate 
                                         timeIntervals={15}
                                         showTimeSelect
                                         dateFormat="dd/MM/YYYY HH:mm"
-                                        locale="pt"
+                                        locale="ptBR"
                                     />
                                 </div>
 
@@ -364,7 +365,7 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate 
                                         showTimeSelect
                                         timeIntervals={15}
                                         dateFormat="dd/MM/YYYY HH:mm"
-                                        locale="pt"
+                                        locale="ptBR"
                                     />
                                 </div>
                             </div>
