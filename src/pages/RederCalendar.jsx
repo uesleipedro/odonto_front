@@ -48,8 +48,9 @@ const RenderCalendar = ({events}) => {
         .then(function (response) {
           if (response.status === 201) {
             alert("Salvo com sucesso");
-            toogleModal()
+            //toogleModal()
             router.refresh();
+            router.reload()
           }
         })
         .catch((e) => {
