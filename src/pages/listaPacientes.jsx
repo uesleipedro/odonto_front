@@ -7,15 +7,11 @@ import { useRouter } from "next/navigation"
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import api from "../utils/Api"
-import BasicModal from "../components/BasicModal"
 import Cookies from "js-cookie"
 import { useAuth } from "../auth/useAuth"
+import { usePaciente } from "../context/PacienteContext"
 import moment from "moment"
-
-// const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub21lIjoiRGFydGhWYWRlciIsImlhdCI6MTY5NjU5ODI2MCwiZXhwIjoxNjk2NzcxMDYwfQ.GakWs7gLYzD1iAnIIS8p9Wu26i1aVi7PZAehATyzEuQ"
-const token = Cookies.get("jwt")
-// const token = JSON.parse(user).token
-
+ 
 const ListaPacientes = () => {
 
     const [paciente, setPaciente] = useState([])
@@ -24,6 +20,7 @@ const ListaPacientes = () => {
     const router = useRouter()
 
     const { user } = useAuth()
+    //const { saveIdPaciente } = usePaciente()
 
     useEffect(() => {
         const init = async () => {
@@ -87,7 +84,8 @@ const ListaPacientes = () => {
     }
 
 
-    return (
+    return ( 
+    
         <div className="m-5 p-5  rounded-lg shadow-lg">
             <div className="mb-5 flex flex-row flex-wrap w-full justify-between items-center">
                 <input type="text" onChange={e => setSearchVal(e.target.value)} className="form-input mr-4 rounded-lg text-gray-600" placeholder="Buscar paciente" />
@@ -116,12 +114,12 @@ const ListaPacientes = () => {
                                         <tr key={data.cpf}>
                                             <Link
                                                 href={{
-                                                    pathname: "/fichaClinica",
-                                                    query: { id_paciente: data.id_paciente }
+                                                    pathname: `/fichaClinica/${data.id_paciente}`,
+                                                    //query: { id_paciente: data.id_paciente }
                                                 }}
 
                                             >
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.nome}</td>
+                                                <td onClick={() => {}} className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.nome}</td>
                                             </Link>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.id_paciente}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{moment(data?.inserted_at).format("DD/MM/YYYY")}</td>
@@ -134,15 +132,6 @@ const ListaPacientes = () => {
                                                     className="text-purple-800 hover:text-purple-900"
                                                 >
                                                     <FaPencilAlt />
-                                                </Link>
-                                                <Link
-                                                    href={{
-                                                        pathname: "/cadastroAnamnese",
-                                                        query: { id_paciente: data.id_paciente }
-                                                    }}
-                                                    className="text-purple-800 hover:text-purple-900"
-                                                >
-                                                    <FaBookMedical />
                                                 </Link>
                                                 <a className="text-purple-800 hover:text-purple-900" href="#"
                                                     onClick={() => showSwalWithLink(data.id_paciente)}
@@ -158,13 +147,6 @@ const ListaPacientes = () => {
                     </div>
                 </div>
             </div>
-
-            <BasicModal
-                title="Excluir Paciente"
-                body="Deseja realmente excluir esse paciente?"
-                doIt={(event) => handleDeletePaciente(idToDelete)}
-
-            />
         </div >
     )
 }

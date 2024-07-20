@@ -1,29 +1,21 @@
-import React, { use, useEffect, useState, useMemo } from "react"
-import { FaTooth, FaBookMedical, FaTrashAlt } from "react-icons/fa"
-import { BiSolidFileDoc } from "react-icons/bi"
-import { MdAttachMoney } from "react-icons/md"
-import Link from "next/link"
+import React, { useEffect, useState, useMemo, useContext } from "react"
+import { FaTrashAlt } from "react-icons/fa"
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import api from "../utils/Api"
-import BasicModal from "../components/BasicModal"
-import Cookies from "js-cookie"
 import { useAuth } from "../auth/useAuth"
+import { FichaClinicaContext } from "../context/FichaClinicaContext"
 import { moneyMask, toDecimalNumeric, formatarMoedaBRL } from "../utils/mask"
 import moment from 'moment'
 import Select from 'react-select'
-import fichaClinica from "./fichaClinica"
 import { useRouter } from 'next/router'
 import { useTransition } from 'react';
 import { useRouter as uR } from 'next/navigation'
 
-
-const token = Cookies.get("jwt")
-
-const ListaProcedimento = ({ id_paciente, refresh }) => {
+const ListaProcedimento = ({ id_paciente }) => {
     const router = useRouter()
     const data = router.query;
-    const [procedimento, setProcedimento] = useState([])
+    const { procedimento, loading, getProcedimentoList } = useContext(FichaClinicaContext)
     const [procedimentoList, setProcedimentoList] = useState([])
     const [searchVal, setSearchVal] = useState('')
     const [idToDelete, setIdToDelete] = useState(0)
@@ -46,17 +38,15 @@ const ListaProcedimento = ({ id_paciente, refresh }) => {
     ])
     const [isPending, startTransition] = useTransition();
     const router2 = uR()
-
     const { user } = useAuth()
 
-    useEffect(() => {
+    /*useEffect(() => {
         const init = async () => {
-            const { Datepicker, Input, initTE, Modal, Ripple } = await import("tw-elements");
-            initTE({ Datepicker, Input, Modal, Ripple });
+            const { Datepicker, Input, initTE, Modal, Ripple, TEToast  } = await import("tw-elements");
+            initTE({ Datepicker, Input, Modal, Ripple, TEToast });
         };
         init();
-    }, [])
-
+    }, [])*/
 
     useEffect(() => {
         const getDentes = async () => {
@@ -69,20 +59,12 @@ const ListaProcedimento = ({ id_paciente, refresh }) => {
                 })
         }
 
-        getProcedimentoList()
+        listaProcedimento()
         getDentes()
         getSetFacesDente(post?.dente)
     }, [])
 
-    const getProcedimentoList = async () => {
-        await api.get(`procedimento/paciente/${id_paciente}`)
-            .then(response => {
-                setProcedimento([...response.data])
-            })
-            .catch(function (error) {
-                console.error(error);
-            })
-
+    const listaProcedimento = async () => {
         await api.get('procedimento_list')
             .then(response => {
                 setProcedimentoList([...procedimentoList, ...response.data])
@@ -92,19 +74,19 @@ const ListaProcedimento = ({ id_paciente, refresh }) => {
             })
     }
 
-  const checkControlFacesDentes = (event) => {
-    const { name, checked } = event.target;
-    setCheckedFaces(prevState => ({
-      ...prevState,
-      [name]: checked,
-    }));
+    const checkControlFacesDentes = (event) => {
+        const { name, checked } = event.target;
+        setCheckedFaces(prevState => ({
+            ...prevState,
+            [name]: checked,
+        }));
 
-  }
+    }
 
     const getSetFacesDente = (dente) => {
         api.get(`faceDente/${dente}`)
             .then(response => {
-              setFacesDente([...response.data])
+                setFacesDente([...response.data])
             })
             .catch(function (error) {
                 console.error(error);
@@ -124,24 +106,24 @@ const ListaProcedimento = ({ id_paciente, refresh }) => {
         if (typeof e?.target?.name === 'undefined')
             return
 
-        let fieldName =  e.target.name
+        let fieldName = e.target.name
         if (fieldName.slice(0, -1) === "face_dente") {
             let faces = post.face_dente
             let face = fieldName.slice(-1)
             const { name, checked } = event.target;
-          
+
             checked ? faces += face : faces = faces.replace(face, '');
             setPost(prevState => ({
-              ...prevState,
-              ["face_dente"]: faces,
+                ...prevState,
+                ["face_dente"]: faces,
             }));
 
             return
         }
 
         if (e.target.name === "preco") {
-            let preco = String(e.target.value).replace("R$ ", "").replace(",", "." );
-            
+            let preco = String(e.target.value).replace("R$ ", "").replace(",", ".");
+
             setPost(existingValues => ({
                 ...existingValues,
                 ...{ ["preco"]: parseFloat(e.target.value) },
@@ -164,7 +146,7 @@ const ListaProcedimento = ({ id_paciente, refresh }) => {
             .catch(error => {
                 console.error(error);
             })
-        await getProcedimentoList()
+        await getProcedimentoList(id_paciente)
     }
 
     const filteredData = useMemo(() => {
@@ -178,26 +160,18 @@ const ListaProcedimento = ({ id_paciente, refresh }) => {
 
         let dados = post
         dados.preco = Number(toDecimalNumeric(post.preco))
-    console.log("dados: ",dados)
 
         switch (toggleInsertUpdate) {
             case 'insert':
                 api.post('procedimento', dados)
-                    .then(function (response) {
-                        if (response.status === 201) {
-                            alert("Salvo com sucesso")
-                        }
-                    })
                     .catch(e => {
                         alert(e)
                     })
-                router.push('/fichaClinica')
 
             case 'update':
                 api.put('procedimento', dados)
                     .then(async function (response) {
                         if (response.status === 201) {
-                            await getProcedimentoList()
                         }
                     })
                     .catch(e => {
@@ -205,6 +179,7 @@ const ListaProcedimento = ({ id_paciente, refresh }) => {
                     })
         }
         setModal(false)
+        await getProcedimentoList(id_paciente)
     }
 
     const getLabelSelect = (arr, id) => {
@@ -268,7 +243,7 @@ const ListaProcedimento = ({ id_paciente, refresh }) => {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                                    {procedimento.map((data) => (
+                                    {loading ? <p>Loading...</p> : procedimento?.map((data) => (
                                         <tr key={data.id_procedimento} className="cursor-pointer">
                                             <td onClick={() => {
                                                 setToggleInsertUpdate('update')
@@ -293,14 +268,6 @@ const ListaProcedimento = ({ id_paciente, refresh }) => {
                     </div>
                 </div>
             </div>
-
-            <BasicModal
-                title="Excluir Procedimento"
-                body="Deseja realmente excluir esse procedimento?"
-                doIt={(event) => handleDeleteProcedimento(idToDelete)}
-
-            />
-
             {modal &&
                 <div
                     data-te-modal-init

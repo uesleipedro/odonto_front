@@ -6,13 +6,18 @@ import moment from 'moment'
 import DatePicker from 'react-datepicker'
 import { registerLocale, setDefaultLocale } from 'react-datepicker'
 import { ptBR } from 'date-fns/locale'
+import 'react-datepicker/dist/react-datepicker.css'
 
 const CadastroPacientes = () => {
     const router = useRouter()
     const data = router.query;
     const [paciente, setPaciente] = useState(data)
-    const [dataNascimento, setDataNascimento] = useState(moment(paciente?.dt_nascimento).toDate())
-
+    const [dataNascimento, setDataNascimento] = useState(
+      paciente?.dt_nascimento
+        ? moment(paciente?.dt_nascimento).toDate()
+        : null
+    )
+  
     useEffect(() => {
       registerLocale('ptBR', ptBR)
       setDefaultLocale('ptBR')
@@ -20,15 +25,18 @@ const CadastroPacientes = () => {
   
     const updateField = e => {
         const fieldName = e.target.name
-        let value = e.target.value
-      
-        //value == "dt_nascimento" ?? moment(value).format("YYYY-MM-DD")
-
+              
         setPaciente(existingValues => ({
             ...existingValues,
             [fieldName]: e.target.value,
         }))
     }
+
+    const changeDate = (date) => {
+      setDataNascimento(date.target.value)
+      updateField(date)
+    }
+
 
     const sendPacienteData = async () => {
         if (typeof paciente?.nome !== "string") {
@@ -52,7 +60,7 @@ const CadastroPacientes = () => {
 
             })
             .catch(function (error) {
-                
+              console.error(error)  
             })
     }
 
@@ -64,12 +72,20 @@ const CadastroPacientes = () => {
 
             })
             .catch(function (error) {
-                
+              console.error(error) 
             })
     }
 
     return (
         <div className="m-5 p-5 rounded-lg shadow-lg">
+
+            <div className="flex justify-end gap-3">
+              <Link href="/listaPacientes">
+                <button className="bg-purple-700 hover:bg-purple-500 text-white border font-bold py-2 px-4 rounded-full mt-5">
+                  Voltar
+                </button>
+              </Link>
+            </div>
 
             <p className="text-gray-600 font-bold">Dados Pessoais</p>
             <hr />
@@ -91,22 +107,29 @@ const CadastroPacientes = () => {
                 </div>
 
                 <div className="w-full md:w-2/5 pr-2 pt-3">
-                    <label className="text-gray-700 ">Data de nascimento</label>
-                    <DatePicker
-                      selected={dataNascimento}
-                      name="dt_nascimento"
-                      onChange={(e) => 
-                        changeDate(
-                          {target: {
-                            value: e,
-                            name: 'dt_nascimento'
-                          }}
-                      )} 
-                      dateFormat="dd/MM/YYYY"
-                      locale="ptBR"
-                    />
-
+                    <label for="dt_nascimento" className="text-gray-700 ">Data de nascimento</label>
+                    <div className="w-full">
+                      <DatePicker
+                        peekNextMonth
+                        showMonthDropdown
+                        showYearDropdown
+                        scrollableYearDropdown={true}
+                        className="form-input rounded-lg text-gray-600 w-full"
+                        selected={dataNascimento}
+                        name="dt_nascimento"
+                        id="dt_nascimento"
+                        onChange={(e) => 
+                          changeDate(
+                           {target: {
+                              value: e,
+                              name: 'dt_nascimento'
+                            }}
+                        )} 
+                        dateFormat="dd/MM/yyyy"
+                        locale="ptBR"
+                      />
                     </div>
+                </div>
 
                 <div className="w-full md:w-1/5 pt-3">
                     <label className="text-gray-700 ">Sexo</label>
@@ -232,7 +255,7 @@ const CadastroPacientes = () => {
 
                 <Link href="/listaPacientes">
                     <button className="bg-white hover:bg-gray-200 text-purple-800 border font-bold py-2 px-4 rounded-full mt-5">
-                        Cancelar
+                        Voltar
                     </button>
                 </Link>
             </div>

@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useContext } from "react"
 import Select from "react-select";
 import api from "../utils/Api"
-import { useFichaClinica } from '../context/FichaClinicaContext'
+import { FichaClinicaContext } from '../context/FichaClinicaContext'
+import LoadingOverlay from "../components/LoadingOverlay"
 
 const Pagamento = ({ orcamento, changeScreen }) => {
 
@@ -10,7 +11,7 @@ const Pagamento = ({ orcamento, changeScreen }) => {
         { label: "Transferência ou PIX", value: 2 },
         { label: "Cartão de crédito", value: 3 },
         { label: "Cartão de débito", value: 4 },
-        { label: "outro", value: 1 },
+        { label: "outro", value: 5 },
     ])
     const [parcelas, setParcelas] = useState([
         { label: 1, value: 1 },
@@ -26,10 +27,10 @@ const Pagamento = ({ orcamento, changeScreen }) => {
         { label: 11, value: 11 },
         { label: 12, value: 12 },
     ])
-    const [selectedPagamento, setSelectedPagamento] = useState(0)
     const [dados, setDados] = useState({})
     const [idPagamento, setIdPagamento] = useState(0)
-    const { getPagamentoList } = useFichaClinica()
+    const { getPagamentoList } = useContext(FichaClinicaContext)
+    const [loadingOverlay, setLoadingOverlay] = useState(false)
 
     useEffect(() => {
         const init = async () => {
@@ -63,12 +64,10 @@ const Pagamento = ({ orcamento, changeScreen }) => {
     }
 
     const updateStatusOrcamento = async (id_orcamento) => {
-        alert("update status entrou")
         await api.put('orcamento/status', {
             id_orcamento: id_orcamento,
             status: 'finalizado'
         }).then((response) => {
-            alert("response", response.status)
         })
 
         return
@@ -97,7 +96,6 @@ const Pagamento = ({ orcamento, changeScreen }) => {
                     updateStatusOrcamento(orcamento?.id_orcamento)
                 }
                 setIdPagamento(Number(response.data.id_pagamento))
-                //router.push('/listaPacientes')
                 return Number(response.data.id_pagamento)
             })
             .catch(function (error) {
@@ -118,7 +116,7 @@ const Pagamento = ({ orcamento, changeScreen }) => {
             }
         )
             .then(async function (response) {
-              getPagamentoList()
+                await getPagamentoList()
             })
             .catch(function (error) {
                 console.error(error)
@@ -154,12 +152,13 @@ const Pagamento = ({ orcamento, changeScreen }) => {
     }
 
     const geraParcela = async () => {
+        setLoadingOverlay(true)
         let valor_parcela = orcamento?.preco / dados.quantidade_parcelas
         let datas_prestacoes = calcularDatasPrestacoes(dados.primeiro_vencimento, dados.quantidade_parcelas)
         let id_pagamento = await cadastroPagamento()
-            .then(data => {
+            .then(async data => {
                 for (let contador = 1; contador <= dados.quantidade_parcelas; contador++) {
-                    geraContasReceber({
+                    await geraContasReceber({
                         id_pagamento: data,
                         nr_parcela: contador,
                         valor: valor_parcela,
@@ -167,10 +166,10 @@ const Pagamento = ({ orcamento, changeScreen }) => {
                         id_paciente: Number(orcamento.id_paciente),
                     })
                 }
-            }).then(response => {
-              changeScreen("listaOrcamento")
+            }).then(async response => {
+                await changeScreen("listaOrcamento")
             })
-
+        setLoadingOverlay(false)
     }
 
     return (
@@ -374,6 +373,7 @@ const Pagamento = ({ orcamento, changeScreen }) => {
                                         className="text-gray-500 w-full"
                                         name="paciente"
                                         options={parcelas}
+                                        required
                                         placeholder="Parcelas"
                                         onChange={(e) => {
                                             updateField({
@@ -438,9 +438,10 @@ const Pagamento = ({ orcamento, changeScreen }) => {
                     Concluir
                 </button>
             </div>
+
+            <LoadingOverlay isLoading={loadingOverlay} />
+
         </div>
-
-
     );
 };
 

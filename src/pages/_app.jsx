@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 // import Context from "../utils/global-context"
 // import { AuthProvider } from '../auth/_UseAuth'
 import { useAuth, AuthProvider } from '../auth/useAuth'
+import { FichaClinicaProvider } from '../context/FichaClinicaContext'
 // const roboto = Roboto({ weight: "400", subsets: ["latin"] });
 import Cookies from 'js-cookie'
 
@@ -19,16 +20,18 @@ export default function App({ Component, pageProps }) {
     <div>
 
       <AuthProvider>
-        {noNav.includes(router.pathname) ? <Component {...pageProps} />
-          :
-          <>
-            <Header />
+        <FichaClinicaProvider>
+          {noNav.includes(router.pathname) ? <Component {...pageProps} />
+            :
+            <>
+              <Header />
 
-            <Sidebar>
-              <Component {...pageProps} />
-            </Sidebar>
-          </>
-        }
+              <Sidebar>
+                <Component {...pageProps} />
+              </Sidebar>
+            </>
+          }
+        </FichaClinicaProvider>
       </AuthProvider>
     </div>
   )

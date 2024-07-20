@@ -1,22 +1,20 @@
-import React, { use, useEffect, useState, useMemo } from "react"
+import { useEffect, useState, useMemo, useContext } from "react"
 import { FaCheck, FaTrashAlt, FaEye } from "react-icons/fa"
 import { ImCancelCircle } from "react-icons/im"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
-import api from "../utils/Api"
-import BasicModal from "../components/BasicModal"
-import Cookies from "js-cookie"
-import { useAuth } from "../auth/useAuth"
 import moment from "moment"
+import api from "../utils/Api"
 import GeraOrcamento from "./geraOrcamento"
-import { useFichaClinica } from '../context/FichaClinicaContext'
-import ViewPagamento from './viewPagamento'
+import { FichaClinicaContext } from '../context/FichaClinicaContext'
+import { usePaciente } from '../context/PacienteContext'
 
-const ListaPagamento = ({ id_paciente }) => {
+const ListaPagamento = () => {
 
-    const { pagamento, loading, getPagamentoList } = useFichaClinica();
+    const { pagamento, loading, getPagamentoList } = useContext(FichaClinicaContext)
+   // const { idPaciente, saveIdPaciente } = usePaciente()
     const [searchVal, setSearchVal] = useState('')
     const [idToDelete, setIdToDelete] = useState(0)
     const [geraOrcamento, setGeraOrcamento] = useState(false)
@@ -24,36 +22,36 @@ const ListaPagamento = ({ id_paciente }) => {
     const [dataPagamento, setDataPagamento] = useState(new Date())
     const [dadosPagamento, setDadosPagamento] = useState({ "status": "Pago" })
     const [showPagamento, setShowPagamento] = useState(false)
-    const [a, setA] = useState()
 
     const router = useRouter()
 
-    const { user } = useAuth()
-
+    /*useEffect(() => {
+        const init = async () => {
+            const { Input, initTE, Modal, Ripple } = await import("tw-elements");
+            initTE({ Input, Modal, Ripple });
+        };
+        init()
+    }, [])*/
     useEffect(() => {
         const init = async () => {
-            const { Datepicker, Input, initTE, Modal, Ripple, Dropdown } = await import("tw-elements");
-            initTE({ Datepicker, Input, Modal, Ripple, Dropdown });
+            const { Datepicker, Input, initTE, Modal, Ripple, TEToast, Tab } = await import("tw-elements");
+            initTE({ Datepicker, Input, Modal, Ripple, TEToast, Tab });
         };
         init();
     }, [])
 
-    const handleToogleView = (data) => {
-      
-    }
-
     const toCurrency = (num) => {
-      return ('R$ ' + num
-        .toString()
-        .replace('.', ','))
+        return ('R$ ' + num
+            .toString()
+            .replace('.', ','))
     }
 
     const finalizarPagamento = () => {
         api.put('contas_receber/finalizar', dadosPagamento)
             .then(function (response) {
                 if (response.status === 201) {
-                  getPagamentoList()
-                  setModal(false)
+                    getPagamentoList()
+                    setModal(false)
                 }
             })
             .catch(e => {
@@ -62,7 +60,6 @@ const ListaPagamento = ({ id_paciente }) => {
     }
 
     const estornarPagamento = async (id_pagamento, nr_parcela) => {
-        console.log("estornaPagamento-> id_pagamento:",id_pagamento, " nr_parcela:",nr_parcela)
         await api.put(`contas_receber/estornar`,
             {
                 'id_pagamento': id_pagamento,
@@ -115,7 +112,7 @@ const ListaPagamento = ({ id_paciente }) => {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                                        {loading ? <p>Loadnig...</p> : pagamento.map((data) => (
+                                        {loading ? <p>Loadnig...</p> : pagamento?.map((data) => (
                                             <tr key={data.id_pagamento}>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.id_pagamento}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.nr_parcela}</td>
@@ -139,8 +136,8 @@ const ListaPagamento = ({ id_paciente }) => {
                                                     </a>
                                                     <a className="text-purple-800 hover:text-purple-900" title="Visualizar" href="#"
                                                         onClick={() => {
-                                                          //showPagamento()
-                                                          //setA(data)
+                                                            //showPagamento()
+                                                            //setA(data)
                                                         }}
                                                     >
                                                         <FaEye />
@@ -153,7 +150,7 @@ const ListaPagamento = ({ id_paciente }) => {
                                                         <ImCancelCircle />
                                                     </a>
                                                 </td>
-                                             </tr>
+                                            </tr>
                                         ))}
                                     </tbody>
                                 </table>
@@ -166,7 +163,6 @@ const ListaPagamento = ({ id_paciente }) => {
                 geraOrcamento &&
                 <GeraOrcamento />
             }
-
             {
                 modal &&
                 <div
@@ -263,13 +259,6 @@ const ListaPagamento = ({ id_paciente }) => {
                     </div>
                 </div >
             }
-
-            <BasicModal
-                title="Excluir Paciente"
-                body="Deseja realmente excluir esse paciente?"
-                doIt={(event) => handleDeletePaciente()}
-
-            />
         </div >
     )
 }

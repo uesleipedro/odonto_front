@@ -1,4 +1,4 @@
-import React, { use, useEffect, useState, useMemo } from "react"
+import React, { useContext, useEffect, useState, useMemo } from "react"
 import { FaTooth, FaMoneyBillAlt, FaTrashAlt } from "react-icons/fa"
 import { IoEyeSharp } from "react-icons/io5";
 import Link from "next/link"
@@ -6,9 +6,9 @@ import { useRouter } from "next/navigation"
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import api from "../utils/Api"
-import BasicModal from "../components/BasicModal"
 import Cookies from "js-cookie"
 import { useAuth } from "../auth/useAuth"
+import { FichaClinicaContext } from "../context/FichaClinicaContext"
 import moment from "moment";
 import GeraOrcamento from "./geraOrcamento"
 import Pagamento from "./pagamento"
@@ -20,42 +20,27 @@ const token = Cookies.get("jwt")
 
 const ListaOrcamento = ({ id_paciente }) => {
 
-    const [orcamento, setOrcamento] = useState([])
+    //const [orcamento, setOrcamento] = useState([])
     const [searchVal, setSearchVal] = useState('')
     const [idToDelete, setIdToDelete] = useState(0)
     const [geraOrcamento, setGeraOrcamento] = useState(false)
     const [selectedOrcamento, setSelectedOrcamento] = useState(0)
     const [screen, setScreen] = useState("listaOrcamento")
     const router = useRouter()
-
+    const { orcamento, getOrcamentoList, getProcedimentoList, loading } = useContext(FichaClinicaContext)
     const { user } = useAuth()
 
-       useEffect(() => {
-        const init = async () => {
-            const { Datepicker, Input, initTE, Modal, Ripple } = await import("tw-elements");
-            initTE({ Datepicker, Input, Modal, Ripple });
-        };
-        init();
-    }, [])
-
-
-    const getOrcamentoList = async () => {
-      await api.get(`orcamento/paciente/${id_paciente}`)
-        .then(response => {
-          setOrcamento([...response.data])
-        })
-          .catch(function (error) {
-            console.error(error);
-          })
-    }
-    
-    useEffect(() => {
-      getOrcamentoList()
-    }, []);
+    /*useEffect(() => {
+     const init = async () => {
+         const { Datepicker, Input, initTE, Modal, Ripple } = await import("tw-elements");
+         initTE({ Datepicker, Input, Modal, Ripple });
+     };
+     init();
+ }, [])*/
 
     const changeScreen = (value) => {
-      setScreen(value)
-      getOrcamentoList()
+        setScreen(value)
+        getOrcamentoList()
 
     }
 
@@ -74,18 +59,19 @@ const ListaOrcamento = ({ id_paciente }) => {
                 console.error(error);
             })
         getOrcamentoList()
+        getProcedimentoList()
     }
 
     const deletePagamento = async (id_orcamento) => {
-      return await api.delete(`pagamento/${id_orcamento}`)
-                      .then(async response => {
-                        console.log('response deletePagamento ', response )
-                        return response.id_pagamento
-                      })
+        return await api.delete(`pagamento/${id_orcamento}`)
+            .then(async response => {
+                console.log('response deletePagamento ', response)
+                return response.id_pagamento
+            })
     }
 
     const deleteContasReceber = async (id_pagamento) => {
-      await api.delete(`contas_receber/${id_pagamento}`)
+        await api.delete(`contas_receber/${id_pagamento}`)
     }
 
     const estornaProcedimento = async (id_orcamento) => {
@@ -174,7 +160,7 @@ const ListaOrcamento = ({ id_paciente }) => {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                                        {orcamento.map((data, index) => (
+                                        {loading ? <p>Loading...</p> : orcamento?.map((data, index) => (
                                             <tr key={data.cpf}>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{moment(data.date).format('DD/MM/YYYY')}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.id_profissional}</td>
@@ -219,15 +205,8 @@ const ListaOrcamento = ({ id_paciente }) => {
             }
 
             {screen === "pagamento" &&
-                <Pagamento orcamento={orcamento[selectedOrcamento]} changeScreen={changeScreen}/>
+                <Pagamento orcamento={orcamento[selectedOrcamento]} changeScreen={changeScreen} />
             }
-
-            <BasicModal
-                title="Excluir Paciente"
-                body="Deseja realmente excluir esse paciente?"
-                doIt={(event) => handleDeletePaciente(idToDelete)}
-
-            />
         </div >
     )
 }

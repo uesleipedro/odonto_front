@@ -9,6 +9,7 @@ import { ptBR } from 'date-fns/locale'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import 'react-datepicker/dist/react-datepicker.css'
+import { FaTrashAlt } from "react-icons/fa"
 
 const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate }) => {
     const router = useRouter();
@@ -178,6 +179,12 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate 
                         >
                             Editar Evento
                         </h5>
+                        <a className="text-white hover:text-white" href="#"
+                          onClick={() => showSwalWithLink(agendamento?.id)}
+                        >
+                          <FaTrashAlt />
+                        </a>
+
                         <button
                             type="button"
                             className="text-white box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
@@ -204,8 +211,12 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate 
                     <div className="relative flex-auto p-4" data-te-modal-body-ref>
                         <form>
                             <div className="mb-3">
+                                <label for="paciente" className="text-sm font-medium text-gray-500 dark:text-gray-300">
+                                  Paciente
+                                </label>
                                 <Select
                                     name="paciente"
+                                    id="paciente"
                                     options={options}
                                     value={{ value: agendamento?.id_paciente, label: getLabelSelect(paciente, agendamento?.id_paciente) }}
                                     placeholder="Paciente"
@@ -220,13 +231,14 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate 
                                 />
                             </div>
                             <div className="mb-3 flex flex-row items-center justify-center gap-2">
-                                <h3 className="text-sm font-medium text-gray-900 dark:text-gray-300">
-                                    Status
-                                </h3>
+                               <label for="status" className="text-sm font-medium text-gray-500 dark:text-gray-300">
+                                  Status
+                                </label> 
                                 <ul
                                     className="items-center w-full text-sm font-medium text-gray-900 bg-white  rounded-lg sm:flex"
                                     name="status"
                                     onChange={updateField}
+                                    id="status"
                                 >
                                     <li className="w-full">
                                         <div className="flex items-center pl-3">
@@ -285,6 +297,9 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate 
                                 </ul>
                             </div>
                             <div className="mb-3">
+                                <label for="descricao" className="text-sm font-medium text-gray-500 dark:text-gray-300">
+                                  Evento
+                                </label>
                                 <input
                                     type="text"
                                     className="relative m-0 -mr-0.5 block w-full flex-auto rounded border border-solid border-neutral-300 bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary focus:text-neutral-700 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none"
@@ -296,10 +311,14 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate 
                                 />
                             </div>
                             <div className="mb-3">
+                                <label for="profissional" className="text-sm font-medium text-gray-500 dark:text-gray-300">
+                                  Profissional
+                                </label>
                                 <Select
                                     options={profissional}
                                     placeholder="Profissional"
                                     name="profissional"
+                                    id="profissional"
                                     value={{value: 1, label: "Padrão"}}
                                     onChange={(e) => {
                                         updateField({
@@ -318,7 +337,7 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate 
                                     data-te-input-wrapper-init
                                 >
                                     <label
-                                        for="form2"
+                                        for="start"
                                         className="ml-2 text-sm font-medium text-gray-500 dark:text-gray-300"
                                     >
                                         Data e hora início
@@ -326,6 +345,7 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate 
                                     <DatePicker
                                       selected={startDate}
                                       name="start"
+                                      id="start"
                                       onChange={(e) => 
                                         changeDate(
                                           {target: {
@@ -337,6 +357,7 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate 
                                         showTimeSelect
                                         dateFormat="dd/MM/YYYY HH:mm"
                                         locale="ptBR"
+                                        dateFormat={["Pp", "P"]}
                                     />
                                 </div>
 
@@ -346,7 +367,7 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate 
                                     data-te-input-wrapper-init
                                 >
                                     <label
-                                        for="form2"
+                                        for="end"
                                         className="ml-2 text-sm font-medium text-gray-500 dark:text-gray-300"
                                     >
                                         Data e hora final
@@ -354,6 +375,7 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate 
                                     <DatePicker
                                       selected={endDate}
                                       name="end"
+                                      id="end"
                                       onChange={(e) => 
                                          changeDate(
                                           {target: {
@@ -365,6 +387,7 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate 
                                         timeIntervals={15}
                                         dateFormat="dd/MM/YYYY HH:mm"
                                         locale="ptBR"
+                                        dateFormat={["Pp", "P"]}
                                     />
                                 </div>
                             </div>
@@ -375,12 +398,13 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate 
                                           checkHandler(e)
                                         }
                                         name="dia_inteiro"
+                                        id="dia_inteiro"
                                         type="checkbox"
                                         defaultChecked={agendamento?.dia_inteiro}
                                         className="w-4 h-4 rounded"
                                     />
                                     <label
-                                        for="default-checkbox"
+                                        for="dia_inteiro"
                                         className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
                                     >
                                         Dia inteiro
@@ -388,6 +412,9 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate 
                                 </div>
                             </div>
                             <div className="mb-3">
+                                <label for="message-text" className="text-sm font-medium text-gray-500 dark:text-gray-300">
+                                  Observação
+                                </label>
                                 <textarea
                                     className="relative m-0 -mr-0.5 block w-full flex-auto rounded-l border border-solid border-neutral-300 bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary focus:text-neutral-700 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none dark:border-neutral-400 dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:focus:border-primary"
                                     id="message-text"
@@ -410,16 +437,6 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate 
                         >
                             Cancelar
                         </button>
-                        <button
-                          type="button"
-                          className="inline-block rounded bg-red-500 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white transition duration-150 ease-in-out hover:bg-red-accent-200 focus:bg-red-accent-100 focus:outline-none focus:ring-0 active:bg-red-accent-200"
-                          data-te-modal-dismiss
-                          data-te-ripple-init
-                          data-te-ripple-color="light"
-                          onClick={() => showSwalWithLink(agendamento?.id)}
-                        >
-                          Excluir
-                        </button>  
                         <button
                             type="button"
                             className="ml-1 inline-block rounded bg-purple-600 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_#3b71ca] transition duration-150 ease-in-out hover:bg-primary-600 hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:bg-primary-600 focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:outline-none focus:ring-0 active:bg-primary-700 active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] dark:shadow-[0_4px_9px_-4px_rgba(59,113,202,0.5)] dark:hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)]"

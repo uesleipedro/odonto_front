@@ -6,7 +6,9 @@ import ptBr from "@fullcalendar/core/locales/pt-br";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import api from "../utils/Api";
-import ModalCadastroAgenda from "./modalCadastroAgenda";
+import ModalCadastroAgenda from "./modalCadastroAgenda"
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 
 const RenderCalendar = ({events}) => {
   const [modal, setModal] = useState(false);
@@ -33,7 +35,7 @@ const RenderCalendar = ({events}) => {
     init();
   }, [])
 
-  const deleteAgendamento = () => {
+  const limparAgendamento = () => {
     setAgendamento({
       id_empresa: 1,
       status: 3,
@@ -42,13 +44,10 @@ const RenderCalendar = ({events}) => {
   }
 
   const updateDataHora = (agendamento) => {
-    console.log('update data hora:', agendamento)
     api
       .put("agenda/updateDataHora", agendamento)
         .then(function (response) {
           if (response.status === 201) {
-            alert("Salvo com sucesso");
-            //toogleModal()
             router.refresh();
             router.reload()
           }
@@ -57,10 +56,9 @@ const RenderCalendar = ({events}) => {
           console.error(e);
          });
     }
-    
 
   const handleSelect = (info) => {
-    deleteAgendamento()
+    limparAgendamento()
 
     updateField({
       target: {
@@ -112,28 +110,49 @@ const RenderCalendar = ({events}) => {
   }
 
   const handleEventDrop = (info) => {
+    const { event } = info
     updateDataHora({
       id_agenda: info.event.id,
-      start: info.event.startStr,
-      end: info.event.endStr
+      start: moment(event.start).format("YYYY-MM-DD HH:mm"),
+      end: moment(event.end).format("YYYY-MM-DD HH:mm")
     })
-
-
   }
 
   const toogleModal = () => {
     setModal(!modal)
   }
 
+  const MySwal = withReactContent(Swal)
+  const alteraData = (info) => {
+
+    MySwal.fire({
+      title: 'Atenção!',
+      text: `O agendamento será alterado para \n 
+              Início: (${moment(info.event.start).format('DD/MM/YYYY, HH:mm')}),  
+              Final: (${moment(info.event.end).format('DD/MM/YYYY, HH:mm')})
+            `,
+      showDenyButton: true,
+      confirmButtonText: 'Alterar',
+      denyButtonText: `Cancelar`,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        handleEventDrop(info)
+        Swal.fire('Alterado!', '', 'success')
+      } else if (result.isDenied) {
+        Swal.fire('Nenhuma alteração foi realizada', '', 'info')
+      }
+    })
+  }
+
   return (
-    <>
+    <div>
       <FullCalendar
         locales={[ptBr]}
         locale="pt-br"
         plugins={[dayGridPlugin, interactionPlugin, timeGridPlugin]}
         initialView="timeGridWeek"
         headerToolbar={{
-          left: "prev,next,today",
+          left: "prev,today,next",
           center: "title",
           right: "dayGridMonth,timeGridWeek,timeGridDay",
         }}
@@ -142,7 +161,8 @@ const RenderCalendar = ({events}) => {
         events={events}
         select={handleSelect}
         eventClick={eventClickAction}
-        eventDrop={handleEventDrop}
+        eventDrop={alteraData}
+        eventResize={alteraData}
         eventTimeFormat={{
           hour: '2-digit',
           minute: '2-digit',
@@ -160,7 +180,7 @@ const RenderCalendar = ({events}) => {
           insertUpdate={insertUpdate}
         />
       )}
-    </>
+    </div>
   );
 };
 

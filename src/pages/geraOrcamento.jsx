@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import api from '../utils/Api'
 import moment from 'moment'
 import Select from "react-select"
 import { moneyMask, formatarMoedaBRL, toDecimalNumeric } from "../utils/mask"
+import { FichaClinicaContext } from "../context/FichaClinicaContext"
 
 const GeraOrcamento = ({ id_paciente, changeScreen }) => {
 
@@ -12,12 +13,12 @@ const GeraOrcamento = ({ id_paciente, changeScreen }) => {
         { label: 'Dr. Fulano', value: 1 }
     ])
     const [selectedProfissional, setSelectedProfissional] = useState(0)
+    const { getOrcamentoList } = useContext(FichaClinicaContext)
 
     useEffect(() => {
         const getProcedimentoList = async () => {
             await api.get('procedimento')
                 .then(response => {
-        console.log('start: ', response.data)
                     setProcedimentos([...response.data])
                 })
                 .catch(function (error) {
@@ -64,14 +65,16 @@ const GeraOrcamento = ({ id_paciente, changeScreen }) => {
             preco: valorOrcamento,
             date: moment().toDate(),
             status: 'Pendente pagamento',
-            id_paciente: id_paciente
+            id_paciente: Number(id_paciente)
         })
             .then(async (response) => {
-                if (response.status === 201)
-                    alert("Salvo com sucesso")
+                if (response.status === 201) { }
+
                 return response.data.id_orcamento
-            }).then((e) => {
-                sendProcedimentoOrcamento(e)
+            }).then(async (e) => {
+                await sendProcedimentoOrcamento(e)
+            }).then(async () => {
+                await getOrcamentoList()
             })
             .catch(e => {
                 alert(e)
@@ -106,6 +109,7 @@ const GeraOrcamento = ({ id_paciente, changeScreen }) => {
                     alert(e)
                 })
         })
+
     }
 
     useEffect(() => {
@@ -113,7 +117,7 @@ const GeraOrcamento = ({ id_paciente, changeScreen }) => {
             let value = 0
             procedimentos.map(e => {
                 if (e.check)
-                    value += Number(String(e.preco).replace('R$ ',''))
+                    value += Number(String(e.preco).replace('R$ ', ''))
             })
 
             setValorOrcamento(value)
@@ -122,9 +126,8 @@ const GeraOrcamento = ({ id_paciente, changeScreen }) => {
         calculaValorOrcamento()
     }, [procedimentos])
 
-    const geraOrcamento = () => {
-        sendOrcamentoData()
-
+    const geraOrcamento = async () => {
+        await sendOrcamentoData()
     }
 
 
@@ -199,22 +202,22 @@ const GeraOrcamento = ({ id_paciente, changeScreen }) => {
                         </div>
                     </div>
                 </div>
+
             </div>
 
             <div className="mb-5 p-3 gap-3 flex flex-end w-full justify-end items-center">
-              <button
-                onClick={() => {changeScreen("listaOrcamento")}}
-                className="bg-red-800 hover:bg-red-500 rounded-lg p-2 text-white font-bold">
-                Voltar
-              </button>
-              <button
-                onClick={geraOrcamento}
-                className="bg-purple-800 hover:bg-purple-500 rounded-lg p-2 text-white font-bold">
-                Gerar Orçamento
-              </button>
+                <button
+                    onClick={() => { changeScreen("listaOrcamento") }}
+                    className="bg-red-800 hover:bg-red-500 rounded-lg p-2 text-white font-bold">
+                    Voltar
+                </button>
+                <button
+                    onClick={geraOrcamento}
+                    className="bg-purple-800 hover:bg-purple-500 rounded-lg p-2 text-white font-bold">
+                    Gerar Orçamento
+                </button>
             </div>
         </div>
-
     )
 }
 

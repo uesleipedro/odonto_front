@@ -1,53 +1,51 @@
-import React, { useEffect, useState } from "react"
-import ListaProcedimento from "./listaProcedimento"
-import ListaOrcamento from "./listaOrcamento"
-import ListaPagamento from "./listaPagamento"
-import CadastroAnamnese from "./cadastroAnamnese"
+"use client"
+
+import { useEffect, useState, useContext } from "react"
+import ListaProcedimento from "../listaProcedimento"
+import ListaOrcamento from "../listaOrcamento"
+import ListaPagamento from "../listaPagamento"
+import CadastroAnamnese from "../cadastroAnamnese"
 import { useRouter } from 'next/router'
 import { useRouter as uR } from 'next/navigation'
-import api from "../utils/Api"
+import api from "../../utils/Api"
 import moment from "moment"
-import { FichaClinicaProvider } from '../context/FichaClinicaContext';
+import { FichaClinicaProvider, FichaClinicaContext } from '../../context/FichaClinicaContext'
+import { usePaciente } from '../../context/PacienteContext'
 
-const fichaClinica = () => {
+const PacienteProfile = () => {
     const router = useRouter();
     const router2 = uR()
-    const data = router.query;
-    const [id_paciente, setId_paciente] = useState(data.id_paciente)
+    //const data = router.query
+    
+    const { id_paciente } = router.query;
+    
     const [paciente, setPaciente] = useState({})
-
+    //const { idPaciente } = usePaciente()
+    const { procedimento, loading, getProcedimentoList } = useContext(FichaClinicaContext)
+    
     useEffect(() => {
-    console.log("fichaclinica DATA: ", data.id_paciente )
         const init = async () => {
-            const { Input, initTE, Tab } = await import("tw-elements");
-            initTE({ Input, Tab });
+            const { Datepicker, Input, initTE, Modal, Ripple, TEToast, Tab  } = await import("tw-elements");
+            initTE({ Datepicker, Input, Modal, Ripple, TEToast, Tab });
         };
         init();
     }, [])
 
     useEffect(() => {
-        const getPaciente = async () => {
-            await api.get(`paciente/${id_paciente}`)
-                .then(response => {
-                    setPaciente(response.data)
-                })
-                .catch(function (error) {
-                    console.error(error);
-                })
-        }
-        getPaciente()
-
-    }, []);
-
-    const refresh = () => {
-
-
-        return
+      getPaciente()
+    }, [])
+  
+    const getPaciente = async () => {
+      await api.get(`paciente/${id_paciente}`)
+        .then(response => {
+          setPaciente(response.data)
+        })
+        .catch(function (error) {
+          console.error(error);
+        })
     }
-
-
+  
     return (
-        <FichaClinicaProvider>
         <section
             className="w-full rounded-md text-center shadow-lg md:p-5 md:text-left"
         >
@@ -135,7 +133,9 @@ const fichaClinica = () => {
                     data-te-tab-active>
                     <ListaProcedimento
                         id_paciente={id_paciente}
-                        refresh={refresh}
+                        procedimento={procedimento}
+                        loading={loading}
+                        getProcedimentoList={getProcedimentoList}
                     />
                 </div>
                 <div
@@ -180,14 +180,14 @@ const fichaClinica = () => {
                             role="tabpanel"
                             aria-labelledby="tabs-orcamento-tab"
                             data-te-tab-active>
-                            <ListaOrcamento id_paciente={data.id_paciente} />
+                            <ListaOrcamento id_paciente={id_paciente} />
                         </div>
                         <div
                             className="hidden opacity-0 transition-opacity duration-150 ease-linear data-[te-tab-active]:block"
                             id="tabs-pagamento"
                             role="tabpanel"
                             aria-labelledby="tabs-pagamento-tab">
-                            <ListaPagamento id_paciente={data.id_paciente} />
+                            <ListaPagamento id_paciente={id_paciente} />
                         </div>
                     </div>
 
@@ -199,14 +199,13 @@ const fichaClinica = () => {
                     role="tabpanel"
                     aria-labelledby="tabs-anamnese-tab"
                 >
-                    <CadastroAnamnese id_paciente={Number(id_paciente)} />
+                    <CadastroAnamnese id_paciente={id_paciente} />
                 </div>
 
             </div>
 
         </section >
-        </FichaClinicaProvider>
     )
 }
 
-export default fichaClinica
+export default PacienteProfile

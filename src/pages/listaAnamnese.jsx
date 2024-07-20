@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation"
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import api from "../utils/Api"
-import BasicModal from "../components/BasicModal"
 import Cookies from "js-cookie"
 import { useAuth } from "../auth/useAuth"
 
@@ -137,13 +136,6 @@ const ListaAnamnese = () => {
                     </div>
                 </div>
             </div>
-
-            <BasicModal
-                title="Excluir anamnese"
-                body="Deseja realmente excluir esse anamnese?"
-                doIt={(event) => handleDeleteanamnese(idToDelete)}
-
-            />
         </div>
     )
 }
