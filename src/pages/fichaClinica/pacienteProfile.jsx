@@ -11,6 +11,7 @@ import api from "../../utils/Api"
 import moment from "moment"
 import { FichaClinicaProvider, FichaClinicaContext } from '../../context/FichaClinicaContext'
 import { usePaciente } from '../../context/PacienteContext'
+import LoadingOverlay from '../../components/LoadingOverlay'
 
 const PacienteProfile = () => {
     const router = useRouter();
@@ -20,7 +21,7 @@ const PacienteProfile = () => {
     const { id_paciente } = router.query;
     
     const [paciente, setPaciente] = useState({})
-    //const { idPaciente } = usePaciente()
+    const [isLoading, setIsloading] = useState(true)
     const { procedimento, loading, getProcedimentoList } = useContext(FichaClinicaContext)
     
     useEffect(() => {
@@ -36,6 +37,7 @@ const PacienteProfile = () => {
     }, [])
   
     const getPaciente = async () => {
+      setIsloading(true)
       await api.get(`paciente/${id_paciente}`)
         .then(response => {
           setPaciente(response.data)
@@ -43,12 +45,15 @@ const PacienteProfile = () => {
         .catch(function (error) {
           console.error(error);
         })
+      setIsloading(false)
     }
   
     return (
         <section
             className="w-full rounded-md text-center shadow-lg md:p-5 md:text-left"
         >
+          <LoadingOverlay isLoading={isLoading} />
+            
             <div className="md:flex md:flex-row block rounded-lg bg-white p-6 shadow-lg dark:bg-neutral-800 dark:shadow-black/20">
                 <div className="w-full shrink-0 grow-0 basis-auto ">
                     <div className="px-2 py-2 md:px-2">

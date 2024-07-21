@@ -115,7 +115,6 @@ const ListaPacientes = () => {
                                             <Link
                                                 href={{
                                                     pathname: `/fichaClinica/${data.id_paciente}`,
-                                                    //query: { id_paciente: data.id_paciente }
                                                 }}
 
                                             >

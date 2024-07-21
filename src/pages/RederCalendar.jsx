@@ -10,7 +10,7 @@ import ModalCadastroAgenda from "./modalCadastroAgenda"
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 
-const RenderCalendar = ({events}) => {
+const RenderCalendar = ({events, updateEvents}) => {
   const [modal, setModal] = useState(false);
   const [paciente, setPaciente] = useState([]);
   const [insertUpdate, setInsertUpdate] = useState('')
@@ -103,19 +103,22 @@ const RenderCalendar = ({events}) => {
     return list[list.findIndex((obj) => obj.id == id)];
   }
 
-  const eventClickAction = (data) => {
-    setAgendamento(filterEventsById(events, data.event.id))
-    setInsertUpdate('update')
+  const eventClickAction = async (data) => {
+    await setAgendamento(filterEventsById(events, data.event.id))
+    await setInsertUpdate('update')
     setModal(true)
+    await updateEvents()
   }
 
-  const handleEventDrop = (info) => {
+  const handleEventDrop = async (info) => {
     const { event } = info
     updateDataHora({
       id_agenda: info.event.id,
       start: moment(event.start).format("YYYY-MM-DD HH:mm"),
       end: moment(event.end).format("YYYY-MM-DD HH:mm")
     })
+
+    await updateEvents()
   }
 
   const toogleModal = () => {
@@ -139,6 +142,7 @@ const RenderCalendar = ({events}) => {
         handleEventDrop(info)
         Swal.fire('Alterado!', '', 'success')
       } else if (result.isDenied) {
+        updateEvents()
         Swal.fire('Nenhuma alteração foi realizada', '', 'info')
       }
     })

@@ -22,7 +22,7 @@ const agenda = () => {
   
   return (
     <div>
-      <RenderCalendar events={events}/>
+      <RenderCalendar events={events} updateEvents={getEvents}/>
     </div>
   );
 };
