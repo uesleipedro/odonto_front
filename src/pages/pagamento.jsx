@@ -4,7 +4,7 @@ import api from "../utils/Api"
 import { FichaClinicaContext } from '../context/FichaClinicaContext'
 import LoadingOverlay from "../components/LoadingOverlay"
 
-const Pagamento = ({ orcamento, changeScreen }) => {
+const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente }) => {
 
     const [formaPagamento, setFormaPagamento] = useState([
         { label: "Dinheiro", value: 1 },
@@ -29,7 +29,7 @@ const Pagamento = ({ orcamento, changeScreen }) => {
     ])
     const [dados, setDados] = useState({})
     const [idPagamento, setIdPagamento] = useState(0)
-    const { getPagamentoList } = useContext(FichaClinicaContext)
+    const { getPagamentoList, getOrcamentoList } = useContext(FichaClinicaContext)
     const [loadingOverlay, setLoadingOverlay] = useState(false)
 
     useEffect(() => {
@@ -67,9 +67,10 @@ const Pagamento = ({ orcamento, changeScreen }) => {
         await api.put('orcamento/status', {
             id_orcamento: id_orcamento,
             status: 'finalizado'
-        }).then((response) => {
+          }).then((response) => {
         })
 
+        getOrcamentoList(id_paciente)
         return
     }
 
@@ -116,7 +117,7 @@ const Pagamento = ({ orcamento, changeScreen }) => {
             }
         )
             .then(async function (response) {
-                await getPagamentoList()
+                await getPagamentoList(id_paciente)
             })
             .catch(function (error) {
                 console.error(error)
@@ -170,6 +171,7 @@ const Pagamento = ({ orcamento, changeScreen }) => {
                 await changeScreen("listaOrcamento")
             })
         setLoadingOverlay(false)
+        setShowToast()
     }
 
     return (

@@ -1,10 +1,8 @@
 import '../styles/globals.css'
 import Sidebar from '../components/Sidebar'
 import Header from '../components/Header'
-// import { Roboto } from "next/font/google"
 import "tw-elements/dist/css/tw-elements.min.css"
 import { useRouter } from 'next/router';
-// import Context from "../utils/global-context"
 // import { AuthProvider } from '../auth/_UseAuth'
 import { useAuth, AuthProvider } from '../auth/useAuth'
 import { FichaClinicaProvider } from '../context/FichaClinicaContext'

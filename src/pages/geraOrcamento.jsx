@@ -5,7 +5,7 @@ import Select from "react-select"
 import { moneyMask, formatarMoedaBRL, toDecimalNumeric } from "../utils/mask"
 import { FichaClinicaContext } from "../context/FichaClinicaContext"
 
-const GeraOrcamento = ({ id_paciente, changeScreen }) => {
+const GeraOrcamento = ({ id_paciente, changeScreen, toogleOverlay, setShowToast }) => {
 
     const [procedimentos, setProcedimentos] = useState([])
     const [valorOrcamento, setValorOrcamento] = useState(0)
@@ -45,7 +45,6 @@ const GeraOrcamento = ({ id_paciente, changeScreen }) => {
     }
 
     const updatePrice = (index) => (e) => {
-        console.log('updatePrice: ', index, toDecimalNumeric(e.target.value))
         const newArray = procedimentos.map((item, i) => {
             if (index === i) {
                 return { ...item, [e.target.name]: toDecimalNumeric(e.target.value) }
@@ -58,7 +57,7 @@ const GeraOrcamento = ({ id_paciente, changeScreen }) => {
     }
 
     const sendOrcamentoData = async () => {
-        api.post('/orcamento', {
+        await api.post('/orcamento', {
             id_empresa: 1,
             id_profissional: selectedProfissional,
             id_paciente: 1,
@@ -74,7 +73,7 @@ const GeraOrcamento = ({ id_paciente, changeScreen }) => {
             }).then(async (e) => {
                 await sendProcedimentoOrcamento(e)
             }).then(async () => {
-                await getOrcamentoList()
+                await getOrcamentoList(id_paciente)
             })
             .catch(e => {
                 alert(e)
@@ -92,18 +91,18 @@ const GeraOrcamento = ({ id_paciente, changeScreen }) => {
         return
     }
 
-    const sendProcedimentoOrcamento = (id_orcamento) => {
-        procedimentos.map(e => {
+    const sendProcedimentoOrcamento = async (id_orcamento) => {
+        procedimentos.map(async e => {
             if (!e.check) return
 
-            api.post('/procedimento_orcamento', {
+            await api.post('/procedimento_orcamento', {
                 id_procedimento: e.id_procedimento,
                 id_orcamento: id_orcamento,
                 preco: e.preco
             })
-                .then(function (response) {
+                .then(async function (response) {
                     if (response.status === 201)
-                        updateStatusProcedimento(e.id_procedimento)
+                        await updateStatusProcedimento(e.id_procedimento)
                 })
                 .catch(e => {
                     alert(e)
@@ -127,9 +126,11 @@ const GeraOrcamento = ({ id_paciente, changeScreen }) => {
     }, [procedimentos])
 
     const geraOrcamento = async () => {
+        //toogleOverlay()
         await sendOrcamentoData()
+        setShowToast()
+        //await toogleOverlay()
     }
-
 
     return (
         <div className="p-5  rounded-lg shadow-lg">

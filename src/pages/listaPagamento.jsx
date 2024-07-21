@@ -10,8 +10,9 @@ import api from "../utils/Api"
 import GeraOrcamento from "./geraOrcamento"
 import { FichaClinicaContext } from '../context/FichaClinicaContext'
 import { usePaciente } from '../context/PacienteContext'
+import Toast from '../components/Toast'
 
-const ListaPagamento = () => {
+const ListaPagamento = ({id_paciente}) => {
 
     const { pagamento, loading, getPagamentoList } = useContext(FichaClinicaContext)
    // const { idPaciente, saveIdPaciente } = usePaciente()
@@ -22,6 +23,7 @@ const ListaPagamento = () => {
     const [dataPagamento, setDataPagamento] = useState(new Date())
     const [dadosPagamento, setDadosPagamento] = useState({ "status": "Pago" })
     const [showPagamento, setShowPagamento] = useState(false)
+    const [showToast, setShowToast] = useState(false)
 
     const router = useRouter()
 
@@ -46,8 +48,8 @@ const ListaPagamento = () => {
             .replace('.', ','))
     }
 
-    const finalizarPagamento = () => {
-        api.put('contas_receber/finalizar', dadosPagamento)
+    const finalizarPagamento = async () => {
+        await api.put('contas_receber/finalizar', dadosPagamento)
             .then(function (response) {
                 if (response.status === 201) {
                     getPagamentoList()
@@ -57,6 +59,8 @@ const ListaPagamento = () => {
             .catch(e => {
                 alert(e)
             })
+        await getPagamentoList(id_paciente)
+        setShowToast(true)        
     }
 
     const estornarPagamento = async (id_pagamento, nr_parcela) => {
@@ -65,7 +69,7 @@ const ListaPagamento = () => {
                 'id_pagamento': id_pagamento,
                 'nr_parcela': nr_parcela
             }).then()
-        getPagamentoList()
+        getPagamentoList(id_paciente)
     }
 
     const estornarOrcamento = async (id_orcamento) => {
@@ -157,6 +161,14 @@ const ListaPagamento = () => {
                             </div>
                         </div>
                     </div>
+
+                  <Toast
+                      message="Salvo com sucesso!"
+                      show={showToast}
+                      onClose={() => setShowToast(false)}
+                  />
+
+
                 </div>
             }
             {

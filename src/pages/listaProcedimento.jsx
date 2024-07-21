@@ -11,6 +11,8 @@ import Select from 'react-select'
 import { useRouter } from 'next/router'
 import { useTransition } from 'react';
 import { useRouter as uR } from 'next/navigation'
+import Toast from '../components/Toast'
+import LoadingOverlay from '../components/LoadingOverlay'
 
 const ListaProcedimento = ({ id_paciente }) => {
     const router = useRouter()
@@ -26,6 +28,8 @@ const ListaProcedimento = ({ id_paciente }) => {
     const [post, setPost] = useState({})
     const [options, setOptions] = useState([])
     const [checkedFaces, setCheckedFaces] = useState("")
+    const [showToast, setShowToast] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
     const [profissional, setProfissional] = useState([
         {
             value: 1,
@@ -36,17 +40,15 @@ const ListaProcedimento = ({ id_paciente }) => {
             label: "Dra. Marcela"
         }
     ])
-    const [isPending, startTransition] = useTransition();
     const router2 = uR()
     const { user } = useAuth()
 
-    /*useEffect(() => {
-        const init = async () => {
-            const { Datepicker, Input, initTE, Modal, Ripple, TEToast  } = await import("tw-elements");
-            initTE({ Datepicker, Input, Modal, Ripple, TEToast });
-        };
-        init();
-    }, [])*/
+   const handleShowToast = () => {
+      setShowToast(true);
+      setTimeout(() => {
+        setShowToast(false);
+      }, 3000); // O toast será escondido após 3 segundos
+    }
 
     useEffect(() => {
         const getDentes = async () => {
@@ -179,7 +181,11 @@ const ListaProcedimento = ({ id_paciente }) => {
                     })
         }
         setModal(false)
+        setIsLoading(true)
         await getProcedimentoList(id_paciente)
+        setIsLoading(false)
+        setShowToast(true)
+        
     }
 
     const getLabelSelect = (arr, id) => {
@@ -267,6 +273,14 @@ const ListaProcedimento = ({ id_paciente }) => {
                         </div>
                     </div>
                 </div>
+         
+                <Toast
+                  message="Procedimento salvo com sucesso!"
+                  show={showToast}
+                  onClose={() => setShowToast(false)}
+                />
+
+                <LoadingOverlay isLoading={isLoading} />
             </div>
             {modal &&
                 <div

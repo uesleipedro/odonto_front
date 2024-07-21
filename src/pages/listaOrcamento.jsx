@@ -13,6 +13,8 @@ import moment from "moment";
 import GeraOrcamento from "./geraOrcamento"
 import Pagamento from "./pagamento"
 import { formatarMoedaBRL } from "../utils/mask"
+import LoadingOverlay from '../components/LoadingOverlay'
+import Toast from '../components/Toast' 
 
 // const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub21lIjoiRGFydGhWYWRlciIsImlhdCI6MTY5NjU5ODI2MCwiZXhwIjoxNjk2NzcxMDYwfQ.GakWs7gLYzD1iAnIIS8p9Wu26i1aVi7PZAehATyzEuQ"
 const token = Cookies.get("jwt")
@@ -26,6 +28,8 @@ const ListaOrcamento = ({ id_paciente }) => {
     const [geraOrcamento, setGeraOrcamento] = useState(false)
     const [selectedOrcamento, setSelectedOrcamento] = useState(0)
     const [screen, setScreen] = useState("listaOrcamento")
+    const [isLoading, setIsLoading] = useState(false)
+    const [showToast, setShowToast] = useState(false)
     const router = useRouter()
     const { orcamento, getOrcamentoList, getProcedimentoList, loading } = useContext(FichaClinicaContext)
     const { user } = useAuth()
@@ -58,8 +62,10 @@ const ListaOrcamento = ({ id_paciente }) => {
             .catch(error => {
                 console.error(error);
             })
-        getOrcamentoList()
-        getProcedimentoList()
+        setIsLoading(true)
+        await getOrcamentoList(id_paciente)
+        await getProcedimentoList(id_paciente)
+        setIsLoading(false)
     }
 
     const deletePagamento = async (id_orcamento) => {
@@ -111,7 +117,9 @@ const ListaOrcamento = ({ id_paciente }) => {
 
     }
 
-
+    const toogleOverlay = () => {
+      setIsLoading(!isLoading)
+    }
 
     const MySwal = withReactContent(Swal)
     const showSwalWithLink = (id_paciente, id_orcamento) => {
@@ -198,14 +206,30 @@ const ListaOrcamento = ({ id_paciente }) => {
                             </div>
                         </div>
                     </div>
+    
+                    <Toast
+                      message="Salvo com sucesso!"
+                      show={showToast}
+                      onClose={() => setShowToast(false)}
+                    />
+
+                    <LoadingOverlay isLoading={isLoading} />
                 </div>
             }
             {screen === "geraOrcamento" &&
-                <GeraOrcamento id_paciente={id_paciente} changeScreen={changeScreen} />
+                <GeraOrcamento 
+                  id_paciente={id_paciente} 
+                  toogleOverlay={toogleOverlay} 
+                  changeScreen={changeScreen} 
+                  setShowToast={() => setShowToast(true)}/>
             }
 
             {screen === "pagamento" &&
-                <Pagamento orcamento={orcamento[selectedOrcamento]} changeScreen={changeScreen} />
+                <Pagamento 
+                  orcamento={orcamento[selectedOrcamento]} 
+                  changeScreen={changeScreen}
+                  setShowToast={() => setShowToast(true)} 
+                  id_paciente={id_paciente} />
             }
         </div >
     )
