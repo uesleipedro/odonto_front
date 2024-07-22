@@ -7,19 +7,21 @@ import DatePicker from 'react-datepicker'
 import { registerLocale, setDefaultLocale } from 'react-datepicker'
 import { ptBR } from 'date-fns/locale'
 import Swal from 'sweetalert2'
+import { useAuth } from '../auth/useAuth'
 import withReactContent from 'sweetalert2-react-content'
 import 'react-datepicker/dist/react-datepicker.css'
 import { FaTrashAlt } from "react-icons/fa"
 
-const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate }) => {
+const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate, updateEvents }) => {
     const router = useRouter();
     const [options, setOptions] = useState([])
     const [paciente, setPaciente] = useState([])
     const [agendamento, setAgendamento] = useState(agendamentoData)
     const [startDate, setStartDate] = useState(moment(agendamentoData?.start).toDate())
     const [endDate, setEndDate] = useState(moment(agendamentoData?.end).toDate())
+    const { user } = useAuth()
     const [profissional, setProfissional] = useState([
-      {value: 1, label: 'Padrão'}
+        { value: 1, label: 'Padrão' }
     ])
 
     useEffect(() => {
@@ -37,33 +39,33 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate 
     }, [])
 
     const changeDate = (date) => {
-      date.target.name == "start" 
-        ? setStartDate(date.target.value)
-        : setEndDate(date.target.value)
-      updateField(date)
+        date.target.name == "start"
+            ? setStartDate(date.target.value)
+            : setEndDate(date.target.value)
+        updateField(date)
     }
-    
+
     const checkHandler = async (e) => {
-      let ck = e.target.checked
-      await updateField({
-        target: {
-          name: "dia_inteiro",
-          value: e.target.checked
-        }
-      })
+        let ck = e.target.checked
+        await updateField({
+            target: {
+                name: "dia_inteiro",
+                value: e.target.checked
+            }
+        })
     }
 
     const updateField = (e) => {
         if (typeof e?.target?.name === "undefined") return
         const fieldName = e.target.name;
 
-        if(fieldName == "start" || fieldName == "end"){
-          setAgendamento((existingValues) => ({
-            ...existingValues,
-            [fieldName]: moment(e.target.value).format("YYYY-MM-DD HH:mm"),
-          }));
+        if (fieldName == "start" || fieldName == "end") {
+            setAgendamento((existingValues) => ({
+                ...existingValues,
+                [fieldName]: moment(e.target.value).format("YYYY-MM-DD HH:mm"),
+            }));
 
-          return
+            return
         }
 
         setAgendamento((existingValues) => ({
@@ -72,54 +74,54 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate 
         }))
     }
 
-    const sendAgendaData = () => {
-      if(insertUpdate == "insert")
-        insertAgenda()
-      else if(insertUpdate == "update")
-        updateAgenda()
+    const sendAgendaData = async () => {
+        if (insertUpdate == "insert")
+            await insertAgenda()
+        else if (insertUpdate == "update")
+            await updateAgenda()
+
+        updateEvents()
     }
 
-    const insertAgenda = () => {
-        api
+    const insertAgenda = async () => {
+        agendamento.id_empresa = user?.user?.foundUser.id_empresa
+        await api
             .post("agenda", agendamento)
             .then(async function (response) {
                 if (response.status === 201) {
                     toogleModal()
-                    router.refresh();
                 }
             })
             .catch((e) => {
                 alert(e);
             });
-        router.refresh()
     }
 
-     const updateAgenda = () => {
-        api
+    const updateAgenda = async () => {
+        await api
             .put("agenda", agendamento)
             .then(function (response) {
                 if (response.status === 201) {
-                    alert("Salvo com sucesso");
+                    alert("Salvo com sucesso")
                     toogleModal()
-                    router.refresh();
                 }
             })
             .catch((e) => {
-                console.error(e);
+                console.error(e)
             });
     }
-    
+
     const deleteAgendamento = async (id_agenda) => {
         await api.delete(`agenda/${id_agenda}`)
             .then(response => {
-                if (response.status === 204){
-                  toogleModal()
-                  router.refresh()
-                  return
+                if (response.status === 204) {
+                    toogleModal()
+                    updateEvents()
+                    return
                 }
             })
             .catch(error => {
-                console.error(error);
+                console.error(error)
             })
     }
 
@@ -127,12 +129,11 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate 
         await api
             .get("paciente")
             .then((response) => {
-
-                setPaciente([...response.data]);
+                setPaciente([...response.data])
             })
             .catch(function (error) {
-                console.error(error);
-            });
+                console.error(error)
+            })
     }
 
     const getLabelSelect = (arr, id) => {
@@ -179,12 +180,6 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate 
                         >
                             Editar Evento
                         </h5>
-                        <a className="text-white hover:text-white" href="#"
-                          onClick={() => showSwalWithLink(agendamento?.id)}
-                        >
-                          <FaTrashAlt />
-                        </a>
-
                         <button
                             type="button"
                             className="text-white box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
@@ -212,7 +207,7 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate 
                         <form>
                             <div className="mb-3">
                                 <label for="paciente" className="text-sm font-medium text-gray-500 dark:text-gray-300">
-                                  Paciente
+                                    Paciente
                                 </label>
                                 <Select
                                     name="paciente"
@@ -231,9 +226,9 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate 
                                 />
                             </div>
                             <div className="mb-3 flex flex-row items-center justify-center gap-2">
-                               <label for="status" className="text-sm font-medium text-gray-500 dark:text-gray-300">
-                                  Status
-                                </label> 
+                                <label for="status" className="text-sm font-medium text-gray-500 dark:text-gray-300">
+                                    Status
+                                </label>
                                 <ul
                                     className="items-center w-full text-sm font-medium text-gray-900 bg-white  rounded-lg sm:flex"
                                     name="status"
@@ -298,7 +293,7 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate 
                             </div>
                             <div className="mb-3">
                                 <label for="descricao" className="text-sm font-medium text-gray-500 dark:text-gray-300">
-                                  Evento
+                                    Evento
                                 </label>
                                 <input
                                     type="text"
@@ -312,14 +307,14 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate 
                             </div>
                             <div className="mb-3">
                                 <label for="profissional" className="text-sm font-medium text-gray-500 dark:text-gray-300">
-                                  Profissional
+                                    Profissional
                                 </label>
                                 <Select
                                     options={profissional}
                                     placeholder="Profissional"
                                     name="profissional"
                                     id="profissional"
-                                    value={{value: 1, label: "Padrão"}}
+                                    value={{ value: 1, label: "Padrão" }}
                                     onChange={(e) => {
                                         updateField({
                                             target: {
@@ -343,20 +338,22 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate 
                                         Data e hora início
                                     </label>
                                     <DatePicker
-                                      selected={startDate}
-                                      name="start"
-                                      id="start"
-                                      onChange={(e) => 
-                                        changeDate(
-                                          {target: {
-                                            value: e,
-                                            name: 'start'
-                                          }}
-                                        )} 
+                                        selected={startDate}
+                                        name="start"
+                                        id="start"
+                                        onChange={(e) =>
+                                            changeDate(
+                                                {
+                                                    target: {
+                                                        value: e,
+                                                        name: 'start'
+                                                    }
+                                                }
+                                            )}
                                         timeIntervals={15}
                                         showTimeSelect
                                         dateFormat="dd/MM/YYYY HH:mm"
-                                        locale="ptBR"
+                                        // locale="ptBR"
                                         dateFormat={["Pp", "P"]}
                                     />
                                 </div>
@@ -373,20 +370,22 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate 
                                         Data e hora final
                                     </label>
                                     <DatePicker
-                                      selected={endDate}
-                                      name="end"
-                                      id="end"
-                                      onChange={(e) => 
-                                         changeDate(
-                                          {target: {
-                                            value: e,
-                                            name: 'end'
-                                          }}
-                                        )}
+                                        selected={endDate}
+                                        name="end"
+                                        id="end"
+                                        onChange={(e) =>
+                                            changeDate(
+                                                {
+                                                    target: {
+                                                        value: e,
+                                                        name: 'end'
+                                                    }
+                                                }
+                                            )}
                                         showTimeSelect
                                         timeIntervals={15}
                                         dateFormat="dd/MM/YYYY HH:mm"
-                                        locale="ptBR"
+                                        // locale="ptBR"
                                         dateFormat={["Pp", "P"]}
                                     />
                                 </div>
@@ -395,7 +394,7 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate 
                                 <div className="flex items-center mb-4">
                                     <input
                                         onChange={(e) =>
-                                          checkHandler(e)
+                                            checkHandler(e)
                                         }
                                         name="dia_inteiro"
                                         id="dia_inteiro"
@@ -413,7 +412,7 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate 
                             </div>
                             <div className="mb-3">
                                 <label for="message-text" className="text-sm font-medium text-gray-500 dark:text-gray-300">
-                                  Observação
+                                    Observação
                                 </label>
                                 <textarea
                                     className="relative m-0 -mr-0.5 block w-full flex-auto rounded-l border border-solid border-neutral-300 bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary focus:text-neutral-700 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none dark:border-neutral-400 dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:focus:border-primary"
@@ -427,15 +426,15 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate 
                         </form>
                     </div>
                     <div className="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
-                      <button
+                        <button
                             type="button"
-                            className="inline-block rounded bg-purple-100 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-primary-700 transition duration-150 ease-in-out hover:bg-primary-accent-100 focus:bg-primary-accent-100 focus:outline-none focus:ring-0 active:bg-primary-accent-200"
+                            className="inline-block rounded bg-red-300 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-primary-700 transition duration-150 ease-in-out hover:bg-red-accent-100 focus:bg-red-100 focus:outline-none focus:ring-0 active:bg-primary-accent-200"
                             data-te-modal-dismiss
                             data-te-ripple-init
                             data-te-ripple-color="light"
-                            onClick={() => toogleModal()}
+                            onClick={() => showSwalWithLink(agendamento?.id)}
                         >
-                            Cancelar
+                            Excluir
                         </button>
                         <button
                             type="button"

@@ -12,7 +12,7 @@ const GeraOrcamento = ({ id_paciente, changeScreen, toogleOverlay, setShowToast 
     const [profissionais, setProfissionais] = useState([
         { label: 'Dr. Fulano', value: 1 }
     ])
-    const [selectedProfissional, setSelectedProfissional] = useState(0)
+    const [selectedProfissional, setSelectedProfissional] = useState(1)
     const { getOrcamentoList } = useContext(FichaClinicaContext)
 
     useEffect(() => {
@@ -140,6 +140,7 @@ const GeraOrcamento = ({ id_paciente, changeScreen, toogleOverlay, setShowToast 
                 name="paciente"
                 options={profissionais}
                 placeholder="Profissional"
+                defaultValue={profissionais[0]}
                 onChange={(e) => {
                     setSelectedProfissional(e.value)
                 }}

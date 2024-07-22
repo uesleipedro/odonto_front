@@ -15,45 +15,42 @@ import LoadingOverlay from '../../components/LoadingOverlay'
 
 const PacienteProfile = () => {
     const router = useRouter();
-    const router2 = uR()
-    //const data = router.query
-    
-    const { id_paciente } = router.query;
-    
+
     const [paciente, setPaciente] = useState({})
     const [isLoading, setIsloading] = useState(true)
     const { procedimento, loading, getProcedimentoList } = useContext(FichaClinicaContext)
-    
+    const { idPaciente, idEmpresa } = usePaciente()
+
     useEffect(() => {
         const init = async () => {
-            const { Datepicker, Input, initTE, Modal, Ripple, TEToast, Tab  } = await import("tw-elements");
+            const { Datepicker, Input, initTE, Modal, Ripple, TEToast, Tab } = await import("tw-elements");
             initTE({ Datepicker, Input, Modal, Ripple, TEToast, Tab });
         };
         init();
     }, [])
 
     useEffect(() => {
-      getPaciente()
+        getPaciente()
     }, [])
-  
+
     const getPaciente = async () => {
-      setIsloading(true)
-      await api.get(`paciente/${id_paciente}`)
-        .then(response => {
-          setPaciente(response.data)
-        })
-        .catch(function (error) {
-          console.error(error);
-        })
-      setIsloading(false)
+        setIsloading(true)
+        await api.get(`paciente/one/${idPaciente}/${idEmpresa}`)
+            .then(response => {
+                setPaciente(response.data)
+            })
+            .catch(function (error) {
+                console.error(error);
+            })
+        setIsloading(false)
     }
-  
+
     return (
         <section
             className="w-full rounded-md text-center shadow-lg md:p-5 md:text-left"
         >
-          <LoadingOverlay isLoading={isLoading} />
-            
+            <LoadingOverlay isLoading={isLoading} />
+
             <div className="md:flex md:flex-row block rounded-lg bg-white p-6 shadow-lg dark:bg-neutral-800 dark:shadow-black/20">
                 <div className="w-full shrink-0 grow-0 basis-auto ">
                     <div className="px-2 py-2 md:px-2">
@@ -137,7 +134,7 @@ const PacienteProfile = () => {
                     aria-labelledby="tabs-home-tab"
                     data-te-tab-active>
                     <ListaProcedimento
-                        id_paciente={id_paciente}
+                        id_paciente={idPaciente}
                         procedimento={procedimento}
                         loading={loading}
                         getProcedimentoList={getProcedimentoList}
@@ -185,14 +182,14 @@ const PacienteProfile = () => {
                             role="tabpanel"
                             aria-labelledby="tabs-orcamento-tab"
                             data-te-tab-active>
-                            <ListaOrcamento id_paciente={id_paciente} />
+                            <ListaOrcamento id_paciente={idPaciente} id_empresa={idEmpresa} />
                         </div>
                         <div
                             className="hidden opacity-0 transition-opacity duration-150 ease-linear data-[te-tab-active]:block"
                             id="tabs-pagamento"
                             role="tabpanel"
                             aria-labelledby="tabs-pagamento-tab">
-                            <ListaPagamento id_paciente={id_paciente} />
+                            <ListaPagamento id_paciente={idPaciente} />
                         </div>
                     </div>
 
@@ -204,7 +201,7 @@ const PacienteProfile = () => {
                     role="tabpanel"
                     aria-labelledby="tabs-anamnese-tab"
                 >
-                    <CadastroAnamnese id_paciente={id_paciente} />
+                    <CadastroAnamnese id_paciente={idPaciente} />
                 </div>
 
             </div>

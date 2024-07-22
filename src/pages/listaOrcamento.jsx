@@ -20,12 +20,7 @@ import Toast from '../components/Toast'
 const token = Cookies.get("jwt")
 // const token = JSON.parse(user).token
 
-const ListaOrcamento = ({ id_paciente }) => {
-
-    //const [orcamento, setOrcamento] = useState([])
-    const [searchVal, setSearchVal] = useState('')
-    const [idToDelete, setIdToDelete] = useState(0)
-    const [geraOrcamento, setGeraOrcamento] = useState(false)
+const ListaOrcamento = ({ id_paciente, id_empresa }) => {
     const [selectedOrcamento, setSelectedOrcamento] = useState(0)
     const [screen, setScreen] = useState("listaOrcamento")
     const [isLoading, setIsLoading] = useState(false)
@@ -53,8 +48,6 @@ const ListaOrcamento = ({ id_paciente }) => {
             .then(async response => {
                 await estornaProcedimento(id_orcamento)
                 let a = await deletePagamento(id_orcamento)
-                console.log('AAAAAA: ', a.data)
-                //await deleteContasReceber()
 
                 if (response.status === 204)
                     return
@@ -63,8 +56,8 @@ const ListaOrcamento = ({ id_paciente }) => {
                 console.error(error);
             })
         setIsLoading(true)
-        await getOrcamentoList(id_paciente)
-        await getProcedimentoList(id_paciente)
+        await getOrcamentoList()
+        await getProcedimentoList()
         setIsLoading(false)
     }
 
@@ -82,39 +75,6 @@ const ListaOrcamento = ({ id_paciente }) => {
 
     const estornaProcedimento = async (id_orcamento) => {
         await api.put(`procedimento/estorno/${id_orcamento}`)
-    }
-
-    const handleToggleCheck = (index) => (e) => {
-        const newArray = orcamento.map((item, i) => {
-            if (index === i) {
-                if (e.target.name === "check") console.log('>>>>>', e.target.name, index, i, e.target.checked)
-                let value = e.target.name === "check"
-                    ? e.target.checked
-                    : e.target.value
-
-                return { ...item, [e.target.name]: value }
-            } else {
-                return item
-            }
-        })
-
-        setProcedimentos(newArray)
-        console.log('procedimentosss', procedimentos)
-    }
-
-    const toDecimalNumeric = (num) => {
-        return Number((num
-            .toString()
-            .replace(',', '.')
-            .replace(/\D/g, '') / 100
-        ).toFixed(2))
-    }
-
-    const toCurrency = (num) => {
-        return ('R$ ' + num
-            .toString()
-            .replace('.', ','))
-
     }
 
     const toogleOverlay = () => {
@@ -138,7 +98,6 @@ const ListaOrcamento = ({ id_paciente }) => {
             }
         })
     }
-
 
     return (
         <div className="m-5 p-5  rounded-lg shadow-lg">
@@ -229,7 +188,8 @@ const ListaOrcamento = ({ id_paciente }) => {
                   orcamento={orcamento[selectedOrcamento]} 
                   changeScreen={changeScreen}
                   setShowToast={() => setShowToast(true)} 
-                  id_paciente={id_paciente} />
+                  id_paciente={id_paciente} 
+                  id_empresa={id_empresa} />
             }
         </div >
     )

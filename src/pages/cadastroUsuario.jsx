@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import Link from "next/link"
 import api from "../utils/Api"
-import middleware from "../middleware"
+//import middleware from "../middleware"
 
 const CadastroUsuario = () => {
 
@@ -13,21 +13,25 @@ const CadastroUsuario = () => {
             ...existingValues,
             [fieldName]: e.target.value,
         }))
+
+    console.log("USER: ", user)
     }
 
-    const sendPacienteData = () => {
-        api.post('/user', user)
+    const sendPacienteData = async () => {
+        console.log("iniciou envio:")
+        await api.post('/user', user)
             .then(function (response) {
                 if (response.status === 201)
                     alert("Salvo com sucesso")
             })
             .catch(e => {
                 alert(e)
-            })
+            }) 
+        console.log("terminou o envio")
     }
 
     return (
-        <form className="m-5 p-5 rounded-lg shadow-lg">
+        <div className="m-5 p-5 rounded-lg shadow-lg">
 
             <p className="text-gray-600 font-bold">Dados Pessoais</p>
             <hr />
@@ -61,7 +65,7 @@ const CadastroUsuario = () => {
 
                 <div className="w-full md:w-3/4 pr-2 pt-3">
                     <label className="text-gray-700 ">Nome da clinica</label>
-                    <input type="text" id="nome_clinica" name="nome_clinica" onChange={updateName} className="form-input rounded-lg text-gray-600 w-full" placeholder="Ex.: Clinica Odonto" />
+                    <input type="text" id="razao_social" name="razao_social" onChange={updateName} className="form-input rounded-lg text-gray-600 w-full" placeholder="Ex.: Clinica Odonto" />
                 </div>
 
                 <div className="w-full md:w-1/1 pr-2 pt-3 flex flex-row gap-4">
@@ -87,14 +91,14 @@ const CadastroUsuario = () => {
                     Salvar
                 </button>
 
-                <Link href="/listaPacientes">
+                <Link href="/">
                     <button className="bg-white hover:bg-gray-200 text-purple-800 border font-bold py-2 px-4 rounded-full mt-5">
                         Cancelar
                     </button>
                 </Link>
             </div>
 
-        </form >
+        </div>
     )
 }
 

@@ -6,11 +6,14 @@ import moment from 'moment'
 import DatePicker from 'react-datepicker'
 import { registerLocale, setDefaultLocale } from 'react-datepicker'
 import { ptBR } from 'date-fns/locale'
+import { useAuth } from '../auth/useAuth'
 import 'react-datepicker/dist/react-datepicker.css'
 
 const CadastroPacientes = () => {
     const router = useRouter()
     const data = router.query;
+    const { user } = useAuth()
+    const id_empresa = user?.user?.foundUser.id_empresa
     const [paciente, setPaciente] = useState(data)
     const [dataNascimento, setDataNascimento] = useState(
       paciente?.dt_nascimento
@@ -37,23 +40,24 @@ const CadastroPacientes = () => {
       updateField(date)
     }
 
-
     const sendPacienteData = async () => {
+        let dados = paciente
+        dados.id_empresa = id_empresa
         if (typeof paciente?.nome !== "string") {
             alert("preencha o campo nome")
             return
         }
 
         paciente.id_paciente == undefined
-            ? await cadastroPaciente()
-            : await updatePaciente()
+            ? await cadastroPaciente(dados)
+            : await updatePaciente(dados)
 
 
         router.push('/listaPacientes')
     }
 
-    const cadastroPaciente = async () => {
-        await api.post('paciente', paciente)
+    const cadastroPaciente = async (dados) => {
+        await api.post('paciente', dados)
             .then(function (response) {
                 if (response.status === 201)
                     alert("Salvo com sucesso")
@@ -64,8 +68,8 @@ const CadastroPacientes = () => {
             })
     }
 
-    const updatePaciente = async () => {
-        await api.put('paciente', paciente)
+    const updatePaciente = async (dados) => {
+        await api.put('paciente', dados)
             .then(function (response) {
                 if (response.status === 201)
                     alert("Salvo com sucesso")
@@ -126,7 +130,7 @@ const CadastroPacientes = () => {
                             }}
                         )} 
                         dateFormat="dd/MM/yyyy"
-                        locale="ptBR"
+                        // locale="ptBR"
                       />
                     </div>
                 </div>

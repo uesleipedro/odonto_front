@@ -3,8 +3,17 @@ import Select from "react-select";
 import api from "../utils/Api"
 import { FichaClinicaContext } from '../context/FichaClinicaContext'
 import LoadingOverlay from "../components/LoadingOverlay"
+import moment from 'moment'
+import DatePicker from 'react-datepicker'
+import { registerLocale, setDefaultLocale } from 'react-datepicker'
+//import { ptBR } from 'date-fns/locale'
+import ptBR from 'date-fns/locale/pt-BR'
+import 'react-datepicker/dist/react-datepicker.css'
 
-const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente }) => {
+registerLocale('pt-BR', ptBR)
+setDefaultLocale('pt-BR')
+
+const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empresa }) => {
 
     const [formaPagamento, setFormaPagamento] = useState([
         { label: "Dinheiro", value: 1 },
@@ -27,10 +36,11 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente }) => {
         { label: 11, value: 11 },
         { label: 12, value: 12 },
     ])
-    const [dados, setDados] = useState({})
+    const [dados, setDados] = useState({ data_primeiro_vencimento: new Date(), quantidade_parcelas: 1 })
     const [idPagamento, setIdPagamento] = useState(0)
-    const { getPagamentoList, getOrcamentoList } = useContext(FichaClinicaContext)
+    const { getPagamentoList, getOrcamentoList, idEmpresa } = useContext(FichaClinicaContext)
     const [loadingOverlay, setLoadingOverlay] = useState(false)
+    const [primeiroVencimento, setPrimeiroVencimento] = useState(new (Date))
 
     useEffect(() => {
         const init = async () => {
@@ -40,9 +50,12 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente }) => {
                 Collapse,
                 initTE,
             });
-        };
-        init();
-    })
+            console.log("primeiro vencimento: ", primeiroVencimento)
+        }
+
+
+        init()
+    }, [])
 
     const moneyMask = (value) => {
         value = value?.replace('.', '').replace(',', '').replace(/\D/g, '')
@@ -67,7 +80,7 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente }) => {
         await api.put('orcamento/status', {
             id_orcamento: id_orcamento,
             status: 'finalizado'
-          }).then((response) => {
+        }).then((response) => {
         })
 
         getOrcamentoList(id_paciente)
@@ -76,16 +89,17 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente }) => {
 
 
     const cadastroPagamento = async () => {
+        console.log('entrou pagamento')
         return await api.post('pagamento',
             {
                 id_orcamento: orcamento?.id_orcamento,
                 tipo_desconto: dados.tipo_desconto,
                 valor_desconto: toDecimalNumeric(dados.desconto),
                 quantidade_parcelas: dados.quantidade_parcelas,
-                data_primeiro_vencimento: dados.primeiro_vencimento,
+                data_primeiro_vencimento: dados.data_primeiro_vencimento,
                 entrada: toDecimalNumeric(dados.entrada),
                 data_pagamento: dados.data_pagamento,
-                id_empresa: 1,
+                id_empresa: id_empresa,
                 valor_total: toDecimalNumeric(orcamento?.preco),
                 status: "Aberto",
                 id_paciente: orcamento?.id_paciente,
@@ -93,6 +107,7 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente }) => {
             }
         )
             .then(async function (response) {
+                console.log('response cadastro pagamento', response.data)
                 if (response.status === 201) {
                     updateStatusOrcamento(orcamento?.id_orcamento)
                 }
@@ -106,6 +121,7 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente }) => {
     }
 
     const geraContasReceber = async (contas) => {
+        console.log("gera contas receber idemrpesa: ", id_empresa)
         await api.post('contas_receber',
             {
                 id_pagamento: contas.id_pagamento,
@@ -113,7 +129,8 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente }) => {
                 valor: contas.valor,
                 dt_vencimento: contas.dt_vencimento,
                 status: "Pendente",
-                id_paciente: contas.id_paciente
+                id_paciente: contas.id_paciente,
+                id_empresa: id_empresa
             }
         )
             .then(async function (response) {
@@ -130,6 +147,11 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente }) => {
             ...existingValues,
             [fieldName]: e.target.value,
         }))
+    }
+
+    const changeDate = (date) => {
+        setPrimeiroVencimento(date.target.value)
+        updateField(date)
     }
 
     const calculoDesconto = async (total) => {
@@ -154,11 +176,15 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente }) => {
 
     const geraParcela = async () => {
         setLoadingOverlay(true)
+        console.log('entrou gera pargela')
         let valor_parcela = orcamento?.preco / dados.quantidade_parcelas
         let datas_prestacoes = calcularDatasPrestacoes(dados.primeiro_vencimento, dados.quantidade_parcelas)
         let id_pagamento = await cadastroPagamento()
             .then(async data => {
+                console.log(">>>> cadastroPagamento response", data)
+                console.log("DADOS ", dados)
                 for (let contador = 1; contador <= dados.quantidade_parcelas; contador++) {
+                    console.log("entrou no for")
                     await geraContasReceber({
                         id_pagamento: data,
                         nr_parcela: contador,
@@ -168,6 +194,7 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente }) => {
                     })
                 }
             }).then(async response => {
+                console.log("response geraContasREceber ", response)
                 await changeScreen("listaOrcamento")
             })
         setLoadingOverlay(false)
@@ -339,7 +366,6 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente }) => {
                             class="group relative flex w-full items-center rounded-t-[15px] border-0 bg-white px-5 py-4 text-left text-base text-neutral-800 transition [overflow-anchor:none] hover:z-[2] focus:z-[3] focus:outline-none dark:bg-neutral-800 dark:text-white [&:not([data-te-collapse-collapsed])]:bg-white [&:not([data-te-collapse-collapsed])]:text-primary [&:not([data-te-collapse-collapsed])]:[box-shadow:inset_0_-1px_0_rgba(229,231,235)] dark:[&:not([data-te-collapse-collapsed])]:bg-neutral-800 dark:[&:not([data-te-collapse-collapsed])]:text-primary-400 dark:[&:not([data-te-collapse-collapsed])]:[box-shadow:inset_0_-1px_0_rgba(75,85,99)]"
                             type="button"
                             data-te-collapse-init
-                            // data-te-collapse-collapsed
                             data-te-target="#collapseThree5"
                             aria-expanded="true"
                             aria-controls="collapseThree5">
@@ -377,6 +403,7 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente }) => {
                                         options={parcelas}
                                         required
                                         placeholder="Parcelas"
+                                        defaultValue={parcelas[0]}
                                         onChange={(e) => {
                                             updateField({
                                                 target: {
@@ -388,11 +415,31 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente }) => {
                                     />
                                 </div>
 
-                                <div className="w-6/12 pt-3">
-                                    <label className="text-gray-500" >Data do 1º vencimento</label>
-                                    <input type="date" id="primeiro_vencimento" name="primeiro_vencimento" onChange={updateField} className="form-input rounded-lg text-gray-500 w-full" />
+                                <div className="w-full md:w-2/5 pr-2 pt-3">
+                                    <label for="dt_nascimento" className="text-gray-700 ">Data 1º Vencimento</label>
+                                    <div className="w-full">
+                                        <DatePicker
+                                            peekNextMonth
+                                            showMonthDropdown
+                                            showYearDropdown
+                                            scrollableYearDropdown={true}
+                                            className="form-input rounded-lg text-gray-600 w-full"
+                                            selected={primeiroVencimento}
+                                            name="data_primeiro_vencimento"
+                                            id="data_primeiro_vencimento"
+                                            onChange={(e) =>
+                                                changeDate(
+                                                    {
+                                                        target: {
+                                                            value: e,
+                                                            name: 'data_primeiro_vencimento'
+                                                        }
+                                                    }
+                                                )}
+                                            dateFormat="dd/MM/yyyy"
+                                        />
+                                    </div>
                                 </div>
-
                             </div>
 
                             <div className="flex w-full gap-3">
@@ -447,4 +494,4 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente }) => {
     );
 };
 
-export default Pagamento;
+export default Pagamento

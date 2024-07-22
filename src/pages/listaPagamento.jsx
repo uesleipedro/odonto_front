@@ -12,17 +12,13 @@ import { FichaClinicaContext } from '../context/FichaClinicaContext'
 import { usePaciente } from '../context/PacienteContext'
 import Toast from '../components/Toast'
 
-const ListaPagamento = ({id_paciente}) => {
+const ListaPagamento = () => {
 
     const { pagamento, loading, getPagamentoList } = useContext(FichaClinicaContext)
-   // const { idPaciente, saveIdPaciente } = usePaciente()
-    const [searchVal, setSearchVal] = useState('')
-    const [idToDelete, setIdToDelete] = useState(0)
     const [geraOrcamento, setGeraOrcamento] = useState(false)
     const [modal, setModal] = useState(false)
     const [dataPagamento, setDataPagamento] = useState(new Date())
     const [dadosPagamento, setDadosPagamento] = useState({ "status": "Pago" })
-    const [showPagamento, setShowPagamento] = useState(false)
     const [showToast, setShowToast] = useState(false)
 
     const router = useRouter()
@@ -59,7 +55,7 @@ const ListaPagamento = ({id_paciente}) => {
             .catch(e => {
                 alert(e)
             })
-        await getPagamentoList(id_paciente)
+        await getPagamentoList()
         setShowToast(true)        
     }
 
@@ -69,7 +65,7 @@ const ListaPagamento = ({id_paciente}) => {
                 'id_pagamento': id_pagamento,
                 'nr_parcela': nr_parcela
             }).then()
-        getPagamentoList(id_paciente)
+        getPagamentoList()
     }
 
     const estornarOrcamento = async (id_orcamento) => {

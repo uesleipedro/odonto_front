@@ -43,13 +43,12 @@ const RenderCalendar = ({events, updateEvents}) => {
     })
   }
 
-  const updateDataHora = (agendamento) => {
-    api
+  const updateDataHora = async (agendamento) => {
+    await api
       .put("agenda/updateDataHora", agendamento)
-        .then(function (response) {
+        .then(async function (response) {
           if (response.status === 201) {
-            router.refresh();
-            router.reload()
+            await updateEvents()
           }
         })
         .catch((e) => {
@@ -117,8 +116,6 @@ const RenderCalendar = ({events, updateEvents}) => {
       start: moment(event.start).format("YYYY-MM-DD HH:mm"),
       end: moment(event.end).format("YYYY-MM-DD HH:mm")
     })
-
-    await updateEvents()
   }
 
   const toogleModal = () => {
@@ -182,6 +179,7 @@ const RenderCalendar = ({events, updateEvents}) => {
           toogleModal={() => toogleModal()}
           agendamentoData={agendamento}
           insertUpdate={insertUpdate}
+          updateEvents={updateEvents}
         />
       )}
     </div>

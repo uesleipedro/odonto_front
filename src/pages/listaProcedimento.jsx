@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useContext } from "react"
+import React, { useEffect, useState, useContext } from "react"
 import { FaTrashAlt } from "react-icons/fa"
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
@@ -9,27 +9,23 @@ import { moneyMask, toDecimalNumeric, formatarMoedaBRL } from "../utils/mask"
 import moment from 'moment'
 import Select from 'react-select'
 import { useRouter } from 'next/router'
-import { useTransition } from 'react';
-import { useRouter as uR } from 'next/navigation'
 import Toast from '../components/Toast'
 import LoadingOverlay from '../components/LoadingOverlay'
 
 const ListaProcedimento = ({ id_paciente }) => {
     const router = useRouter()
-    const data = router.query;
     const { procedimento, loading, getProcedimentoList } = useContext(FichaClinicaContext)
     const [procedimentoList, setProcedimentoList] = useState([])
-    const [searchVal, setSearchVal] = useState('')
-    const [idToDelete, setIdToDelete] = useState(0)
     const [facesDente, setFacesDente] = useState([])
     const [toggleInsertUpdate, setToggleInsertUpdate] = useState('insert')
     const [preco, setPreco] = useState("0")
     const [modal, setModal] = useState(false)
     const [post, setPost] = useState({})
     const [options, setOptions] = useState([])
-    const [checkedFaces, setCheckedFaces] = useState("")
     const [showToast, setShowToast] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
+    const { user } = useAuth()
+    const id_empresa = user?.user?.foundUser.id_empresa
     const [profissional, setProfissional] = useState([
         {
             value: 1,
@@ -40,15 +36,6 @@ const ListaProcedimento = ({ id_paciente }) => {
             label: "Dra. Marcela"
         }
     ])
-    const router2 = uR()
-    const { user } = useAuth()
-
-   const handleShowToast = () => {
-      setShowToast(true);
-      setTimeout(() => {
-        setShowToast(false);
-      }, 3000); // O toast será escondido após 3 segundos
-    }
 
     useEffect(() => {
         const getDentes = async () => {
@@ -76,15 +63,6 @@ const ListaProcedimento = ({ id_paciente }) => {
             })
     }
 
-    const checkControlFacesDentes = (event) => {
-        const { name, checked } = event.target;
-        setCheckedFaces(prevState => ({
-            ...prevState,
-            [name]: checked,
-        }));
-
-    }
-
     const getSetFacesDente = (dente) => {
         api.get(`faceDente/${dente}`)
             .then(response => {
@@ -98,9 +76,10 @@ const ListaProcedimento = ({ id_paciente }) => {
 
     const updateProcedimento = async (id_procedimento) => {
         let procedimentoFiltrado = procedimento.filter(dataItem => dataItem.id_procedimento === id_procedimento)
-        await setPost(procedimentoFiltrado[0])
-        await getSetFacesDente(procedimentoFiltrado[0]?.dente)
+        setPost(procedimentoFiltrado[0])
+        getSetFacesDente(procedimentoFiltrado[0]?.dente)
         setModal(true)
+        getProcedimentoList()
     }
 
     const updateField = e => {
@@ -148,20 +127,13 @@ const ListaProcedimento = ({ id_paciente }) => {
             .catch(error => {
                 console.error(error);
             })
-        await getProcedimentoList(id_paciente)
+        await getProcedimentoList()
     }
 
-    const filteredData = useMemo(() => {
-        if (searchVal.trim() === '') {
-            return procedimento
-        }
-        return procedimento.filter(dataItem => dataItem.nome.toLowerCase().includes(searchVal.toLocaleLowerCase()))
-    }, [procedimento, searchVal])
-
     const sendProcedimentoData = async () => {
-
         let dados = post
         dados.preco = Number(toDecimalNumeric(post.preco))
+        dados.id_empresa = id_empresa
 
         switch (toggleInsertUpdate) {
             case 'insert':
@@ -182,10 +154,10 @@ const ListaProcedimento = ({ id_paciente }) => {
         }
         setModal(false)
         setIsLoading(true)
-        await getProcedimentoList(id_paciente)
+        await getProcedimentoList()
         setIsLoading(false)
         setShowToast(true)
-        
+
     }
 
     const getLabelSelect = (arr, id) => {
@@ -273,11 +245,11 @@ const ListaProcedimento = ({ id_paciente }) => {
                         </div>
                     </div>
                 </div>
-         
+
                 <Toast
-                  message="Procedimento salvo com sucesso!"
-                  show={showToast}
-                  onClose={() => setShowToast(false)}
+                    message="Procedimento salvo com sucesso!"
+                    show={showToast}
+                    onClose={() => setShowToast(false)}
                 />
 
                 <LoadingOverlay isLoading={isLoading} />

@@ -16,17 +16,19 @@ export function useAuth() {
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null)
+    const [token, setToken] = useState(null)
 
     useEffect(() => {
-        async function loadUserFromCookies() {
+        const loadUserFromCookies = () => {
             const data = Cookies.get('user')
-            // const token = JSON.parse(data)?.token || ''
-            const token = 'asdf' 
+            //const token = JSON.parse(data)?.token || ''
+            //const token = 'asdf' 
             if (data) {
                 // 
                 api.defaults.headers.Authorization = `Bearer ${token}`
                 // const { data: user } = await api.get('user/me')
-                if (data) setUser(JSON.parse(data))
+                setUser(JSON.parse(data))
+                //setToken(JSON.parse(token))
             }
             // setUser(data)
         }
@@ -44,7 +46,7 @@ export function AuthProvider({ children }) {
             .then(async (response) => {
                 if (response.status === 201) {
                     // api.defaults.headers.Authorization = `Bearer ${token}`
-                    
+                    console.log("response login:", response.data)
                     api.defaults.headers.Authorization = `Bearer ${JSON.stringify(response.data).token}`
                     Cookies.set("user", JSON.stringify(response.data))
                     setUser(response.data)
@@ -76,7 +78,12 @@ export function AuthProvider({ children }) {
 
     return (
         <>
-            <AuthContext.Provider value={value}>
+            <AuthContext.Provider value={{
+              user,
+              token,
+              login,
+              logout
+            }}>
                 {children}
             </AuthContext.Provider>
         </>

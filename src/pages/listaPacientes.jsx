@@ -11,16 +11,16 @@ import Cookies from "js-cookie"
 import { useAuth } from "../auth/useAuth"
 import { usePaciente } from "../context/PacienteContext"
 import moment from "moment"
- 
+
 const ListaPacientes = () => {
 
     const [paciente, setPaciente] = useState([])
     const [searchVal, setSearchVal] = useState('')
     const [idToDelete, setIdToDelete] = useState(0)
-    const router = useRouter()
-
     const { user } = useAuth()
-    //const { saveIdPaciente } = usePaciente()
+    const { saveIdPaciente, saveIdEmpresa } = usePaciente()
+    const id_empresa = user?.user?.foundUser.id_empresa
+    const router = useRouter()
 
     useEffect(() => {
         const init = async () => {
@@ -30,10 +30,9 @@ const ListaPacientes = () => {
         init();
     }, [])
 
-
     useEffect(() => {
         const getPacientList = async () => {
-            await api.get('paciente')
+            await api.get(`paciente/${id_empresa}`)
                 .then(response => {
                     setPaciente([...paciente, ...response.data])
                 })
@@ -42,7 +41,7 @@ const ListaPacientes = () => {
                 })
         }
         getPacientList()
-    }, []);
+    }, [user]);
 
 
     const handleDeletePaciente = async (id_paciente) => {
@@ -84,8 +83,8 @@ const ListaPacientes = () => {
     }
 
 
-    return ( 
-    
+    return (
+
         <div className="m-5 p-5  rounded-lg shadow-lg">
             <div className="mb-5 flex flex-row flex-wrap w-full justify-between items-center">
                 <input type="text" onChange={e => setSearchVal(e.target.value)} className="form-input mr-4 rounded-lg text-gray-600" placeholder="Buscar paciente" />
@@ -118,7 +117,11 @@ const ListaPacientes = () => {
                                                 }}
 
                                             >
-                                                <td onClick={() => {}} className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.nome}</td>
+                                                <td onClick={() => { 
+                                                        saveIdPaciente(data.id_paciente)
+                                                        saveIdEmpresa(data.id_empresa)
+                                                    }} 
+                                                    className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.nome}</td>
                                             </Link>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.id_paciente}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{moment(data?.inserted_at).format("DD/MM/YYYY")}</td>

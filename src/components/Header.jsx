@@ -40,7 +40,6 @@ const Header = () => {
                 >
                     Sair
                 </span>
-                {/* <DropMenu /> */}
             </div>
         </div>
     )
