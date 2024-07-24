@@ -57,16 +57,16 @@ const PagamentoView = ({ dados }) => {
                         </button>
                     </div>
                     <div className="relative flex-auto p-4" data-te-modal-body-ref>
-                        <p>Nº Pagamento: {dados.id_pagamento}</p>
-                        <p>Nº Orçamento: {dados.id_orcamento}</p>
-                        <p>Valor desconto: {dados.valor_desconto}</p>
-                        <p>Quantidade parcelas: {dados.nr_parcela}</p>
-                        <p>Data do primeiro vencimento: {dados.data_primeiro_vencimento}</p>
-                        <p>entrada: {dados.entrada}</p>
-                        <p>Data pagamento: {dados.data_pagamento}</p>
-                        <p>Status: {dados.status}</p>
-                        <p>Paciente: {dados.id_paciente}</p>
-                        <p>Valor: {dados.valor}</p>
+                        <p>Nº Pagamento: {dados?.id_pagamento}</p>
+                        <p>Nº Orçamento: {dados?.id_orcamento}</p>
+                        <p>Valor desconto: {dados?.valor_desconto}</p>
+                        <p>Quantidade parcelas: {dados?.nr_parcela}</p>
+                        <p>Data do primeiro vencimento: {dados?.data_primeiro_vencimento}</p>
+                        <p>entrada: {dados?.entrada}</p>
+                        <p>Data pagamento: {dados?.data_pagamento}</p>
+                        <p>Status: {dados?.status}</p>
+                        <p>Paciente: {dados?.id_paciente}</p>
+                        <p>Valor: {dados?.valor}</p>
                     </div>
                     <div className="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
                         <button

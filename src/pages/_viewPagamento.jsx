@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-const ViewPagamento = ({ pagamento, onClose }) => {
+const ViewPagamento = ({ dados, onClose }) => {
 
   useEffect(() => {
     const init = async () => {
@@ -42,13 +42,13 @@ const ViewPagamento = ({ pagamento, onClose }) => {
             ></button>
           </div>
           <div className="modal-body relative p-4">
-            <p><strong>ID Pagamento:</strong> {pagamento?.id_pagamento}</p>
-            <p><strong>Número da Parcela:</strong> {pagamento?.nr_parcela}</p>
-            <p><strong>Valor:</strong> {pagamento?.valor}</p>
-            <p><strong>Data de Vencimento:</strong> {pagamento?.dt_vencimento}</p>
-            <p><strong>Status:</strong> {pagamento?.status}</p>
-            <p><strong>Nome do Paciente:</strong> {pagamento?.id_paciente}</p>
-            <p><strong>Data do Recebimento:</strong> {pagamento?.dt_recebimento}</p>
+            {/* <p><strong>ID Pagamento:</strong> {dados?.id_pagamento}</p>
+            <p><strong>Número da Parcela:</strong> {dados?.nr_parcela}</p>
+            <p><strong>Valor:</strong> {dados?.valor}</p>
+            <p><strong>Data de Vencimento:</strong> {dados?.dt_vencimento}</p>
+            <p><strong>Status:</strong> {dados?.status}</p>
+            <p><strong>Nome do Paciente:</strong> {dados?.id_paciente}</p>
+            <p><strong>Data do Recebimento:</strong> {dados?.dt_recebimento}</p> */}
           </div>
           <div className="modal-footer flex flex-shrink-0 flex-wrap items-center justify-end p-4 border-t border-gray-200 rounded-b-md">
             <button

@@ -142,7 +142,7 @@ const ListaPagamento = () => {
                                                         <ImCancelCircle />
                                                     </a>
                                                 </td>
-                                                <PagamentoView dados={data} />
+                                                {/* <PagamentoView dados={data} /> */}
                                             </tr>
                                         ))}
                                     </tbody>
