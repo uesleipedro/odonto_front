@@ -11,6 +11,7 @@ import GeraOrcamento from "./geraOrcamento"
 import { FichaClinicaContext } from '../context/FichaClinicaContext'
 import { usePaciente } from '../context/PacienteContext'
 import Toast from '../components/Toast'
+import PagamentoView from "./view/pagamentoView"
 
 const ListaPagamento = () => {
 
@@ -21,15 +22,6 @@ const ListaPagamento = () => {
     const [dadosPagamento, setDadosPagamento] = useState({ "status": "Pago" })
     const [showToast, setShowToast] = useState(false)
 
-    const router = useRouter()
-
-    /*useEffect(() => {
-        const init = async () => {
-            const { Input, initTE, Modal, Ripple } = await import("tw-elements");
-            initTE({ Input, Modal, Ripple });
-        };
-        init()
-    }, [])*/
     useEffect(() => {
         const init = async () => {
             const { Datepicker, Input, initTE, Modal, Ripple, TEToast, Tab } = await import("tw-elements");
@@ -56,7 +48,7 @@ const ListaPagamento = () => {
                 alert(e)
             })
         await getPagamentoList()
-        setShowToast(true)        
+        setShowToast(true)
     }
 
     const estornarPagamento = async (id_pagamento, nr_parcela) => {
@@ -150,6 +142,7 @@ const ListaPagamento = () => {
                                                         <ImCancelCircle />
                                                     </a>
                                                 </td>
+                                                <PagamentoView dados={data} />
                                             </tr>
                                         ))}
                                     </tbody>
@@ -158,11 +151,12 @@ const ListaPagamento = () => {
                         </div>
                     </div>
 
-                  <Toast
-                      message="Salvo com sucesso!"
-                      show={showToast}
-                      onClose={() => setShowToast(false)}
-                  />
+
+                    <Toast
+                        message="Salvo com sucesso!"
+                        show={showToast}
+                        onClose={() => setShowToast(false)}
+                    />
 
 
                 </div>

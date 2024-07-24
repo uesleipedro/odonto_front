@@ -10,7 +10,6 @@ import Swal from 'sweetalert2'
 import { useAuth } from '../auth/useAuth'
 import withReactContent from 'sweetalert2-react-content'
 import 'react-datepicker/dist/react-datepicker.css'
-import { FaTrashAlt } from "react-icons/fa"
 
 const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate, updateEvents }) => {
     const router = useRouter();
@@ -36,6 +35,10 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate,
         registerLocale('ptBR', ptBR)
         setDefaultLocale('ptBR')
         handleGetPacientList()
+
+        console.log("agendamento.id_paciente: ", agendamento?.id_paciente)
+        console.log("agendamento.id_paciente2: ", paciente)
+        console.log("agendamento.id_paciente3: ", getLabelSelect(paciente, agendamento?.id_paciente))
     }, [])
 
     const changeDate = (date) => {
@@ -126,9 +129,11 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate,
     }
 
     const handleGetPacientList = async () => {
+        let id = user?.user?.foundUser?.id_empresa
         await api
-            .get("paciente")
+            .get(`paciente/${id}`)
             .then((response) => {
+                console.log("response paciente:", response.data)
                 setPaciente([...response.data])
             })
             .catch(function (error) {
@@ -137,6 +142,7 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate,
     }
 
     const getLabelSelect = (arr, id) => {
+        console.log("getLab:", arr,id)
         if (!arr || !id) return
         let a = arr.filter(dataItem => dataItem?.id_paciente == id)
 
@@ -428,7 +434,7 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate,
                     <div className="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
                         <button
                             type="button"
-                            className="inline-block rounded bg-red-300 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-primary-700 transition duration-150 ease-in-out hover:bg-red-accent-100 focus:bg-red-100 focus:outline-none focus:ring-0 active:bg-primary-accent-200"
+                            className="inline-block rounded bg-red-500 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white transition duration-150 ease-in-out hover:bg-red-accent-100 focus:bg-red-100 focus:outline-none focus:ring-0 active:bg-primary-accent-200"
                             data-te-modal-dismiss
                             data-te-ripple-init
                             data-te-ripple-color="light"

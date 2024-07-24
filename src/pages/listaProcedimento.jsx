@@ -134,16 +134,17 @@ const ListaProcedimento = ({ id_paciente }) => {
         let dados = post
         dados.preco = Number(toDecimalNumeric(post.preco))
         dados.id_empresa = id_empresa
+        setIsLoading(true)
 
         switch (toggleInsertUpdate) {
             case 'insert':
-                api.post('procedimento', dados)
+                await api.post('procedimento', dados)
                     .catch(e => {
                         alert(e)
                     })
 
             case 'update':
-                api.put('procedimento', dados)
+                await api.put('procedimento', dados)
                     .then(async function (response) {
                         if (response.status === 201) {
                         }
@@ -153,7 +154,6 @@ const ListaProcedimento = ({ id_paciente }) => {
                     })
         }
         setModal(false)
-        setIsLoading(true)
         await getProcedimentoList()
         setIsLoading(false)
         setShowToast(true)

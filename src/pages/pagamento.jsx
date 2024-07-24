@@ -9,6 +9,7 @@ import { registerLocale, setDefaultLocale } from 'react-datepicker'
 //import { ptBR } from 'date-fns/locale'
 import ptBR from 'date-fns/locale/pt-BR'
 import 'react-datepicker/dist/react-datepicker.css'
+import { formatarMoedaBRL } from "../utils/mask";
 
 registerLocale('pt-BR', ptBR)
 setDefaultLocale('pt-BR')
@@ -36,7 +37,7 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
         { label: 11, value: 11 },
         { label: 12, value: 12 },
     ])
-    const [dados, setDados] = useState({ data_primeiro_vencimento: new Date(), quantidade_parcelas: 1 })
+    const [dados, setDados] = useState({ data_primeiro_vencimento: new Date(), quantidade_parcelas: 1, desconto: 0 })
     const [idPagamento, setIdPagamento] = useState(0)
     const { getPagamentoList, getOrcamentoList, idEmpresa } = useContext(FichaClinicaContext)
     const [loadingOverlay, setLoadingOverlay] = useState(false)
@@ -50,7 +51,6 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
                 Collapse,
                 initTE,
             });
-            console.log("primeiro vencimento: ", primeiroVencimento)
         }
 
 
@@ -89,7 +89,6 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
 
 
     const cadastroPagamento = async () => {
-        console.log('entrou pagamento')
         return await api.post('pagamento',
             {
                 id_orcamento: orcamento?.id_orcamento,
@@ -107,7 +106,6 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
             }
         )
             .then(async function (response) {
-                console.log('response cadastro pagamento', response.data)
                 if (response.status === 201) {
                     updateStatusOrcamento(orcamento?.id_orcamento)
                 }
@@ -121,7 +119,6 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
     }
 
     const geraContasReceber = async (contas) => {
-        console.log("gera contas receber idemrpesa: ", id_empresa)
         await api.post('contas_receber',
             {
                 id_pagamento: contas.id_pagamento,
@@ -143,10 +140,13 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
 
     const updateField = e => {
         const fieldName = e.target.name
+
         setDados(existingValues => ({
             ...existingValues,
             [fieldName]: e.target.value,
         }))
+
+        console.log("updateField: ", dados)
     }
 
     const changeDate = (date) => {
@@ -155,9 +155,10 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
     }
 
     const calculoDesconto = async (total) => {
+        console.log('entrou calculo desconto', total, dados.desconto)
         return dados.tipo_desconto === 'porcentagem'
-            ? toDecimalNumeric(total) - toDecimalNumeric(total) * (dados.valor_desconto / 100)
-            : toDecimalNumeric(total) - dados.valor_desconto
+            ? total - total * (dados.desconto / 100)
+            : total - dados.desconto
     }
 
     function calcularDatasPrestacoes(dataPrimeiraPrestacao, numeroPrestacoes) {
@@ -176,15 +177,18 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
 
     const geraParcela = async () => {
         setLoadingOverlay(true)
-        console.log('entrou gera pargela')
-        let valor_parcela = orcamento?.preco / dados.quantidade_parcelas
+        let valor_com_desconto = await calculoDesconto(orcamento?.preco)
+        let valor_entrada = dados?.entrada
+        let valor_final = valor_com_desconto - valor_entrada
+        let valor_parcela = valor_final / dados.quantidade_parcelas
         let datas_prestacoes = calcularDatasPrestacoes(dados.primeiro_vencimento, dados.quantidade_parcelas)
         let id_pagamento = await cadastroPagamento()
             .then(async data => {
-                console.log(">>>> cadastroPagamento response", data)
-                console.log("DADOS ", dados)
-                for (let contador = 1; contador <= dados.quantidade_parcelas; contador++) {
-                    console.log("entrou no for")
+                let contador = valor_entrada ? 2 : 1
+                let qtd_parcelas = valor_entrada
+                    ? dados.quantidade_parcelas + 1
+                    : dados.quantidade_parcelas
+                for (contador; contador <= qtd_parcelas; contador++) {
                     await geraContasReceber({
                         id_pagamento: data,
                         nr_parcela: contador,
@@ -193,8 +197,16 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
                         id_paciente: Number(orcamento.id_paciente),
                     })
                 }
+
+                valor_entrada && await geraContasReceber({
+                    id_pagamento: data,
+                    nr_parcela: 1,
+                    valor: valor_entrada,
+                    dt_vencimento: datas_prestacoes[0],
+                    id_paciente: Number(orcamento.id_paciente),
+                })
+
             }).then(async response => {
-                console.log("response geraContasREceber ", response)
                 await changeScreen("listaOrcamento")
             })
         setLoadingOverlay(false)
@@ -343,13 +355,13 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
                                     type="text"
                                     id="desconto"
                                     name="desconto"
-                                    value={dados.desconto}
+                                    value={formatarMoedaBRL(dados?.desconto)}
                                     placeholder="R$ 0,00"
                                     onChange={(e) => {
                                         updateField({
                                             target: {
                                                 name: "desconto",
-                                                value: moneyMask(e.target.value),
+                                                value: toDecimalNumeric(e.target.value),
                                             },
                                         });
                                     }}
@@ -448,14 +460,14 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
                                     <input
                                         type="text"
                                         id="entrada"
-                                        value={dados.entrada}
+                                        value={formatarMoedaBRL(dados.entrada)}
                                         name="entrada"
                                         placeholder="R$ 0,00"
                                         onChange={(e) => {
                                             updateField({
                                                 target: {
                                                     name: "entrada",
-                                                    value: moneyMask(e.target.value),
+                                                    value: toDecimalNumeric(e.target.value),
                                                 },
                                             });
                                         }}
@@ -473,6 +485,7 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
                 </div>
                 <div className="mb-5 p-3 flex flex-end w-full justify-end items-center">
                 </div>
+                <p>Total: {formatarMoedaBRL(orcamento?.preco)}</p>
             </div>
 
             <div className="mb-5 p-3 gap-3 flex flex-end w-full justify-end items-center">

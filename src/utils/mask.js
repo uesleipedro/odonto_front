@@ -6,13 +6,11 @@ export const moneyMask = (value) => {
     parseFloat(value) / 100
   )
 
-  
-
   return 'R$ ' + result
 }
 
 export const formatarMoedaBRL = (valor) => {
-    return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    return valor?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
 export const toDecimalNumeric = (num) => {

@@ -33,6 +33,11 @@ const PacienteProfile = () => {
         getPaciente()
     }, [])
 
+    useEffect(() => {
+        console.log("paciente",paciente)
+
+    },[paciente])
+
     const getPaciente = async () => {
         setIsloading(true)
         await api.get(`paciente/one/${idPaciente}/${idEmpresa}`)
@@ -73,7 +78,7 @@ const PacienteProfile = () => {
                             </div>
                             <div className="mb-4 w-full md:w-4/12">
                                 <p className="font-bold">Paciente desde:</p>
-                                <p> ... </p>
+                                <p> {moment(paciente?.inserted_at).format("DD/MM/YYYY")} </p>
                             </div>
                             <div className="mb-4 w-full md:w-4/12">
                                 <p className="font-bold">Dentista responsável:</p>
