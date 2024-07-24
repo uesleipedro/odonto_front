@@ -98,23 +98,27 @@ const ListaProcedimento = ({ id_paciente }) => {
                 ...prevState,
                 ["face_dente"]: faces,
             }));
-
             return
         }
 
-        if (e.target.name === "preco") {
-            let preco = String(e.target.value).replace("R$ ", "").replace(",", ".");
+        // if (e.target.name === "preco") {
+        //     console.log("preco", e.target.value)
 
-            setPost(existingValues => ({
-                ...existingValues,
-                ...{ ["preco"]: parseFloat(e.target.value) },
-            }))
-        }
+        //     let preco = String(e.target.value).replace("R$ ", "").replace(",", ".");
+
+        //     setPost(existingValues => ({
+        //         ...existingValues,
+        //         ...{ ["preco"]: parseFloat(e.target.value) },
+        //     }))
+        //     return
+        // }
 
         setPost(existingValues => ({
             ...existingValues,
             [fieldName]: e.target.value,
         }))
+
+        console.log("updatafield", post)
     }
 
 
@@ -132,7 +136,7 @@ const ListaProcedimento = ({ id_paciente }) => {
 
     const sendProcedimentoData = async () => {
         let dados = post
-        dados.preco = Number(toDecimalNumeric(post.preco))
+        // dados.preco = Number(toDecimalNumeric(post.preco))
         dados.id_empresa = id_empresa
         setIsLoading(true)
 
@@ -433,7 +437,7 @@ const ListaProcedimento = ({ id_paciente }) => {
                                                 updateField({
                                                     target: {
                                                         name: "preco",
-                                                        value: moneyMask(e.target.value),
+                                                        value: toDecimalNumeric(e.target.value),
                                                     },
                                                 });
                                             }}
