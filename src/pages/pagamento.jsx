@@ -181,7 +181,7 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
         let valor_entrada = dados?.entrada
         let valor_final = valor_com_desconto - valor_entrada
         let valor_parcela = valor_final / dados.quantidade_parcelas
-        let datas_prestacoes = calcularDatasPrestacoes(dados.primeiro_vencimento, dados.quantidade_parcelas)
+        let datas_prestacoes = calcularDatasPrestacoes(dados.data_primeiro_vencimento, dados.quantidade_parcelas)
         let id_pagamento = await cadastroPagamento()
             .then(async data => {
                 let contador = valor_entrada ? 2 : 1
@@ -443,7 +443,7 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
                                                 changeDate(
                                                     {
                                                         target: {
-                                                            value: e,
+                                                            value: moment(e).format("YYYY-MM-DD"),
                                                             name: 'data_primeiro_vencimento'
                                                         }
                                                     }
