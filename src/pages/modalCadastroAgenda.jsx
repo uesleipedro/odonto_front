@@ -396,7 +396,7 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate,
                                     />
                                 </div>
                             </div>
-                            <div className="mb-3">
+                            {/* <div className="mb-3">
                                 <div className="flex items-center mb-4">
                                     <input
                                         onChange={(e) =>
@@ -415,7 +415,7 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate,
                                         Dia inteiro
                                     </label>
                                 </div>
-                            </div>
+                            </div> */}
                             <div className="mb-3">
                                 <label for="message-text" className="text-sm font-medium text-gray-500 dark:text-gray-300">
                                     Observação

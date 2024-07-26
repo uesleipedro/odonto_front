@@ -14,7 +14,8 @@ import GeraOrcamento from "./geraOrcamento"
 import Pagamento from "./pagamento"
 import { formatarMoedaBRL } from "../utils/mask"
 import LoadingOverlay from '../components/LoadingOverlay'
-import Toast from '../components/Toast' 
+import Toast from '../components/Toast'
+import OrcamentoView from "./view/orcamentoView";
 
 // const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub21lIjoiRGFydGhWYWRlciIsImlhdCI6MTY5NjU5ODI2MCwiZXhwIjoxNjk2NzcxMDYwfQ.GakWs7gLYzD1iAnIIS8p9Wu26i1aVi7PZAehATyzEuQ"
 const token = Cookies.get("jwt")
@@ -25,6 +26,7 @@ const ListaOrcamento = ({ id_paciente, id_empresa }) => {
     const [screen, setScreen] = useState("listaOrcamento")
     const [isLoading, setIsLoading] = useState(false)
     const [showToast, setShowToast] = useState(false)
+    const [showViewPagamento, setShowViewPagamento] = useState(false)
     const router = useRouter()
     const { orcamento, getOrcamentoList, getProcedimentoList, loading } = useContext(FichaClinicaContext)
     const { user } = useAuth()
@@ -41,6 +43,10 @@ const ListaOrcamento = ({ id_paciente, id_empresa }) => {
         setScreen(value)
         getOrcamentoList()
 
+    }
+
+    const toogleViewPagamento = () => {
+        setShowViewPagamento(!showViewPagamento)
     }
 
     const handleDeleteOrcamento = async (id_orcamento, id_paciente) => {
@@ -78,7 +84,7 @@ const ListaOrcamento = ({ id_paciente, id_empresa }) => {
     }
 
     const toogleOverlay = () => {
-      setIsLoading(!isLoading)
+        setIsLoading(!isLoading)
     }
 
     const MySwal = withReactContent(Swal)
@@ -135,9 +141,13 @@ const ListaOrcamento = ({ id_paciente, id_empresa }) => {
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.status}</td>
                                                 <td className="flex flex-row gap-3 px-6 py-4 whitespace-nowrap text-right text-md font-medium">
 
-                                                    <Link href="/fichaClinica" className="text-purple-800 hover:text-purple-900">
+                                                    <a href="#" className="text-purple-800 hover:text-purple-900"
+                                                        onClick={() => {
+                                                            toogleViewPagamento()
+                                                        }}
+                                                    >
                                                         <IoEyeSharp />
-                                                    </Link>
+                                                    </a>
                                                     <a className="text-purple-800 hover:text-purple-900" href="#"
                                                         onClick={() => showSwalWithLink(data.id_paciente, data.id_orcamento)}
                                                     >
@@ -158,38 +168,44 @@ const ListaOrcamento = ({ id_paciente, id_empresa }) => {
                                                     </a>
                                                     {/* </Link> */}
                                                 </td>
+
+                                                <OrcamentoView
+                                                    dados={data}
+                                                    toogleViewPagamento={toogleViewPagamento}
+                                                    showViewPagamento={showViewPagamento} />
                                             </tr>
+
                                         ))}
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
-    
+
                     <Toast
-                      message="Salvo com sucesso!"
-                      show={showToast}
-                      onClose={() => setShowToast(false)}
+                        message="Salvo com sucesso!"
+                        show={showToast}
+                        onClose={() => setShowToast(false)}
                     />
 
                     <LoadingOverlay isLoading={isLoading} />
                 </div>
             }
             {screen === "geraOrcamento" &&
-                <GeraOrcamento 
-                  id_paciente={id_paciente} 
-                  toogleOverlay={toogleOverlay} 
-                  changeScreen={changeScreen} 
-                  setShowToast={() => setShowToast(true)}/>
+                <GeraOrcamento
+                    id_paciente={id_paciente}
+                    toogleOverlay={toogleOverlay}
+                    changeScreen={changeScreen}
+                    setShowToast={() => setShowToast(true)} />
             }
 
             {screen === "pagamento" &&
-                <Pagamento 
-                  orcamento={orcamento[selectedOrcamento]} 
-                  changeScreen={changeScreen}
-                  setShowToast={() => setShowToast(true)} 
-                  id_paciente={id_paciente} 
-                  id_empresa={id_empresa} />
+                <Pagamento
+                    orcamento={orcamento[selectedOrcamento]}
+                    changeScreen={changeScreen}
+                    setShowToast={() => setShowToast(true)}
+                    id_paciente={id_paciente}
+                    id_empresa={id_empresa} />
             }
         </div >
     )

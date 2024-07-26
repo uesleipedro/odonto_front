@@ -9,7 +9,7 @@ import { registerLocale, setDefaultLocale } from 'react-datepicker'
 //import { ptBR } from 'date-fns/locale'
 import ptBR from 'date-fns/locale/pt-BR'
 import 'react-datepicker/dist/react-datepicker.css'
-import { formatarMoedaBRL } from "../utils/mask";
+import { formatarMoedaBRL, porcentagemMask, teste } from "../utils/mask";
 
 registerLocale('pt-BR', ptBR)
 setDefaultLocale('pt-BR')
@@ -37,11 +37,16 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
         { label: 11, value: 11 },
         { label: 12, value: 12 },
     ])
-    const [dados, setDados] = useState({ data_primeiro_vencimento: new Date(), quantidade_parcelas: 1, desconto: 0 })
+    const [dados, setDados] = useState({
+        data_primeiro_vencimento: new Date(),
+        quantidade_parcelas: 1,
+        desconto: 0,
+        tipo_desconto: "real"
+    })
     const [idPagamento, setIdPagamento] = useState(0)
     const { getPagamentoList, getOrcamentoList, idEmpresa } = useContext(FichaClinicaContext)
     const [loadingOverlay, setLoadingOverlay] = useState(false)
-    const [primeiroVencimento, setPrimeiroVencimento] = useState(new (Date))
+    const [primeiroVencimento, setPrimeiroVencimento] = useState(moment(new (Date)).format("YYYY-MM-DD"))
 
     useEffect(() => {
         const init = async () => {
@@ -57,23 +62,21 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
         init()
     }, [])
 
-    const moneyMask = (value) => {
-        value = value?.replace('.', '').replace(',', '').replace(/\D/g, '')
-
-        const options = { minimumFractionDigits: 2 }
-        const result = new Intl.NumberFormat('pt-BR', options).format(
-            parseFloat(value) / 100
-        )
-
-        return 'R$ ' + result
-    }
-
     const toDecimalNumeric = (num) => {
+        // if(dados?.tipo_desconto == "real") return num
+        console.log("toDecimal:", num)
+        console.log("todecimal: ", num)
         return Number((num
             ?.toString()
             .replace(',', '.')
             .replace(/\D/g, '') / 100
         ).toFixed(2))
+    }
+
+    const stringToFloat = (input) => {
+        console.log('stringToFloat entrada: ', input)
+        const floatValue = parseFloat(input.replace(',', '.'));
+        return parseFloat(floatValue.toFixed(2));
     }
 
     const updateStatusOrcamento = async (id_orcamento) => {
@@ -141,6 +144,8 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
     const updateField = e => {
         const fieldName = e.target.name
 
+        console.log("updateField entrada: ", e)
+
         setDados(existingValues => ({
             ...existingValues,
             [fieldName]: e.target.value,
@@ -151,17 +156,33 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
 
     const changeDate = (date) => {
         setPrimeiroVencimento(date.target.value)
+        date.target.value = moment(date.target.value).format("YYYY-MM-DD")
         updateField(date)
     }
 
+    const handleInputChange = (value) => {
+
+        switch (dados?.tipo_desconto) {
+            case "real":
+                return formatarMoedaBRL(value)
+
+            case "porcentagem":
+                return porcentagemMask(value)
+
+            default:
+                return
+        }
+    }
     const calculoDesconto = async (total) => {
-        console.log('entrou calculo desconto', total, dados.desconto)
+        console.log("Calculo desconto entrada: ", total)
+        if (!dados.desconto) return total
+
         return dados.tipo_desconto === 'porcentagem'
             ? total - total * (dados.desconto / 100)
             : total - dados.desconto
     }
 
-    function calcularDatasPrestacoes(dataPrimeiraPrestacao, numeroPrestacoes) {
+    const calcularDatasPrestacoes = (dataPrimeiraPrestacao, numeroPrestacoes) => {
         let data = new Date(dataPrimeiraPrestacao)
 
         let datasPrestacoes = [];
@@ -179,15 +200,20 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
         setLoadingOverlay(true)
         let valor_com_desconto = await calculoDesconto(orcamento?.preco)
         let valor_entrada = dados?.entrada
-        let valor_final = valor_com_desconto - valor_entrada
+        let valor_final = valor_entrada
+            ? valor_com_desconto - valor_entrada
+            : valor_com_desconto
+
         let valor_parcela = valor_final / dados.quantidade_parcelas
-        let datas_prestacoes = calcularDatasPrestacoes(dados.data_primeiro_vencimento, dados.quantidade_parcelas)
-        let id_pagamento = await cadastroPagamento()
+        let qtd_parcelas = valor_entrada
+            ? dados.quantidade_parcelas + 1
+            : dados.quantidade_parcelas
+
+        let datas_prestacoes = calcularDatasPrestacoes(dados.data_primeiro_vencimento, qtd_parcelas)
+        await cadastroPagamento()
             .then(async data => {
                 let contador = valor_entrada ? 2 : 1
-                let qtd_parcelas = valor_entrada
-                    ? dados.quantidade_parcelas + 1
-                    : dados.quantidade_parcelas
+
                 for (contador; contador <= qtd_parcelas; contador++) {
                     await geraContasReceber({
                         id_pagamento: data,
@@ -336,6 +362,7 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
                                                 name="tipo_desconto"
                                                 className="w-4 h-4"
                                                 onChange={updateField}
+                                                defaultChecked={true}
                                             />
                                             <label
                                                 for="status2"
@@ -349,23 +376,38 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
                             </div>
 
 
-                            <div className="w-full md:w-6/12 pt-3">
+                            <div className="relative w-full md:w-6/12 pt-3">
                                 <label className="text-gray-500">Valor</label>
+                                <span className="absolute inset-y-0 left-0 flex items-center pl-3 pt-9">
+                                    {dados?.tipo_desconto == "real" ? "R$" : "%"}
+                                </span>
                                 <input
                                     type="text"
                                     id="desconto"
                                     name="desconto"
-                                    value={formatarMoedaBRL(dados?.desconto)}
-                                    placeholder="R$ 0,00"
+                                    value={String(dados?.desconto.toFixed(2))?.replace('.', ',')}//{teste(dados?.desconto)}
+                                    // value={dados?.tipo_desconto == "real"
+                                    //     ? formatarMoedaBRL(dados?.desconto)
+                                    //     : dados?.desconto
+                                    // }
+                                    // value={
+                                    //     dados?.tipo_desconto == "porcentagem"
+                                    //         ? handleInputChange(dados?.desconto)
+                                    //         : handleInputChange(dados?.desconto)
+                                    // }
+                                    //placeholder="0,00"
                                     onChange={(e) => {
                                         updateField({
                                             target: {
                                                 name: "desconto",
-                                                value: toDecimalNumeric(e.target.value),
+                                                value: toDecimalNumeric(e.target.value)
+                                                //dados?.tipo_desconto == "real"
+                                                // toDecimalNumeric(e.target.value)
+                                                //: dados?.desconto
                                             },
                                         });
                                     }}
-                                    className="form-input rounded-lg text-gray-500 w-full"
+                                    className="form-input pl-9 rounded-lg text-gray-500 w-full"
                                 />
                             </div>
                         </div>
@@ -443,7 +485,7 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
                                                 changeDate(
                                                     {
                                                         target: {
-                                                            value: moment(e).format("YYYY-MM-DD"),
+                                                            value: e,
                                                             name: 'data_primeiro_vencimento'
                                                         }
                                                     }
@@ -473,11 +515,11 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
                                         }}
                                         className="form-input rounded-lg text-gray-500 w-full" />
                                 </div>
-
+{/* 
                                 <div className="w-6/12 pt-3">
                                     <label className="text-gray-500 ">Data do pagamento</label>
                                     <input type="date" id="data_pagamento" name="data_pagamento" onChange={updateField} className="form-input rounded-lg text-gray-500 w-full" />
-                                </div>
+                                </div> */}
 
                             </div>
                         </div>

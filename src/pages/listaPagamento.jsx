@@ -21,6 +21,7 @@ const ListaPagamento = () => {
     const [dataPagamento, setDataPagamento] = useState(new Date())
     const [dadosPagamento, setDadosPagamento] = useState({ "status": "Pago" })
     const [showToast, setShowToast] = useState(false)
+    const [showViewPagamento, setShowViewPagamento] = useState(false)
 
     useEffect(() => {
         const init = async () => {
@@ -32,8 +33,12 @@ const ListaPagamento = () => {
 
     const toCurrency = (num) => {
         return ('R$ ' + num
-            .toString()
-            .replace('.', ','))
+            ?.toString()
+            ?.replace('.', ','))
+    }
+
+    const toogleViewPagamento = () => {
+        setShowViewPagamento(!showViewPagamento)
     }
 
     const finalizarPagamento = async () => {
@@ -114,7 +119,7 @@ const ListaPagamento = () => {
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.status}</td>
                                                 <td className="flex flex-row gap-3 px-6 py-4 whitespace-nowrap text-right text-md font-medium">
 
-                                                    <a className="text-purple-800 hover:text-purple-900" title="Visualizar" href="#"
+                                                    <a className="text-purple-800 hover:text-purple-900" title="Confirmar pagamento" href="#"
                                                         onClick={() => {
                                                             setModal(true)
                                                             setDadosPagamento(existingValues => ({
@@ -128,13 +133,12 @@ const ListaPagamento = () => {
                                                     </a>
                                                     <a className="text-purple-800 hover:text-purple-900" title="Visualizar" href="#"
                                                         onClick={() => {
-                                                            //showPagamento()
-                                                            //setA(data)
+                                                            toogleViewPagamento()
                                                         }}
                                                     >
                                                         <FaEye />
                                                     </a>
-                                                    <a className="text-purple-800 hover:text-purple-900" title="Cancelar Pagamento" href="#"
+                                                    <a className="text-purple-800 hover:text-purple-900" title="Cancelar Pagamento" rel="noopener noreferrer" href="#"
                                                         onClick={() => {
                                                             showSwalWithLink(data.id_pagamento, data.nr_parcela)
                                                         }}
@@ -142,7 +146,10 @@ const ListaPagamento = () => {
                                                         <ImCancelCircle />
                                                     </a>
                                                 </td>
-                                                {/* <PagamentoView dados={data} /> */}
+                                                <PagamentoView
+                                                    dados={data}
+                                                    toogleViewPagamento={toogleViewPagamento}
+                                                    showViewPagamento={showViewPagamento} />
                                             </tr>
                                         ))}
                                     </tbody>

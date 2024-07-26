@@ -2,7 +2,7 @@ import { react, useState, useEffect } from 'react'
 import { formatarMoedaBRL } from '../../utils/mask';
 import moment from 'moment';
 
-const PagamentoView = ({ dados, toogleViewPagamento, showViewPagamento }) => {
+const OrcamentoView = ({ dados, toogleViewPagamento, showViewPagamento }) => {
 
     useEffect(() => {
         const init = async () => {
@@ -36,7 +36,7 @@ const PagamentoView = ({ dados, toogleViewPagamento, showViewPagamento }) => {
                             className="text-white text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200"
                             id="exampleModalVaryingLabel"
                         >
-                            Dados do Pagamento
+                            Dados do Orçamento
                         </h5>
                         <button
                             type="button"
@@ -62,12 +62,10 @@ const PagamentoView = ({ dados, toogleViewPagamento, showViewPagamento }) => {
                         </button>
                     </div>
                     <div className="relative flex-auto p-4" data-te-modal-body-ref>
-                        <p><strong>Nº Pagamento:</strong> {dados?.id_pagamento}</p>
-                        <p><strong>Nº Parcela:</strong> {dados?.nr_parcela}</p>
-                        <p><strong>Data de vencimento:</strong> {moment(dados?.dt_vencimento).format("DD/MM/YYYY")}</p>
-                        <p><strong>Data de recebimento:</strong> {moment(dados?.dt_recebimento).format("DD/MM/YYYY")}</p>
-                        <p><strong>Status: {dados?.status}</strong></p>
-                        <p><strong>Valor:</strong> {formatarMoedaBRL(dados?.valor)}</p>
+                        <p><strong>Nº Orçamento:</strong> {dados?.id_orcamento}</p>
+                        <p><strong>Data:</strong> {moment(dados?.date).format("DD/MM/YYYY")}</p>
+                        <p><strong>Status:</strong> {dados?.status}</p>
+                        <p><strong>Valor:</strong> {formatarMoedaBRL(dados?.preco)}</p>
                     </div>
                     <div className="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
                         <button
@@ -97,4 +95,4 @@ const PagamentoView = ({ dados, toogleViewPagamento, showViewPagamento }) => {
     )
 }
 
-export default PagamentoView
+export default OrcamentoView
