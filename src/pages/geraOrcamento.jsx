@@ -2,10 +2,12 @@ import React, { useState, useEffect, useContext } from 'react'
 import api from '../utils/Api'
 import moment from 'moment'
 import Select from "react-select"
-import { moneyMask, formatarMoedaBRL, toDecimalNumeric } from "../utils/mask"
+import { formatarMoedaBRL, toDecimalNumeric } from "../utils/mask"
 import { FichaClinicaContext } from "../context/FichaClinicaContext"
+import { useAuth } from '../auth/useAuth'
+import { usePaciente } from '../context/PacienteContext'
 
-const GeraOrcamento = ({ id_paciente, changeScreen, toogleOverlay, setShowToast }) => {
+const GeraOrcamento = ({ changeScreen, toogleOverlay, setShowToast }) => {
 
     const [procedimentos, setProcedimentos] = useState([])
     const [valorOrcamento, setValorOrcamento] = useState(0)
@@ -14,6 +16,9 @@ const GeraOrcamento = ({ id_paciente, changeScreen, toogleOverlay, setShowToast 
     ])
     const [selectedProfissional, setSelectedProfissional] = useState(1)
     const { getOrcamentoList } = useContext(FichaClinicaContext)
+    const { user } = useAuth()
+    const { idPaciente } = usePaciente()
+    const id_empresa = user?.user?.foundUser?.id_empresa
 
     useEffect(() => {
         const getProcedimentoList = async () => {
@@ -58,13 +63,12 @@ const GeraOrcamento = ({ id_paciente, changeScreen, toogleOverlay, setShowToast 
 
     const sendOrcamentoData = async () => {
         await api.post('/orcamento', {
-            id_empresa: 1,
+            id_empresa: id_empresa,
             id_profissional: selectedProfissional,
-            id_paciente: 1,
+            id_paciente: Number(idPaciente),
             preco: valorOrcamento,
             date: moment().toDate(),
             status: 'Pendente pagamento',
-            id_paciente: Number(id_paciente)
         })
             .then(async (response) => {
                 if (response.status === 201) { }
@@ -73,7 +77,7 @@ const GeraOrcamento = ({ id_paciente, changeScreen, toogleOverlay, setShowToast 
             }).then(async (e) => {
                 await sendProcedimentoOrcamento(e)
             }).then(async () => {
-                await getOrcamentoList(id_paciente)
+                await getOrcamentoList(idPaciente)
             })
             .catch(e => {
                 alert(e)
@@ -98,11 +102,12 @@ const GeraOrcamento = ({ id_paciente, changeScreen, toogleOverlay, setShowToast 
             await api.post('/procedimento_orcamento', {
                 id_procedimento: e.id_procedimento,
                 id_orcamento: id_orcamento,
-                preco: e.preco
+                preco: e.preco,
+                id_empresa: Number(id_empresa)
             })
                 .then(async function (response) {
                     if (response.status === 201)
-                        await updateStatusProcedimento(e.id_procedimento)
+                        updateStatusProcedimento(e.id_procedimento)
                 })
                 .catch(e => {
                     alert(e)

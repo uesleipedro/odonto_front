@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import Link from "next/link"
 import api from "../utils/Api"
-//import middleware from "../middleware"
 
 const CadastroUsuario = () => {
 
@@ -13,12 +12,9 @@ const CadastroUsuario = () => {
             ...existingValues,
             [fieldName]: e.target.value,
         }))
-
-    console.log("USER: ", user)
     }
 
     const sendPacienteData = async () => {
-        console.log("iniciou envio:")
         await api.post('/user', user)
             .then(function (response) {
                 if (response.status === 201)
@@ -26,8 +22,7 @@ const CadastroUsuario = () => {
             })
             .catch(e => {
                 alert(e)
-            }) 
-        console.log("terminou o envio")
+            })
     }
 
     return (

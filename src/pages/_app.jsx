@@ -13,7 +13,7 @@ import Cookies from 'js-cookie'
 export default function App({ Component, pageProps }) {
   const router = useRouter()
   const user = true //Cookies.get("user")
-  const noNav = ['/login', '/cadastroUsuario']
+  const noNav = ['/login', '/cadastroUsuario', '/view/orcamentoView/[id_orcamento]']
 
   return (
     <div>

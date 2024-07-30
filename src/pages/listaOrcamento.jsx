@@ -15,7 +15,6 @@ import Pagamento from "./pagamento"
 import { formatarMoedaBRL } from "../utils/mask"
 import LoadingOverlay from '../components/LoadingOverlay'
 import Toast from '../components/Toast'
-import OrcamentoView from "./view/orcamentoView";
 
 // const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub21lIjoiRGFydGhWYWRlciIsImlhdCI6MTY5NjU5ODI2MCwiZXhwIjoxNjk2NzcxMDYwfQ.GakWs7gLYzD1iAnIIS8p9Wu26i1aVi7PZAehATyzEuQ"
 const token = Cookies.get("jwt")
@@ -54,6 +53,7 @@ const ListaOrcamento = ({ id_paciente, id_empresa }) => {
             .then(async response => {
                 await estornaProcedimento(id_orcamento)
                 let a = await deletePagamento(id_orcamento)
+                await deleteProcedimentoOrcamentoByOrcamento(id_orcamento)
 
                 if (response.status === 204)
                     return
@@ -65,6 +65,13 @@ const ListaOrcamento = ({ id_paciente, id_empresa }) => {
         await getOrcamentoList()
         await getProcedimentoList()
         setIsLoading(false)
+    }
+
+    const deleteProcedimentoOrcamentoByOrcamento = async (id_orcamento) => {
+        await api.delete(`procedimento_orcamento/by_orcamento/${id_orcamento}/${id_empresa}`)
+            .catch(error => {
+                console.error(error)
+            })
     }
 
     const deletePagamento = async (id_orcamento) => {
@@ -141,11 +148,7 @@ const ListaOrcamento = ({ id_paciente, id_empresa }) => {
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.status}</td>
                                                 <td className="flex flex-row gap-3 px-6 py-4 whitespace-nowrap text-right text-md font-medium">
 
-                                                    <a href="#" className="text-purple-800 hover:text-purple-900"
-                                                        onClick={() => {
-                                                            toogleViewPagamento()
-                                                        }}
-                                                    >
+                                                    <a href={`/view/orcamentoView/${data.id_orcamento}`} target="_blank" className="text-purple-800 hover:text-purple-900">
                                                         <IoEyeSharp />
                                                     </a>
                                                     <a className="text-purple-800 hover:text-purple-900" href="#"
@@ -169,10 +172,10 @@ const ListaOrcamento = ({ id_paciente, id_empresa }) => {
                                                     {/* </Link> */}
                                                 </td>
 
-                                                <OrcamentoView
+                                                {/* <OrcamentoView
                                                     dados={data}
                                                     toogleViewPagamento={toogleViewPagamento}
-                                                    showViewPagamento={showViewPagamento} />
+                                                    showViewPagamento={showViewPagamento} /> */}
                                             </tr>
 
                                         ))}

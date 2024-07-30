@@ -80,10 +80,6 @@ const PacienteProfile = () => {
                                 <p className="font-bold">Paciente desde:</p>
                                 <p> {moment(paciente?.inserted_at).format("DD/MM/YYYY")} </p>
                             </div>
-                            <div className="mb-4 w-full md:w-4/12">
-                                <p className="font-bold">Dentista responsável:</p>
-                                <p>...</p>
-                            </div>
                         </div>
                     </div>
                 </div>
