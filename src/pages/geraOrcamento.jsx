@@ -6,15 +6,14 @@ import { formatarMoedaBRL, toDecimalNumeric } from "../utils/mask"
 import { FichaClinicaContext } from "../context/FichaClinicaContext"
 import { useAuth } from '../auth/useAuth'
 import { usePaciente } from '../context/PacienteContext'
+import Swal from 'sweetalert2'
 
-const GeraOrcamento = ({ changeScreen, toogleOverlay, setShowToast }) => {
+const GeraOrcamento = ({ changeScreen, setShowToast }) => {
 
     const [procedimentos, setProcedimentos] = useState([])
     const [valorOrcamento, setValorOrcamento] = useState(0)
-    const [profissionais, setProfissionais] = useState([
-        { label: 'Dr. Fulano', value: 1 }
-    ])
-    const [selectedProfissional, setSelectedProfissional] = useState(1)
+    const [profissionais, setProfissionais] = useState()
+    const [selectedProfissional, setSelectedProfissional] = useState()
     const { getOrcamentoList } = useContext(FichaClinicaContext)
     const { user } = useAuth()
     const { idPaciente } = usePaciente()
@@ -31,7 +30,19 @@ const GeraOrcamento = ({ changeScreen, toogleOverlay, setShowToast }) => {
                 })
         }
         getProcedimentoList()
+        getProfissional()
     }, [])
+
+    const getProfissional = async () => {
+        await api
+            .get(`user/empresa/${id_empresa}`)
+            .then((response) => {
+                setProfissionais([...response.data])
+            })
+            .catch(function (error) {
+                console.error(error)
+            })
+    }
 
     const handleToggleCheck = (index) => (e) => {
         const newArray = procedimentos.map((item, i) => {
@@ -131,10 +142,13 @@ const GeraOrcamento = ({ changeScreen, toogleOverlay, setShowToast }) => {
     }, [procedimentos])
 
     const geraOrcamento = async () => {
-        //toogleOverlay()
+        if(!selectedProfissional){
+            Swal.fire("Selecione um Profissional!")
+            return
+        }
+
         await sendOrcamentoData()
         setShowToast()
-        //await toogleOverlay()
     }
 
     return (
@@ -145,7 +159,6 @@ const GeraOrcamento = ({ changeScreen, toogleOverlay, setShowToast }) => {
                 name="paciente"
                 options={profissionais}
                 placeholder="Profissional"
-                defaultValue={profissionais[0]}
                 onChange={(e) => {
                     setSelectedProfissional(e.value)
                 }}
