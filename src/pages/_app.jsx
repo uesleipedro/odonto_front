@@ -3,12 +3,10 @@ import Sidebar from '../components/Sidebar'
 import Header from '../components/Header'
 import "tw-elements/dist/css/tw-elements.min.css"
 import { useRouter } from 'next/router';
-// import { AuthProvider } from '../auth/_UseAuth'
 import { useAuth, AuthProvider } from '../auth/useAuth'
 import { PacienteProvider } from '../context/PacienteContext';
 import { FichaClinicaProvider } from '../context/FichaClinicaContext'
-// const roboto = Roboto({ weight: "400", subsets: ["latin"] });
-import Cookies from 'js-cookie'
+import MenuHamburger from '../components/MenuHamburger'
 
 export default function App({ Component, pageProps }) {
   const router = useRouter()
@@ -27,6 +25,7 @@ export default function App({ Component, pageProps }) {
                 <Header />
 
                 <Sidebar>
+                  <MenuHamburger />
                   <Component {...pageProps} />
                 </Sidebar>
               </>
