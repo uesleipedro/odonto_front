@@ -1,8 +1,7 @@
-import { react, useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import Select from "react-select"
 import moment from "moment"
 import api from '../utils/Api'
-import { useRouter } from "next/navigation"
 import DatePicker from 'react-datepicker'
 import { registerLocale, setDefaultLocale } from 'react-datepicker'
 import { ptBR } from 'date-fns/locale'
@@ -11,17 +10,15 @@ import { useAuth } from '../auth/useAuth'
 import withReactContent from 'sweetalert2-react-content'
 import 'react-datepicker/dist/react-datepicker.css'
 
-const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate, updateEvents }) => {
-    const router = useRouter();
+const ModalCadastroAgenda = ({ toogleModal, agendamentoData, insertUpdate, updateEvents }) => {
     const [options, setOptions] = useState([])
     const [paciente, setPaciente] = useState([])
     const [agendamento, setAgendamento] = useState(agendamentoData)
     const [startDate, setStartDate] = useState(moment(agendamentoData?.start).toDate())
     const [endDate, setEndDate] = useState(moment(agendamentoData?.end).toDate())
     const { user } = useAuth()
-    const [profissional, setProfissional] = useState([
-        { value: 1, label: 'Padrão' }
-    ])
+    const id_empresa = user?.user?.foundUser?.id_empresa
+    const [profissional, setProfissional] = useState()
 
     useEffect(() => {
         let opt = []
@@ -35,27 +32,25 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate,
         registerLocale('ptBR', ptBR)
         setDefaultLocale('ptBR')
         handleGetPacientList()
-
-        console.log("agendamento.id_paciente: ", agendamento?.id_paciente)
-        console.log("agendamento.id_paciente2: ", paciente)
-        console.log("agendamento.id_paciente3: ", getLabelSelect(paciente, agendamento?.id_paciente))
+        getProfissional()
     }, [])
+
+    const getProfissional = async () => {
+        await api
+            .get(`user/empresa/${id_empresa}`)
+            .then((response) => {
+                setProfissional([...response.data])
+            })
+            .catch(function (error) {
+                console.error(error)
+            })
+    }
 
     const changeDate = (date) => {
         date.target.name == "start"
             ? setStartDate(date.target.value)
             : setEndDate(date.target.value)
         updateField(date)
-    }
-
-    const checkHandler = async (e) => {
-        let ck = e.target.checked
-        await updateField({
-            target: {
-                name: "dia_inteiro",
-                value: e.target.checked
-            }
-        })
     }
 
     const updateField = (e) => {
@@ -71,9 +66,19 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate,
             return
         }
 
+        fieldName == "id_paciente" && setLabel("nome", e.target.label)
+        fieldName == "id_profissional" && setLabel("nome_profissional", e.target.label)
+
         setAgendamento((existingValues) => ({
             ...existingValues,
             [fieldName]: e.target.value,
+        }))
+    }
+
+    const setLabel = (field, value) => {
+        setAgendamento((existingValues) => ({
+            ...existingValues,
+            [field]: value,
         }))
     }
 
@@ -87,7 +92,7 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate,
     }
 
     const insertAgenda = async () => {
-        agendamento.id_empresa = user?.user?.foundUser.id_empresa
+        agendamento.id_empresa = id_empresa
         await api
             .post("agenda", agendamento)
             .then(async function (response) {
@@ -129,24 +134,15 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate,
     }
 
     const handleGetPacientList = async () => {
-        let id = user?.user?.foundUser?.id_empresa
+        let id = id_empresa
         await api
             .get(`paciente/${id}`)
             .then((response) => {
-                console.log("response paciente:", response.data)
                 setPaciente([...response.data])
             })
             .catch(function (error) {
                 console.error(error)
             })
-    }
-
-    const getLabelSelect = (arr, id) => {
-        console.log("getLab:", arr,id)
-        if (!arr || !id) return
-        let a = arr.filter(dataItem => dataItem?.id_paciente == id)
-
-        return a[0]?.nome
     }
 
     const MySwal = withReactContent(Swal)
@@ -219,13 +215,14 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate,
                                     name="paciente"
                                     id="paciente"
                                     options={options}
-                                    value={{ value: agendamento?.id_paciente, label: getLabelSelect(paciente, agendamento?.id_paciente) }}
+                                    value={{ value: agendamento?.id_paciente, label: agendamento?.nome }}
                                     placeholder="Paciente"
                                     onChange={(e) => {
                                         updateField({
                                             target: {
                                                 name: "id_paciente",
                                                 value: e.value,
+                                                label: e.label
                                             },
                                         });
                                     }}
@@ -320,12 +317,13 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate,
                                     placeholder="Profissional"
                                     name="profissional"
                                     id="profissional"
-                                    value={{ value: 1, label: "Padrão" }}
+                                    value={{ value: agendamento?.id_profissional, label: agendamento?.nome_profissional }}
                                     onChange={(e) => {
                                         updateField({
                                             target: {
                                                 name: "id_profissional",
                                                 value: e.value,
+                                                label: e.label
                                             },
                                         });
                                     }}
@@ -396,26 +394,6 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate,
                                     />
                                 </div>
                             </div>
-                            {/* <div className="mb-3">
-                                <div className="flex items-center mb-4">
-                                    <input
-                                        onChange={(e) =>
-                                            checkHandler(e)
-                                        }
-                                        name="dia_inteiro"
-                                        id="dia_inteiro"
-                                        type="checkbox"
-                                        defaultChecked={agendamento?.dia_inteiro}
-                                        className="w-4 h-4 rounded"
-                                    />
-                                    <label
-                                        for="dia_inteiro"
-                                        className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                                    >
-                                        Dia inteiro
-                                    </label>
-                                </div>
-                            </div> */}
                             <div className="mb-3">
                                 <label for="message-text" className="text-sm font-medium text-gray-500 dark:text-gray-300">
                                     Observação
@@ -432,16 +410,18 @@ const ModalCadastroAgenda = ({ data, toogleModal, agendamentoData, insertUpdate,
                         </form>
                     </div>
                     <div className="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
-                        <button
-                            type="button"
-                            className="inline-block rounded bg-red-500 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white transition duration-150 ease-in-out hover:bg-red-accent-100 focus:bg-red-100 focus:outline-none focus:ring-0 active:bg-primary-accent-200"
-                            data-te-modal-dismiss
-                            data-te-ripple-init
-                            data-te-ripple-color="light"
-                            onClick={() => showSwalWithLink(agendamento?.id)}
-                        >
-                            Excluir
-                        </button>
+                        {agendamento?.id &&
+                            <button
+                                type="button"
+                                className="inline-block rounded bg-red-500 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white transition duration-150 ease-in-out hover:bg-red-accent-100 focus:bg-red-100 focus:outline-none focus:ring-0 active:bg-primary-accent-200"
+                                data-te-modal-dismiss
+                                data-te-ripple-init
+                                data-te-ripple-color="light"
+                                onClick={() => showSwalWithLink(agendamento?.id)}
+                            >
+                                Excluir
+                            </button>
+                        }
                         <button
                             type="button"
                             className="ml-1 inline-block rounded bg-purple-600 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_#3b71ca] transition duration-150 ease-in-out hover:bg-primary-600 hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:bg-primary-600 focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:outline-none focus:ring-0 active:bg-primary-700 active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] dark:shadow-[0_4px_9px_-4px_rgba(59,113,202,0.5)] dark:hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)]"

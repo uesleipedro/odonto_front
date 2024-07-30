@@ -26,16 +26,7 @@ const ListaProcedimento = ({ id_paciente }) => {
     const [isLoading, setIsLoading] = useState(false)
     const { user } = useAuth()
     const id_empresa = user?.user?.foundUser.id_empresa
-    const [profissional, setProfissional] = useState([
-        {
-            value: 1,
-            label: "Dr. Roberto"
-        },
-        {
-            value: 2,
-            label: "Dra. Marcela"
-        }
-    ])
+    const [profissional, setProfissional] = useState()
 
     useEffect(() => {
         const getDentes = async () => {
@@ -51,7 +42,19 @@ const ListaProcedimento = ({ id_paciente }) => {
         listaProcedimento()
         getDentes()
         getSetFacesDente(post?.dente)
+        getProfissional()
     }, [])
+
+    const getProfissional = async () => {
+        await api
+            .get(`user/empresa/${id_empresa}`)
+            .then((response) => {
+                setProfissional([...response.data])
+            })
+            .catch(function (error) {
+                console.error(error)
+            })
+    }
 
     const listaProcedimento = async () => {
         await api.get('procedimento_list')
@@ -100,27 +103,22 @@ const ListaProcedimento = ({ id_paciente }) => {
             }));
             return
         }
-
-        // if (e.target.name === "preco") {
-        //     console.log("preco", e.target.value)
-
-        //     let preco = String(e.target.value).replace("R$ ", "").replace(",", ".");
-
-        //     setPost(existingValues => ({
-        //         ...existingValues,
-        //         ...{ ["preco"]: parseFloat(e.target.value) },
-        //     }))
-        //     return
-        // }
+        fieldName == "id_procedimento_list" && setLabel("nome_procedimento", e.target.label)
+        fieldName == "id_profissional" && setLabel("nome_profissional", e.target.label)
 
         setPost(existingValues => ({
             ...existingValues,
             [fieldName]: e.target.value,
         }))
 
-        console.log("updatafield", post)
     }
 
+    const setLabel = (field, value) => {
+        setPost((existingValues) => ({
+            ...existingValues,
+            [field]: value,
+        }))
+    }
 
     const handleDeleteProcedimento = async (id_procedimento) => {
         await api.delete(`procedimento/${id_procedimento}`)
@@ -136,7 +134,6 @@ const ListaProcedimento = ({ id_paciente }) => {
 
     const sendProcedimentoData = async () => {
         let dados = post
-        // dados.preco = Number(toDecimalNumeric(post.preco))
         dados.id_empresa = id_empresa
         setIsLoading(true)
 
@@ -164,15 +161,6 @@ const ListaProcedimento = ({ id_paciente }) => {
 
     }
 
-    const getLabelSelect = (arr, id) => {
-        if (!arr || !id) return
-
-        let a = arr.filter(dataItem => dataItem.value === id)
-        console.log('filter:', a)
-        return a[0].label
-    }
-
-
     const MySwal = withReactContent(Swal)
     const showSwalWithLink = (id_procedimento) => {
         MySwal.fire({
@@ -189,7 +177,6 @@ const ListaProcedimento = ({ id_paciente }) => {
             }
         })
     }
-
 
     return (
         <div className=" p-5  rounded-lg shadow-lg">
@@ -306,12 +293,13 @@ const ListaProcedimento = ({ id_paciente }) => {
                                             name="id_procedimento_list"
                                             options={procedimentoList}
                                             placeholder="Procedimento"
-                                            value={{ value: post.id_procedimento_list, label: getLabelSelect(procedimentoList, post.id_procedimento_list) }}
+                                            value={{ value: post.id_procedimento_list, label: post?.nome_procedimento }}
                                             onChange={(e) => {
                                                 updateField({
                                                     target: {
                                                         name: 'id_procedimento_list',
-                                                        value: e.value
+                                                        value: e.value,
+                                                        label: e.label
                                                     }
                                                 })
                                             }}
@@ -414,12 +402,13 @@ const ListaProcedimento = ({ id_paciente }) => {
                                             options={profissional}
                                             placeholder="Profissional"
                                             name="profissional"
-                                            value={{ value: post.id_profissional, label: getLabelSelect(profissional, post.id_profissional) }}
+                                            value={{ value: post.id_profissional, label: post?.nome_profissional }}
                                             onChange={(e) => {
                                                 updateField({
                                                     target: {
                                                         name: 'id_profissional',
-                                                        value: e.value
+                                                        value: e.value,
+                                                        label: e.label
                                                     }
                                                 })
                                             }}

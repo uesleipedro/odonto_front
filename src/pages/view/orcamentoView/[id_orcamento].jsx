@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import api from '../../../utils/Api';
-import { formatarMoedaBRL } from '../../../utils/mask';
-import LoadingOverlay from '../../../components/LoadingOverlay';
+import api from '../../../utils/Api'
+import { formatarMoedaBRL } from '../../../utils/mask'
+import LoadingOverlay from '../../../components/LoadingOverlay'
+import { useAuth } from '../../../auth/useAuth'
 
 const OrcamentoView = () => {
     const router = useRouter()
     const { id_orcamento } = router.query
     const [orcamento, setOrcamento] = useState()
+    const { user } = useAuth()
+    const id_empresa = user?.user?.foundUser.id_empresa
 
     useEffect(() => {
         const init = async () => {
@@ -19,7 +22,7 @@ const OrcamentoView = () => {
 
     useEffect(() => {
         if (router.isReady && id_orcamento) {
-            api.get(`orcamento/view/${id_orcamento}`)
+            api.get(`orcamento/view/${id_orcamento}/${id_empresa}`)
                 .then(async response => {
                     setOrcamento([...response.data])
                 })

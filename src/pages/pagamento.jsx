@@ -47,6 +47,7 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
     const { getPagamentoList, getOrcamentoList, idEmpresa } = useContext(FichaClinicaContext)
     const [loadingOverlay, setLoadingOverlay] = useState(false)
     const [primeiroVencimento, setPrimeiroVencimento] = useState(moment(new (Date)).format("YYYY-MM-DD"))
+    const [valorFinal, setValorFinal] = useState(orcamento?.preco)
 
     useEffect(() => {
         const init = async () => {
@@ -61,6 +62,21 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
 
         init()
     }, [])
+
+    useEffect(() => {
+        calculoTotal()
+    }, [dados?.desconto])
+
+
+    const calculoTotal = async () => {
+        let valor_com_desconto = await calculoDesconto(orcamento?.preco)
+        let valor_entrada = dados?.entrada
+        let valor_final = valor_entrada
+            ? valor_com_desconto - valor_entrada
+            : valor_com_desconto
+
+        setValorFinal(valor_final)
+    }
 
     const toDecimalNumeric = (num) => {
         // if(dados?.tipo_desconto == "real") return num
@@ -385,27 +401,14 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
                                     type="text"
                                     id="desconto"
                                     name="desconto"
-                                    value={String(dados?.desconto.toFixed(2))?.replace('.', ',')}//{teste(dados?.desconto)}
-                                    // value={dados?.tipo_desconto == "real"
-                                    //     ? formatarMoedaBRL(dados?.desconto)
-                                    //     : dados?.desconto
-                                    // }
-                                    // value={
-                                    //     dados?.tipo_desconto == "porcentagem"
-                                    //         ? handleInputChange(dados?.desconto)
-                                    //         : handleInputChange(dados?.desconto)
-                                    // }
-                                    //placeholder="0,00"
+                                    value={String(dados?.desconto.toFixed(2))?.replace('.', ',')}
                                     onChange={(e) => {
                                         updateField({
                                             target: {
                                                 name: "desconto",
                                                 value: toDecimalNumeric(e.target.value)
-                                                //dados?.tipo_desconto == "real"
-                                                // toDecimalNumeric(e.target.value)
-                                                //: dados?.desconto
                                             },
-                                        });
+                                        })
                                     }}
                                     className="form-input pl-9 rounded-lg text-gray-500 w-full"
                                 />
@@ -515,19 +518,13 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
                                         }}
                                         className="form-input rounded-lg text-gray-500 w-full" />
                                 </div>
-{/* 
-                                <div className="w-6/12 pt-3">
-                                    <label className="text-gray-500 ">Data do pagamento</label>
-                                    <input type="date" id="data_pagamento" name="data_pagamento" onChange={updateField} className="form-input rounded-lg text-gray-500 w-full" />
-                                </div> */}
-
                             </div>
                         </div>
                     </div>
                 </div>
                 <div className="mb-5 p-3 flex flex-end w-full justify-end items-center">
                 </div>
-                <p>Total: {formatarMoedaBRL(orcamento?.preco)}</p>
+                <p>Total: {formatarMoedaBRL(valorFinal)}</p>
             </div>
 
             <div className="mb-5 p-3 gap-3 flex flex-end w-full justify-end items-center">
