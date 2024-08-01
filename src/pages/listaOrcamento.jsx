@@ -1,13 +1,9 @@
-import React, { useContext, useEffect, useState, useMemo } from "react"
-import { FaTooth, FaMoneyBillAlt, FaTrashAlt } from "react-icons/fa"
-import { IoEyeSharp } from "react-icons/io5";
-import Link from "next/link"
-import { useRouter } from "next/navigation"
+import React, { useContext, useState } from "react"
+import { FaMoneyBillAlt, FaTrashAlt } from "react-icons/fa"
+import { IoEyeSharp } from "react-icons/io5"
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import api from "../utils/Api"
-import Cookies from "js-cookie"
-import { useAuth } from "../auth/useAuth"
 import { FichaClinicaContext } from "../context/FichaClinicaContext"
 import moment from "moment";
 import GeraOrcamento from "./geraOrcamento"
@@ -16,36 +12,17 @@ import { formatarMoedaBRL } from "../utils/mask"
 import LoadingOverlay from '../components/LoadingOverlay'
 import Toast from '../components/Toast'
 
-// const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub21lIjoiRGFydGhWYWRlciIsImlhdCI6MTY5NjU5ODI2MCwiZXhwIjoxNjk2NzcxMDYwfQ.GakWs7gLYzD1iAnIIS8p9Wu26i1aVi7PZAehATyzEuQ"
-const token = Cookies.get("jwt")
-// const token = JSON.parse(user).token
-
 const ListaOrcamento = ({ id_paciente, id_empresa }) => {
     const [selectedOrcamento, setSelectedOrcamento] = useState(0)
     const [screen, setScreen] = useState("listaOrcamento")
     const [isLoading, setIsLoading] = useState(false)
     const [showToast, setShowToast] = useState(false)
-    const [showViewPagamento, setShowViewPagamento] = useState(false)
-    const router = useRouter()
     const { orcamento, getOrcamentoList, getProcedimentoList, loading } = useContext(FichaClinicaContext)
-    const { user } = useAuth()
-
-    /*useEffect(() => {
-     const init = async () => {
-         const { Datepicker, Input, initTE, Modal, Ripple } = await import("tw-elements");
-         initTE({ Datepicker, Input, Modal, Ripple });
-     };
-     init();
- }, [])*/
 
     const changeScreen = (value) => {
         setScreen(value)
         getOrcamentoList()
 
-    }
-
-    const toogleViewPagamento = () => {
-        setShowViewPagamento(!showViewPagamento)
     }
 
     const handleDeleteOrcamento = async (id_orcamento, id_paciente) => {
@@ -99,7 +76,6 @@ const ListaOrcamento = ({ id_paciente, id_empresa }) => {
         MySwal.fire({
             title: 'Deseja realmente excluir?',
             showDenyButton: true,
-            // showCancelButton: true,
             confirmButtonText: 'Excluir',
             denyButtonText: `Cancelar`,
         }).then((result) => {
@@ -169,15 +145,8 @@ const ListaOrcamento = ({ id_paciente, id_empresa }) => {
                                                             ? <></>
                                                             : <><FaMoneyBillAlt /> Ir para pagamento</>}
                                                     </a>
-                                                    {/* </Link> */}
                                                 </td>
-
-                                                {/* <OrcamentoView
-                                                    dados={data}
-                                                    toogleViewPagamento={toogleViewPagamento}
-                                                    showViewPagamento={showViewPagamento} /> */}
                                             </tr>
-
                                         ))}
                                     </tbody>
                                 </table>

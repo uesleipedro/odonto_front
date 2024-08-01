@@ -6,7 +6,7 @@ import LoadingOverlay from "../components/LoadingOverlay"
 import moment from 'moment'
 import DatePicker from 'react-datepicker'
 import { registerLocale, setDefaultLocale } from 'react-datepicker'
-//import { ptBR } from 'date-fns/locale'
+import Swal from "sweetalert2"
 import ptBR from 'date-fns/locale/pt-BR'
 import 'react-datepicker/dist/react-datepicker.css'
 import { formatarMoedaBRL, porcentagemMask, teste } from "../utils/mask";
@@ -79,20 +79,11 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
     }
 
     const toDecimalNumeric = (num) => {
-        // if(dados?.tipo_desconto == "real") return num
-        console.log("toDecimal:", num)
-        console.log("todecimal: ", num)
         return Number((num
             ?.toString()
             .replace(',', '.')
             .replace(/\D/g, '') / 100
         ).toFixed(2))
-    }
-
-    const stringToFloat = (input) => {
-        console.log('stringToFloat entrada: ', input)
-        const floatValue = parseFloat(input.replace(',', '.'));
-        return parseFloat(floatValue.toFixed(2));
     }
 
     const updateStatusOrcamento = async (id_orcamento) => {
@@ -160,14 +151,10 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
     const updateField = e => {
         const fieldName = e.target.name
 
-        console.log("updateField entrada: ", e)
-
         setDados(existingValues => ({
             ...existingValues,
             [fieldName]: e.target.value,
         }))
-
-        console.log("updateField: ", dados)
     }
 
     const changeDate = (date) => {
@@ -176,21 +163,7 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
         updateField(date)
     }
 
-    const handleInputChange = (value) => {
-
-        switch (dados?.tipo_desconto) {
-            case "real":
-                return formatarMoedaBRL(value)
-
-            case "porcentagem":
-                return porcentagemMask(value)
-
-            default:
-                return
-        }
-    }
     const calculoDesconto = async (total) => {
-        console.log("Calculo desconto entrada: ", total)
         if (!dados.desconto) return total
 
         return dados.tipo_desconto === 'porcentagem'
@@ -213,6 +186,11 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
     }
 
     const geraParcela = async () => {
+        if (!dados.forma_pagamento) {
+            Swal.fire("Selecione uma forma de pagamento!")
+            return
+        }
+
         setLoadingOverlay(true)
         let valor_com_desconto = await calculoDesconto(orcamento?.preco)
         let valor_entrada = dados?.entrada
@@ -294,10 +272,11 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
                         aria-labelledby="headingOne5">
                         <div className="px-5 py-4">
                             <Select
-                                className="text-gray-500 w-6/12"
+                                className="text-gray-500 w-12/12"
                                 name="paciente"
                                 options={formaPagamento}
                                 placeholder="Forma de pagamento"
+                                required
                                 onChange={(e) => {
                                     updateField({
                                         target: {
@@ -392,7 +371,7 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
                             </div>
 
 
-                            <div className="relative w-full md:w-6/12 pt-3">
+                            <div className="relative w-full md:w-12/12 pt-3">
                                 <label className="text-gray-500">Valor</label>
                                 <span className="absolute inset-y-0 left-0 flex items-center pl-3 pt-9">
                                     {dados?.tipo_desconto == "real" ? "R$" : "%"}
@@ -472,7 +451,7 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
                                     />
                                 </div>
 
-                                <div className="w-full md:w-2/5 pr-2 pt-3">
+                                <div className="w-6/12 pr-2 pt-3">
                                     <label for="dt_nascimento" className="text-gray-700 ">Data 1º Vencimento</label>
                                     <div className="w-full">
                                         <DatePicker
@@ -480,7 +459,8 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
                                             showMonthDropdown
                                             showYearDropdown
                                             scrollableYearDropdown={true}
-                                            className="form-input rounded-lg text-gray-600 w-full"
+                                            className="w-full p-2 border border-gray-300 rounded-md"
+                                            wrapperClassName={"dp-full-width"}
                                             selected={primeiroVencimento}
                                             name="data_primeiro_vencimento"
                                             id="data_primeiro_vencimento"
@@ -524,7 +504,7 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
                 </div>
                 <div className="mb-5 p-3 flex flex-end w-full justify-end items-center">
                 </div>
-                <p>Total: {formatarMoedaBRL(valorFinal)}</p>
+                <p className="text-purple-800 font-bold">Total: {formatarMoedaBRL(valorFinal)}</p>
             </div>
 
             <div className="mb-5 p-3 gap-3 flex flex-end w-full justify-end items-center">

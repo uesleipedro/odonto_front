@@ -10,7 +10,7 @@ export const moneyMask = (value) => {
 }
 
 export const teste = (input) => {
-  console.log("input: " , input )
+  console.log("input: ", input)
   input = String(input).replace(/^0+/, '').replace(/\D/g, '');
 
   if (input.length > 2) {
@@ -39,8 +39,6 @@ export const porcentagemMask = (value) => {
     intValue = 100
   }
 
-  console.log('saiu por centagem : ', intValue !== '' ? intValue + '%' : '')
-
   return intValue !== '' ? intValue + '%' : ''
 }
 
@@ -54,4 +52,34 @@ export const toDecimalNumeric = (num) => {
     .replace(',', '.')
     .replace(/\D/g, '') / 100
   ).toFixed(2))
+}
+
+export const maskCPF_CNPJ = (value) => {
+  value = value?.replace(/\D/g, '')
+
+  if (value?.length <= 11) {
+    value = value?.replace(/(\d{3})(\d)/, '$1.$2')
+    value = value?.replace(/(\d{3})(\d)/, '$1.$2')
+    value = value?.replace(/(\d{3})(\d{1,2})$/, '$1-$2')
+  } else {
+    value = value?.replace(/^(\d{2})(\d)/, '$1.$2')
+    value = value?.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
+    value = value?.replace(/\.(\d{3})(\d)/, '.$1/$2')
+    value = value?.replace(/(\d{4})(\d)/, '$1-$2')
+  }
+
+  return value
+}
+
+export const maskPhone = (value) => {
+  value = value?.replace(/\D/g, '')
+  if (value?.length > 10) {
+    value = value?.replace(/^(\d{2})(\d)/, '($1) $2')
+    value = value?.replace(/(\d{5})(\d)/, '$1-$2')
+  } else {
+    value = value?.replace(/^(\d{2})(\d)/, '($1) $2')
+    value = value?.replace(/(\d{4})(\d)/, '$1-$2')
+  }
+
+  return value
 }

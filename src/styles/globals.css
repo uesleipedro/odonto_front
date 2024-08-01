@@ -26,3 +26,13 @@
   .hamburger .icon {
     /* Estilos do ícone, por exemplo, usando font-awesome ou react-icons */
   }
+
+  .swal2-styled.swal2-deny {
+    background-color: #5b21b6;
+    color: white;
+  }
+  
+  .swal2-styled.swal2-confirm {
+    background-color: #cc1313;
+    color: white;
+  }

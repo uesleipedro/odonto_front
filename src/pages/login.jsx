@@ -7,23 +7,22 @@ const login = () => {
     const [usuario, setUsuario] = useState("")
     const [passwd, setPasswd] = useState("")
     const router = new useRouter()
-    const { user, login, logout } = useAuth()
+    const { login } = useAuth()
 
-    const access = async () => {
-        const authorized = await login({ usuario, passwd })
+    const access = () => {
+        const authorized = login({ usuario, passwd })
 
         if (!authorized) {
             alert(`Erro na autenticação`)
             return
         }
-        //  
         router.push("/")
     }
 
     return (
-        <div className="w-full h-screen justify-items-center items-center flex">
-            <div className="w-1/2 items-center justify-center flex ">
-                <form className="w-2/3 h-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 w-full h-screen">
+            <div className="items-center justify-center flex h-screen">
+                <form className="w-full md:m-18 m-10">
                     <div className="flex mb-10">
                         <p className="inline-block align-baseline font-bold text-3xl text-purple-500">
                             Odonto
@@ -59,7 +58,7 @@ const login = () => {
                     </div>
                     <div className="flex items-center justify-center">
                         <p className="inline-block align-baseline font-bold text-sm text-gray-500">
-                            Ainda não tem cadastro? 
+                            Ainda não tem cadastro?
                             <Link className="inline-block align-baseline font-bold text-sm text-gray-500 hover:text-gray-800" href="cadastroUsuario">
                                 Crie sua conta
                             </Link>
@@ -67,10 +66,10 @@ const login = () => {
                     </div>
                 </form>
             </div>
-            <div className="h-full w-1/2 p-20">
-                <div className=" h-full w-2/3 bg-contain bg-no-repeat bg-center bg-[url('../a.webp')]"></div>
+            <div className="hidden md:block ">
+                <div className=" h-full m-10 bg-contain bg-no-repeat bg-center bg-[url('../a.webp')]"></div>
             </div>
-        </div>
+        </div >
     )
 }
 
