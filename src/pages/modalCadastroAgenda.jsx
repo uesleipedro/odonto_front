@@ -151,6 +151,7 @@ const ModalCadastroAgenda = ({ toogleModal, agendamentoData, insertUpdate, updat
             title: 'Deseja realmente excluir?',
             showDenyButton: true,
             confirmButtonText: 'Excluir',
+            confirmButtonColor: '#EF4444',
             denyButtonText: `Cancelar`,
         }).then((result) => {
             if (result.isConfirmed) {

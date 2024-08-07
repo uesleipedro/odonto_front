@@ -22,7 +22,6 @@ const ListaOrcamento = ({ id_paciente, id_empresa }) => {
     const changeScreen = (value) => {
         setScreen(value)
         getOrcamentoList()
-
     }
 
     const handleDeleteOrcamento = async (id_orcamento, id_paciente) => {
@@ -77,6 +76,7 @@ const ListaOrcamento = ({ id_paciente, id_empresa }) => {
             title: 'Deseja realmente excluir?',
             showDenyButton: true,
             confirmButtonText: 'Excluir',
+            confirmButtonColor: '#EF4444',
             denyButtonText: `Cancelar`,
         }).then((result) => {
             if (result.isConfirmed) {
@@ -119,7 +119,7 @@ const ListaOrcamento = ({ id_paciente, id_empresa }) => {
                                         {loading ? <p>Loading...</p> : orcamento?.map((data, index) => (
                                             <tr key={data.cpf}>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{moment(data.date).format('DD/MM/YYYY')}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.id_profissional}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.nome_profissional}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{formatarMoedaBRL(data?.preco)}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.status}</td>
                                                 <td className="flex flex-row gap-3 px-6 py-4 whitespace-nowrap text-right text-md font-medium">

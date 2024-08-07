@@ -75,6 +75,7 @@ const ListaPagamento = () => {
             title: 'Deseja realmente estornar?',
             showDenyButton: true,
             confirmButtonText: 'Estornar',
+            confirmButtonColor: '#EF4444',
             denyButtonText: `Cancelar`,
         }).then((result) => {
             if (result.isConfirmed) {

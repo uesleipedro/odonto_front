@@ -6,7 +6,7 @@ import Swal from "sweetalert2"
 
 const CadastroUsuario = () => {
 
-    const [user, setUser] = useState()
+    const [user, setUser] = useState({access_levels: 1})
 
     const updateName = e => {
         const fieldName = e.target.name

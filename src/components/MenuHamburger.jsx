@@ -12,7 +12,7 @@ const MenuHamburger = () => {
         { name: 'Agenda', link: '/agenda' },
         { name: 'Paciente', link: '/listaPacientes' },
         { name: 'Financeiro', link: '/financeiro' },
-        { name: 'Opções', link: '/opcoes' }
+        { name: 'Opções', link: '/cadastroUsuarioInterno' }
     ]
 
     return (

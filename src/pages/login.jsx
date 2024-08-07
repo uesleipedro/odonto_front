@@ -2,6 +2,7 @@ import React, { useState } from "react"
 import { useAuth } from "../auth/useAuth"
 import { useRouter } from 'next/navigation'
 import Link from "next/link"
+import Head from 'next/head'
 
 const login = () => {
     const [usuario, setUsuario] = useState("")
@@ -9,8 +10,8 @@ const login = () => {
     const router = new useRouter()
     const { login } = useAuth()
 
-    const access = () => {
-        const authorized = login({ usuario, passwd })
+    const access = async () => {
+        const authorized = await login({ usuario, passwd })
 
         if (!authorized) {
             alert(`Erro na autenticação`)
@@ -20,56 +21,71 @@ const login = () => {
     }
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 w-full h-screen">
-            <div className="items-center justify-center flex h-screen">
-                <form className="w-full md:m-18 m-10">
-                    <div className="flex mb-10">
-                        <p className="inline-block align-baseline font-bold text-3xl text-purple-500">
-                            Odonto
-                        </p>
+        <>
+            <Head>
+                <title>Login</title>
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+            </Head>
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-800 to-purple-600 relative overflow-hidden">
+                <div className="absolute inset-0 wave-bg"></div>
+                <div className="relative z-10 p-8 bg-purple-800 bg-opacity-25 backdrop-blur-sm rounded-lg shadow-lg max-w-md w-full">
+                    <h1 className="text-2xl font-bold mb-6 text-white text-center">Login</h1>
+                    <div>
+                        <div className="mb-4">
+                            <label htmlFor="email" className="block text-sm font-medium text-white">Usuário</label>
+                            <input
+                                type="email"
+                                id="username"
+                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                                onChange={() => setUsuario(event.target.value)} />
+                        </div>
+                        <div className="mb-6">
+                            <label htmlFor="password" className="block text-sm font-medium text-white">Senha</label>
+                            <input
+                                type="password"
+                                id="password"
+                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                                onChange={() => setPasswd(event.target.value)}
+                                onKeyUp={(e) => {
+                                    if (e.key === "Enter")
+                                        access()
+                                }} />
+                        </div>
+                        <div className="flex items-center justify-center mb-4">
+                            <div className="flex items-center">
+                                <input type="checkbox" id="remember_me" className="h-4 w-4 text-grey-700 focus:ring-purple-500 border-gray-300 rounded" />
+                                <label htmlFor="remember_me" className="ml-2 block text-sm text-white">Lembrar login</label>
+                            </div>
+                        </div>
+                        <div>
+                            <button
+                                type="submit"
+                                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                                onClick={() => access()}
+                            >Login
+                            </button>
+                        </div>
+                        <div className="text-sm flex items-center justify-center pt-5 mb-4">
+                            <a href="#" className="inline-block align-baseline font-bold text-sm text-white hover:text-white">Esqueceu sua senha?</a>
+                        </div>
+                        <div className="flex items-center justify-center">
+                            <p className="text-sm flex text-white items-center justify-center mb-4">
+                                <Link className="inline-block align-baseline font-bold text-sm text-white hover:text-white" href="cadastroUsuario">
+                                    Crie sua conta
+                                </Link>
+                            </p>
+                        </div>
                     </div>
-                    <div className="flex items-center justify-center">
-                        <p className="inline-block align-baseline text-lg text-grey-100">
-                            Olá novamente!
-                        </p>
-                    </div>
-                    <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2">
-                            Usuário
-                        </label>
-                        <input onChange={() => setUsuario(event.target.value)} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="username" type="text" placeholder="Username" />
-                    </div>
-                    <div className="mb-6">
-                        <label className="block text-gray-700 text-sm font-bold mb-2">
-                            Senha
-                        </label>
-                        <input onChange={() => setPasswd(event.target.value)} className="shadow appearance-none border border-red-500 rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="******************" />
-                        <p className="text-red-500 text-xs italic">Please choose a password.</p>
-                    </div>
-                    <div className="flex items-center justify-between">
-                        <button onClick={() => access()} className="bg-purple-600 hover:bg-purple-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
-                            Entrar
-                        </button>
-                    </div>
-                    <div className="flex items-center justify-center">
-                        <a className="inline-block align-baseline font-bold text-sm text-gray-500 hover:text-gray-800" href="#">
-                            Esqueceu a senha?
-                        </a>
-                    </div>
-                    <div className="flex items-center justify-center">
-                        <p className="inline-block align-baseline font-bold text-sm text-gray-500">
-                            Ainda não tem cadastro?
-                            <Link className="inline-block align-baseline font-bold text-sm text-gray-500 hover:text-gray-800" href="cadastroUsuario">
-                                Crie sua conta
-                            </Link>
-                        </p>
-                    </div>
-                </form>
+                </div>
             </div>
-            <div className="hidden md:block ">
-                <div className=" h-full m-10 bg-contain bg-no-repeat bg-center bg-[url('../a.webp')]"></div>
-            </div>
-        </div >
+            <style jsx>{`
+          .wave-bg {
+            background: url('/wave.svg');
+            background-size: cover;
+          }
+        `}</style>
+        </>
     )
 }
 

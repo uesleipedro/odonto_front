@@ -12,7 +12,7 @@ const Menu = () => {
         { name: 'Agenda', icon: <RxCalendar size={20} />, link: '/agenda' },
         { name: 'Paciente', icon: <HiUserGroup size={20} />, link: '/listaPacientes' },
         { name: 'Financeiro', icon: <FaRegMoneyBillAlt size={20} />, link: '/financeiro' },
-        { name: 'Opções', icon: <FiSettings size={20} />, link: '/opcoes' }
+        { name: 'Opções', icon: <FiSettings size={20} />, link: '/listaUsuarios' }
     ]
 
     const handleItemClick = (name) => {
