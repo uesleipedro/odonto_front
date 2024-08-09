@@ -1,3 +1,4 @@
+import { useRef } from "react"
 import FullCalendar from "@fullcalendar/react"
 import dayGridPlugin from "@fullcalendar/daygrid"
 import timeGridPlugin from "@fullcalendar/timegrid"
@@ -10,6 +11,7 @@ import ModalCadastroAgenda from "./modalCadastroAgenda"
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import { useAuth } from '../auth/useAuth'
+import SimpleCalendar from "../components/SimpleCalendar"
 
 const RenderCalendar = ({ events, updateEvents }) => {
   const { user } = useAuth()
@@ -148,40 +150,55 @@ const RenderCalendar = ({ events, updateEvents }) => {
     })
   }
 
+  const bigCalendarRef = useRef(null);
+
+  const handleDateClick = (date) => {
+    // Navegar o calendário grande para a data clicada no pequeno
+    const calendarApi = bigCalendarRef?.current?.getApi();
+    calendarApi?.gotoDate(date.date);
+  };
+
   return (
     <div>
-      <FullCalendar
-        locales={[ptBr]}
-        locale="pt-br"
-        plugins={[dayGridPlugin, interactionPlugin, timeGridPlugin]}
-        initialView="timeGridWeek"
-        headerToolbar={{
-          left: "prev,today,next",
-          center: "title",
-          right: "dayGridMonth,timeGridWeek,timeGridDay",
-        }}
-        selectable
-        editable
-        // events={events}
-        eventSources={[
-          {
-            events,
-            color: '#7c3aed', // Cor da agenda de trabalho (azul)
-            textColor: '#ffffff', // Cor do texto
-          }
-        ]}
-        select={handleSelect}
-        eventClick={eventClickAction}
-        eventDrop={alteraData}
-        eventResize={alteraData}
-        eventTimeFormat={{
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit',
-          meridiem: false,
-          hour12: false
-        }}
-      />
+      <div className="calendar-container">
+        <div className="mini-calendar">
+          <SimpleCalendar />
+        </div>
+        <div className="big-calendar">
+          <FullCalendar
+            locales={[ptBr]}
+            locale="pt-br"
+            plugins={[dayGridPlugin, interactionPlugin, timeGridPlugin]}
+            initialView="timeGridWeek"
+            headerToolbar={{
+              left: "prev,today,next",
+              center: "title",
+              right: "dayGridMonth,timeGridWeek,timeGridDay",
+            }}
+            selectable
+            editable
+            // events={events}
+            eventSources={[
+              {
+                events,
+                color: '#7c3aed', // Cor da agenda de trabalho (azul)
+                textColor: '#ffffff', // Cor do texto
+              }
+            ]}
+            select={handleSelect}
+            eventClick={eventClickAction}
+            eventDrop={alteraData}
+            eventResize={alteraData}
+            eventTimeFormat={{
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+              meridiem: false,
+              hour12: false
+            }}
+          />
+        </div>
+      </div>
 
       {modal && (
         <ModalCadastroAgenda
