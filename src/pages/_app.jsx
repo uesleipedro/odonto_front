@@ -10,7 +10,7 @@ import MenuHamburger from '../components/MenuHamburger'
 
 export default function App({ Component, pageProps }) {
   const router = useRouter()
-  const noNav = ['/login', '/cadastroUsuario', '/view/orcamentoView/[id_orcamento]']
+  const noNav = ['/login', '/cadastroUsuario', '/view/orcamentoView/[id_orcamento]', '/redefinirSenha/[email]']
 
   return (
     <div>

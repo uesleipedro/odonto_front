@@ -3,21 +3,103 @@ import { useAuth } from "../auth/useAuth"
 import { useRouter } from 'next/navigation'
 import Link from "next/link"
 import Head from 'next/head'
+import Swal from "sweetalert2"
+import api from "../utils/Api"
+import Toast from "../components/Toast"
+import withReactContent from 'sweetalert2-react-content'
 
 const login = () => {
     const [usuario, setUsuario] = useState("")
     const [passwd, setPasswd] = useState("")
+    const [showToast, setShowToast] = useState(false)
+    const [solicitado, setSolicitado] = useState(false)
     const router = new useRouter()
     const { login } = useAuth()
 
     const access = async () => {
+        if (usuario === "" || passwd === "") {
+            Swal.fire("Preencha os campos corretamente!")
+            return
+        }
+
         const authorized = await login({ usuario, passwd })
 
         if (!authorized) {
-            alert(`Erro na autenticação`)
+            Swal.fire("Erro na autenticação!")
             return
         }
         router.push("/")
+    }
+
+    const recuperarSenha = async () => {
+        if (usuario == "") {
+            Swal.fire("Preencha o campo usuário!")
+            return
+        }
+
+        await api.post(`user/recuperarSenha`, { email: usuario })
+            .then((data) => {
+                data.status == 200 && setShowToast(true)
+            }).catch((err) => {
+                Swal.fire("Verifique o nome de usuário e tente novamente!")
+            })
+        //await Swal.fire("Verifique seu email para resertar a senha!")
+        router.push(`/redefinirSenha/${usuario}`)
+    }
+
+    const inputToken = () => {
+        Swal.fire({
+            title: "Insira o Token enviado para o seu email!",
+            input: "text",
+            inputAttributes: {
+                autocapitalize: "off"
+            },
+            showCancelButton: false,
+            confirmButtonText: "Verificar",
+            showLoaderOnConfirm: true,
+            allowOutsideClick: false,
+            preConfirm: async (token) => {
+                try {
+                    return await api.post('user/checkToken', {
+                        email: usuario,
+                        token
+                    }).then((response) => {
+                        console.log("response", response)
+                        return response
+                    })
+                } catch (error) {
+                    return false
+                }
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+            if (result.isConfirmed && result.value.status == 200)
+                router.push(`/redefinirSenha/${usuario}`)
+            else
+                Swal.fire("Token incorreto")
+            // console.log(">>>", result.value.status)
+            // if (result.isConfirmed) {
+            // }
+        });
+    }
+
+    const MySwal = withReactContent(Swal)
+    const enviarEmail = () => {
+        MySwal.fire({
+            title: 'Atenção!',
+            text: `Assim que clicar em OK será enviado um token para seu email para que a senha possa ser alterada`,
+            showDenyButton: false,
+            confirmButtonText: 'OK',
+            denyButtonText: `Cancelar`,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                recuperarSenha()
+                //Swal.fire('Alterado!', '', 'success')
+            } else if (result.isDenied) {
+                updateEvents()
+                Swal.fire('Nenhuma alteração foi realizada', '', 'info')
+            }
+        })
     }
 
     return (
@@ -67,7 +149,16 @@ const login = () => {
                             </button>
                         </div>
                         <div className="text-sm flex items-center justify-center pt-5 mb-4">
-                            <a href="#" className="inline-block align-baseline font-bold text-sm text-white hover:text-white">Esqueceu sua senha?</a>
+                            <a
+                                href="#"
+                                onClick={() => {
+                                    solicitado
+                                        ? inputToken()
+                                        : enviarEmail()
+                                }}
+                                className="inline-block align-baseline font-bold text-sm text-white hover:text-white"
+                            >Esqueceu sua senha?
+                            </a>
                         </div>
                         <div className="flex items-center justify-center">
                             <p className="text-sm flex text-white items-center justify-center mb-4">
@@ -79,6 +170,11 @@ const login = () => {
                     </div>
                 </div>
             </div>
+            <Toast
+                message="Foram enviadas instruções para redefinição de senha para o seu email!"
+                show={showToast}
+                onClose={() => setShowToast(false)}
+            />
             <style jsx>{`
           .wave-bg {
             background: url('/wave.svg');
