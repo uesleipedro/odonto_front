@@ -12,6 +12,7 @@ import moment from "moment"
 import { FichaClinicaProvider, FichaClinicaContext } from '../../context/FichaClinicaContext'
 import { usePaciente } from '../../context/PacienteContext'
 import LoadingOverlay from '../../components/LoadingOverlay'
+import TeethDiagram from "../../components/TeethDiagram"
 
 const PacienteProfile = () => {
     const router = useRouter();
@@ -34,9 +35,9 @@ const PacienteProfile = () => {
     }, [])
 
     useEffect(() => {
-        console.log("paciente",paciente)
+        console.log("paciente", paciente)
 
-    },[paciente])
+    }, [paciente])
 
     const getPaciente = async () => {
         setIsloading(true)
@@ -82,6 +83,25 @@ const PacienteProfile = () => {
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div className="inline-grid grid-cols-1 md:grid-cols-2 gap-4 wrapp">
+                <div className="p-5">
+                    <TeethDiagram />
+                </div>
+                <div className="w-full">
+                    <h2 className="pb-1 pt-2 text-2xl font-bold">
+                        Andamento
+                    </h2>
+                    <div className="flex flex-col justify-center">
+                        <p className="p-4">O paciente não possui andamentos adicionados.</p>
+                        <button onClick={() => { }}
+                            className="bg-purple-800 hover:bg-purple-500 rounded-lg p-2 text-white font-bold"
+                        >Adicionar andamento</button>
+
+                    </div>
+
                 </div>
             </div>
 

@@ -4,6 +4,7 @@ import api from '../../../utils/Api'
 import { formatarMoedaBRL } from '../../../utils/mask'
 import LoadingOverlay from '../../../components/LoadingOverlay'
 import { useAuth } from '../../../auth/useAuth'
+import moment from 'moment'
 
 const OrcamentoView = () => {
     const router = useRouter()
@@ -25,6 +26,7 @@ const OrcamentoView = () => {
             api.get(`orcamento/view/${id_orcamento}/${id_empresa}`)
                 .then(async response => {
                     setOrcamento([...response.data])
+                    console.log(response.data)
                 })
                 .catch(function (error) {
                     console.error(error)
@@ -37,18 +39,31 @@ const OrcamentoView = () => {
     }
 
     if (!orcamento) {
-        return <LoadingOverlay isLoading={!orcamento}/>
+        return <LoadingOverlay isLoading={!orcamento} />
     }
 
     return (
         <div className="min-h-screen flex flex-col">
             <header className="bg-purple-500 text-white p-4 text-center">
-                <h1 className="text-2xl font-bold">Orçamento</h1>
+                <h1 className="text-2xl font-bold">{orcamento[0]?.nome_fantasia}</h1>
+                <p className="text-sm font-bold">CNPJ: {orcamento[0]?.cnpj_cpf}</p>
             </header>
             <main className="flex-grow p-4">
+                <h1 className="h-full text-center text-2xl font-bold pb-10">Orçamento</h1>
                 <div className="max-w-3xl mx-auto bg-white shadow-md rounded-lg p-6">
-                    <h2 className="text-xl font-semibold mb-4">Nº Orçamento: {orcamento[0]?.id_orcamento}</h2>
-                    <h2 className="text-xl font-semibold mb-4">Nome: {orcamento[0].nome}</h2>
+                    <div>
+                        <div className='flex flex-row justify-between'>
+                            <h2 className="basis-1/2 text-md mb-4"><strong>Nº Orçamento:</strong> {orcamento[0]?.id_orcamento}</h2>
+                            <h2 className="basis-1/2 text-md mb-4"><strong>Data do orçamento:</strong> {moment(orcamento[0].date).format("DD/MM/YYYY")}</h2>
+                        </div>
+                        <div className="flex flex-row">
+                            <h2 className="basis-1/2 text-md mb-4"><strong>Nome:</strong> {orcamento[0].nome}</h2>
+                            <h2 className="basis-1/2 text-md mb-4"><strong>CPF:</strong> {orcamento[0].cpf}</h2>
+                        </div>
+                        <div className="flex flex-row">
+                            <h2 className="basis-1/2 text-md mb-4"><strong>Telefone:</strong> {orcamento[0].telefone_movel}</h2>
+                        </div>
+                    </div>
                     <table className="table-auto w-full mb-4">
                         <thead>
                             <tr>
@@ -74,11 +89,11 @@ const OrcamentoView = () => {
                         Imprimir
                     </button>
                 </div>
-            </main>
+            </main >
             <footer className="bg-purple-500 text-white p-4 text-center">
                 <p>© 2024 Clínica Médica. Todos os direitos reservados.</p>
             </footer>
-        </div>
+        </div >
     );
 };
 

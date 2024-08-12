@@ -9,6 +9,7 @@ import Swal from 'sweetalert2'
 import { useAuth } from '../auth/useAuth'
 import withReactContent from 'sweetalert2-react-content'
 import 'react-datepicker/dist/react-datepicker.css'
+import axios from 'axios'
 
 const ModalCadastroAgenda = ({ toogleModal, agendamentoData, insertUpdate, updateEvents }) => {
     const [options, setOptions] = useState([])
@@ -97,12 +98,26 @@ const ModalCadastroAgenda = ({ toogleModal, agendamentoData, insertUpdate, updat
             .post("agenda", agendamento)
             .then(async function (response) {
                 if (response.status === 201) {
+                    await sendWppMessage()
                     toogleModal()
                 }
             })
             .catch((e) => {
                 alert(e);
             });
+    }
+
+    const messageToSend = `
+        Olá, fulano
+        foi marcada uma consulta para o dia tal, hora tal
+        Agradecemos a preferência
+    `
+
+    const sendWppMessage = () => {
+        axios.post('http://localhost:3000/api/wpp/send-message', {
+            to: paciente[agendamento?.id_paciente]?.telefone_movel,
+            message: messageToSend
+        })
     }
 
     const updateAgenda = async () => {
