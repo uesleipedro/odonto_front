@@ -1,11 +1,15 @@
 import { NextResponse } from 'next/server'
 import { authRoutes, protectedRoutes } from './router/routes'
 
-function getUserRole(req) {
-    return JSON.parse(req.cookies.get('user')?.value)?.access_level
+async function getUserRole(req) {
+    const dados = await req.cookies.get('user')?.value
+    if (dados === undefined) return null
+
+    return JSON.parse(dados)?.access_level
 }
 
-const startsWithAny = (url, prefixes) => {
+const startsWithAny = async (url, prefixes) => {
+
     if (prefixes === null) return true
 
     for (const prefix of prefixes) {
@@ -17,27 +21,30 @@ const startsWithAny = (url, prefixes) => {
 }
 
 export async function middleware(request) {
-    const role = getUserRole(request)
+    const role = await getUserRole(request)
     const url = request.nextUrl.pathname
+    const basePath = url?.split('/')[1]
+    const auth = await startsWithAny(url, role)
 
     if (
-        protectedRoutes.includes(request.nextUrl.pathname) &&
-        (!request.cookies.has('user'))
+        // (!role?.includes(`/${basePath}`) ||  basePath !== '') ||
+        !request.cookies.has('user')
     ) {
+        console.log("entrou no if")
         request.cookies.delete("user")
         return NextResponse.rewrite(new URL("/login", request.url))
     }
 
-    if (!startsWithAny(url, role) || role === null) {
+    if (!auth) {
         return NextResponse.redirect(new URL('/accessDenied', request.url));
-    } 
+    }
 
     const SECRET_KEY = 'your-secret-key-here'
 }
 
 export const config = {
     matcher: [
-        "/login",
+        "/",
         "/agenda/:path*",
         "/paciente/:path*",
         "/fichaClinica/:path*",
