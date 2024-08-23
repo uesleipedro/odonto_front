@@ -10,9 +10,9 @@ const Menu = () => {
 
     const menuItems = [
         { name: 'Agenda', icon: <RxCalendar size={20} />, link: '/agenda' },
-        { name: 'Paciente', icon: <HiUserGroup size={20} />, link: '/listaPacientes' },
+        { name: 'Paciente', icon: <HiUserGroup size={20} />, link: '/paciente/listaPacientes' },
         { name: 'Financeiro', icon: <FaRegMoneyBillAlt size={20} />, link: '/financeiro' },
-        { name: 'Opções', icon: <FiSettings size={20} />, link: '/listaUsuarios' }
+        { name: 'Opções', icon: <FiSettings size={20} />, link: '/usuario/listaUsuarios' }
     ]
 
     const handleItemClick = (name) => {

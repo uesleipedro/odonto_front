@@ -51,7 +51,7 @@ export const FichaClinicaProvider = ({ children }) => {
   }
 
   const getOrcamentoList = async () => {
-    await api.get(`orcamento/paciente/${idPaciente}`)
+    await api.get(`orcamento/paciente?id_paciente=${idPaciente}&id_empresa=${idEmpresa}`)
       .then(response => {
         setOrcamento([...response.data])
       })

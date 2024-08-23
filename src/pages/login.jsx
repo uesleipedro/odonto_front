@@ -32,19 +32,14 @@ const login = () => {
     }
 
     const recuperarSenha = async () => {
-        if (usuario == "") {
-            Swal.fire("Preencha o campo usuário!")
-            return
-        }
-
         await api.post(`user/recuperarSenha`, { email: usuario })
             .then((data) => {
                 data.status == 200 && setShowToast(true)
             }).catch((err) => {
                 Swal.fire("Verifique o nome de usuário e tente novamente!")
             })
-        //await Swal.fire("Verifique seu email para resertar a senha!")
-        router.push(`/redefinirSenha/${usuario}`)
+
+        router.push(`/usuario/redefinirSenha/${usuario}`)
     }
 
     const inputToken = () => {
@@ -77,14 +72,16 @@ const login = () => {
                 router.push(`/redefinirSenha/${usuario}`)
             else
                 Swal.fire("Token incorreto")
-            // console.log(">>>", result.value.status)
-            // if (result.isConfirmed) {
-            // }
-        });
+        })
     }
 
     const MySwal = withReactContent(Swal)
     const enviarEmail = () => {
+        if (usuario == "") {
+            Swal.fire("Preencha o campo usuário!")
+            return
+        }
+
         MySwal.fire({
             title: 'Atenção!',
             text: `Assim que clicar em OK será enviado um token para seu email para que a senha possa ser alterada`,
@@ -162,7 +159,7 @@ const login = () => {
                         </div>
                         <div className="flex items-center justify-center">
                             <p className="text-sm flex text-white items-center justify-center mb-4">
-                                <Link className="inline-block align-baseline font-bold text-sm text-white hover:text-white" href="cadastroUsuario">
+                                <Link className="inline-block align-baseline font-bold text-sm text-white hover:text-white" href="/usuario/cadastroUsuario">
                                     Crie sua conta
                                 </Link>
                             </p>

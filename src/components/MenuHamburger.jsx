@@ -14,9 +14,9 @@ const MenuHamburger = () => {
 
     const menuItems = [
         { name: 'Agenda', link: '/agenda' },
-        { name: 'Paciente', link: '/listaPacientes' },
+        { name: 'Paciente', link: '/paciente/listaPacientes' },
         { name: 'Financeiro', link: '/financeiro' },
-        { name: 'Opções', link: '/listaUsuarios' }
+        { name: 'Opções', link: '/usuario/listaUsuarios' }
     ]
 
     return (

@@ -1,26 +1,25 @@
 "use client"
 
 import { useEffect, useState, useContext } from "react"
-import ListaProcedimento from "../listaProcedimento"
-import ListaOrcamento from "../listaOrcamento"
-import ListaPagamento from "../listaPagamento"
-import CadastroAnamnese from "../cadastroAnamnese"
-import { useRouter } from 'next/router'
-import { useRouter as uR } from 'next/navigation'
+import ListaProcedimento from "./listaProcedimento"
+import ListaOrcamento from "./listaOrcamento"
+import ListaPagamento from "./listaPagamento"
+import CadastroAnamnese from "./anamnese/cadastroAnamnese"
 import api from "../../utils/Api"
 import moment from "moment"
-import { FichaClinicaProvider, FichaClinicaContext } from '../../context/FichaClinicaContext'
+import { FichaClinicaContext } from '../../context/FichaClinicaContext'
 import { usePaciente } from '../../context/PacienteContext'
 import LoadingOverlay from '../../components/LoadingOverlay'
 import TeethDiagram from "../../components/TeethDiagram"
+import CadastroProcedimento from "../../components/CadastroProcedimento"
 
 const PacienteProfile = () => {
-    const router = useRouter();
-
     const [paciente, setPaciente] = useState({})
     const [isLoading, setIsloading] = useState(true)
     const { procedimento, loading, getProcedimentoList } = useContext(FichaClinicaContext)
     const { idPaciente, idEmpresa } = usePaciente()
+    const [show, setShow] = useState(false)
+    const [numeroDente, setNumeroDente] = useState()
 
     useEffect(() => {
         const init = async () => {
@@ -34,10 +33,14 @@ const PacienteProfile = () => {
         getPaciente()
     }, [])
 
-    useEffect(() => {
-        console.log("paciente", paciente)
+    const toogleShow = () => {
+        setShow(!show)
+    }
 
-    }, [paciente])
+    const setTooth = async (numero_dente) => {
+        setNumeroDente(numero_dente)
+        toogleShow()
+    }
 
     const getPaciente = async () => {
         setIsloading(true)
@@ -86,9 +89,12 @@ const PacienteProfile = () => {
                 </div>
             </div>
 
-            <div className="inline-grid grid-cols-1 md:grid-cols-2 gap-4 wrapp">
+            <div className="inline-grid grid-cols-1 md:grid-cols-2 gap-4 wrapp w-full">
                 <div className="p-5">
-                    <TeethDiagram />
+                    <TeethDiagram
+                        setTooth={setTooth}
+                        id_paciente={idPaciente}
+                    />
                 </div>
                 <div className="w-full">
                     <h2 className="pb-1 pt-2 text-2xl font-bold">
@@ -226,6 +232,21 @@ const PacienteProfile = () => {
                 </div>
 
             </div>
+
+            <CadastroProcedimento
+                show={show}
+                toogleShow={toogleShow}
+                id_paciente={idPaciente}
+                dadosProcedimento={{
+                    dente: numeroDente,
+                    face_dente: '',
+                    estado: 'A realizar',
+                    adicionado: moment(Date()).format('YYYY-MM-DD'),
+                    id_paciente: Number(idPaciente),
+                    preco: "R$ 0,00"
+                }}
+                insertUpdate={"insert"}
+            />
 
         </section >
     )
