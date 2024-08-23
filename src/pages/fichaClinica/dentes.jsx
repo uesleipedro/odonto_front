@@ -1,6 +1,6 @@
 
 // COMPONENTE JSX
-function Icon() {
+export default function Icon() {
 
     return (
         <svg width="21" height="27" viewBox="0 0 21 27" fill="none" xmlns="http://www.w3.org/2000/svg" data-test="tooth">
@@ -14,7 +14,7 @@ function Icon() {
 //Arcada superior
 //toth1 => dentes 18,17,16, 26,27,28
 export const Tooth1 = ({ onClick, tooth_number, cor_dente }) => {
-    console.log("cor_dente",cor_dente)
+    console.log("cor_dente", cor_dente)
     return (
         <div style={{ display: 'flex', flexDirection: 'column' }}>
             <svg onClick={() => onClick(tooth_number)} cursor="pointer" width="21" height="27" viewBox="0 0 21 27" fill={cor_dente} xmlns="http://www.w3.org/2000/svg" data-test="tooth">
