@@ -70,7 +70,8 @@ export const FichaClinicaProvider = ({ children }) => {
       procedimentoList,
       getProcedimentoList,
       getOrcamentoList,
-      orcamento
+      orcamento,
+      idPaciente
     }}>
       {children}
     </FichaClinicaContext.Provider>

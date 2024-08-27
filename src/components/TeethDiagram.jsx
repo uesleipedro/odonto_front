@@ -11,11 +11,8 @@ import {
 } from '../pages/fichaClinica/dentes'
 import { useEffect, useState } from 'react'
 import api from '../utils/Api'
-import { useAuth } from '../auth/useAuth';
 
-const TeethDiagram = ({ setTooth, id_paciente }) => {
-    const { user } = useAuth()
-    const id_empresa = user?.user?.foundUser.id_empresa
+const TeethDiagram = ({ setTooth, id_paciente, id_empresa }) => {
     const [listaDentesComProcedimento, setListaDentesComProcedimento] = useState()
 
     useEffect(() => {
@@ -30,7 +27,6 @@ const TeethDiagram = ({ setTooth, id_paciente }) => {
     }
 
     const comProcedimento = async (tooth_number) => {
-        return await "blue"
         return ["1", "2"].includes("1")
             ? "red"
             : "none"

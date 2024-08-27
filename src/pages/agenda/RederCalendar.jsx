@@ -9,19 +9,20 @@ import api from "../../utils/Api"
 import ModalCadastroAgenda from "./modalCadastroAgenda"
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
-import { useAuth } from "../../auth/useAuth" 
+import { useAuth } from "../../auth/useAuth"
 
 const RenderCalendar = ({ events, updateEvents }) => {
   const { user } = useAuth()
   const id_empresa = user?.user?.foundUser.id_empresa
-  const [modal, setModal] = useState(false);
-  const [paciente, setPaciente] = useState([]);
+  const [modal, setModal] = useState(false)
+  const [paciente, setPaciente] = useState([])
   const [insertUpdate, setInsertUpdate] = useState('')
-  const [agendamento, setAgendamento] = useState({
+  const payload = {
     id_empresa,
     status: 3,
     dia_inteiro: false,
-  });
+  }
+  const [agendamento, setAgendamento] = useState(payload)
 
   useEffect(() => {
     const init = async () => {
@@ -39,11 +40,7 @@ const RenderCalendar = ({ events, updateEvents }) => {
   }, [])
 
   const limparAgendamento = () => {
-    setAgendamento({
-      id_empresa,
-      status: 3,
-      dia_inteiro: false,
-    })
+    setAgendamento(payload)
   }
 
   const updateDataHora = async (agendamento) => {
@@ -105,9 +102,9 @@ const RenderCalendar = ({ events, updateEvents }) => {
     return list[list.findIndex((obj) => obj.id == id)];
   }
 
-  const eventClickAction = async (data) => {
-    await setAgendamento(filterEventsById(events, data.event.id))
-    await setInsertUpdate('update')
+  const handleEventClick = async (data) => {
+    setAgendamento(filterEventsById(events, data.event.id))
+    setInsertUpdate('update')
     setModal(true)
     await updateEvents()
   }
@@ -158,11 +155,21 @@ const RenderCalendar = ({ events, updateEvents }) => {
         headerToolbar={{
           left: "prev,today,next",
           center: "title",
-          right: "dayGridMonth,timeGridWeek,timeGridDay",
+          right: "dayGridMonth,timeGridWeek,timeGridDay customButton",
+        }}
+        customButtons={{
+          customButton: {
+            text: 'Incluir Agendamento', // Texto do botão
+            click: () => handleSelect({
+              info: {
+                startStr: new Date,
+                endStr: new Date
+              }
+            })
+          }
         }}
         selectable
         editable
-        // events={events}
         eventSources={[
           {
             events,
@@ -171,7 +178,7 @@ const RenderCalendar = ({ events, updateEvents }) => {
           }
         ]}
         select={handleSelect}
-        eventClick={eventClickAction}
+        eventClick={handleEventClick}
         eventDrop={alteraData}
         eventResize={alteraData}
         eventTimeFormat={{

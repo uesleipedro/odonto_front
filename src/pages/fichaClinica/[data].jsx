@@ -4,8 +4,8 @@ import PacienteProfile from './pacienteProfile'
 import { usePaciente } from '../../context/PacienteContext'
 
 const PacienteProfilePage = () => {
-  const { idPaciente, idEmpresa } = usePaciente()
-  const id_paciente = idPaciente
+  const { idPaciente } = usePaciente()
+
   const {
     getPagamentoList,
     getProcedimentoList,

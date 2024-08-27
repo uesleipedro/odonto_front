@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react'
 import api from "../utils/Api"
 import Cookies from 'js-cookie'
+import { useRouter } from 'next/navigation'
 
 const authContextDefaultValues = {
     user: null,
@@ -17,6 +18,7 @@ export function useAuth() {
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null)
     const [token, setToken] = useState(null)
+    const router = useRouter()
 
     useEffect(() => {
         const loadUserFromCookies = () => {
@@ -68,6 +70,7 @@ export function AuthProvider({ children }) {
     const logout = () => {
         setUser(null)
         Cookies.remove("user")
+        router.refresh()
     };
 
     const value = {
@@ -79,10 +82,10 @@ export function AuthProvider({ children }) {
     return (
         <>
             <AuthContext.Provider value={{
-              user,
-              token,
-              login,
-              logout
+                user,
+                token,
+                login,
+                logout
             }}>
                 {children}
             </AuthContext.Provider>

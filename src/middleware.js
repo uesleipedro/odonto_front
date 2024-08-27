@@ -30,7 +30,6 @@ export async function middleware(request) {
         // (!role?.includes(`/${basePath}`) ||  basePath !== '') ||
         !request.cookies.has('user')
     ) {
-        console.log("entrou no if")
         request.cookies.delete("user")
         return NextResponse.rewrite(new URL("/login", request.url))
     }

@@ -1,20 +1,7 @@
-import { react, useState, useEffect } from 'react'
-import { formatarMoedaBRL } from '../../../utils/mask';
-import moment from 'moment';
+import { formatarMoedaBRL } from '../../../utils/mask'
+import moment from 'moment'
 
-const PagamentoView = ({ dados, toogleViewPagamento, showViewPagamento }) => {
-
-    useEffect(() => {
-        const init = async () => {
-            const { Modal, initTE, Ripple } = await import("tw-elements");
-            initTE({ Modal, Ripple });
-        };
-        init()
-    }, [])
-
-    function handlePrint() {
-        window.print()
-    }
+const PagamentoView = ({ dados, toogleViewPagamento, showViewPagamento, index }) => {
 
     if (!showViewPagamento) return null
 
@@ -62,12 +49,15 @@ const PagamentoView = ({ dados, toogleViewPagamento, showViewPagamento }) => {
                         </button>
                     </div>
                     <div className="relative flex-auto p-4" data-te-modal-body-ref>
-                        <p><strong>Nº Pagamento:</strong> {dados?.id_pagamento}</p>
-                        <p><strong>Nº Parcela:</strong> {dados?.nr_parcela}</p>
-                        <p><strong>Data de vencimento:</strong> {moment(dados?.dt_vencimento).format("DD/MM/YYYY")}</p>
-                        <p><strong>Data de recebimento:</strong> {moment(dados?.dt_recebimento).format("DD/MM/YYYY")}</p>
-                        <p><strong>Status: {dados?.status}</strong></p>
-                        <p><strong>Valor:</strong> {formatarMoedaBRL(dados?.valor)}</p>
+                        <p><strong>Nº Pagamento:</strong> {dados[index]?.id_pagamento}</p>
+                        <p><strong>Nº Parcela:</strong> {dados[index]?.nr_parcela}</p>
+                        <p><strong>Data de vencimento:</strong> {moment(dados[index]?.dt_vencimento).format("DD/MM/YYYY")}</p>
+                        <p><strong>Data de recebimento:</strong>{
+                            dados[index]?.dt_recebimento
+                            && moment(dados[index]?.dt_recebimento).format("DD/MM/YYYY")
+                        }</p>
+                        <p><strong>Status: {dados[index]?.status}</strong></p>
+                        <p><strong>Valor:</strong> {formatarMoedaBRL(dados[index]?.valor)}</p>
                     </div>
                     <div className="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
                         <button
@@ -80,16 +70,6 @@ const PagamentoView = ({ dados, toogleViewPagamento, showViewPagamento }) => {
                         >
                             Fechar
                         </button>
-                        {/* <button
-                            type="button"
-                            className="inline-block rounded bg-red-500 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white transition duration-150 ease-in-out hover:bg-red-accent-100 focus:bg-red-100 focus:outline-none focus:ring-0 active:bg-primary-accent-200"
-                            data-te-modal-dismiss
-                            data-te-ripple-init
-                            data-te-ripple-color="light"
-                            onClick={handlePrint}
-                        >
-                            Emprimir
-                        </button> */}
                     </div>
                 </div>
             </div>

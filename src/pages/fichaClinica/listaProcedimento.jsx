@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react"
+import React, { useState, useContext, useEffect } from "react"
 import { FaTrashAlt } from "react-icons/fa"
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
@@ -8,18 +8,51 @@ import moment from 'moment'
 import Toast from "../../components/Toast"
 import LoadingOverlay from "../../components/LoadingOverlay"
 import CadastroProcedimento from "../../components/CadastroProcedimento"
+import TeethDiagram from "../../components/TeethDiagram"
+import CadastroEvolucoes from "../../components/CadastroEvolucoes"
+import { useAuth } from '../../auth/useAuth'
 
-const ListaProcedimento = ({ id_paciente }) => {
+const ListaProcedimento = ({ id_paciente, id_empresa }) => {
     const { procedimento, loading, getProcedimentoList } = useContext(FichaClinicaContext)
     const [toggleInsertUpdate, setToggleInsertUpdate] = useState('insert')
     const [post, setPost] = useState({})
     const [showToast, setShowToast] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
     const [show, setShow] = useState(false)
+    const [showCadastroEvolucoes, setShowCadastroEvolucoes] = useState(false)
+    const { user } = useAuth()
+    const id_user = user?.user?.foundUser.id_user
+    const [evolucoes, setEvolucoes] = useState()
+    const [evolucao, setEvolucao] = useState()
+
+    useEffect(() => {
+        getEvolucoes()
+    }, [])
+
+    const getEvolucoes = () => {
+        api.get(`evolucao?id_empresa=${id_empresa}&id_paciente=${id_paciente}`)
+            .then(response => {
+                console.log("ev", response.data)
+                setEvolucoes([...response.data])
+            })
+    }
 
     const updateProcedimento = async (id_procedimento) => {
         let procedimentoFiltrado = await procedimento.filter(dataItem => dataItem.id_procedimento === id_procedimento)
         setPost(procedimentoFiltrado[0])
+        toogleShow()
+    }
+
+    const setTooth = async (numero_dente) => {
+        setToggleInsertUpdate('insert')
+        setPost({
+            dente: numero_dente,
+            face_dente: '',
+            estado: 'A realizar',
+            adicionado: moment(Date()).format('YYYY-MM-DD'),
+            id_paciente: Number(id_paciente),
+            preco: "R$ 0,00"
+        })
         toogleShow()
     }
 
@@ -37,6 +70,13 @@ const ListaProcedimento = ({ id_paciente }) => {
 
     const toogleShow = () => {
         setShow(!show)
+    }
+
+    const toogleShowCadastroEvolucoes = (dados) => {
+        setEvolucao(dados)
+        if(!dados) setEvolucao(null)
+        setShowCadastroEvolucoes(!showCadastroEvolucoes)
+
     }
 
     const MySwal = withReactContent(Swal)
@@ -76,7 +116,48 @@ const ListaProcedimento = ({ id_paciente }) => {
 
             </div>
 
-            <div className="flex flex-col">
+            <div className="inline-grid grid-cols-1 md:grid-cols-2 gap-4 wrapp w-full">
+                <div className="pt-5 pl-5 pr-5">
+                    <TeethDiagram
+                        setTooth={setTooth}
+                        id_paciente={id_paciente}
+                        id_empresa={id_empresa}
+                    />
+                </div>
+                <div className="w-full">
+                    <h2 className="pb-1 pt-2 text-2xl font-bold">
+                        Evolução
+                    </h2>
+                    <div className="flex flex-col justify-center">
+                        {/* <p className="p-4">O paciente não possui evoluções adicionadas.</p> */}
+                        <button onClick={() => toogleShowCadastroEvolucoes(null)}
+                            className="px-6 pb-2 bg-purple-800 hover:bg-purple-500 rounded-lg p-2 text-white font-bold"
+                        >Adicionar Evolução</button>
+                        <div className="border rounded-lg shadow overflow-hidden">
+                            <table className="min-w-full">
+                                <thead className="bg-purple-800 dark:bg-purple-700">
+                                    <tr className="text-white text-left font-medium">
+                                        <th scope="col" className="px-6 py-3">Evoluções</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-200 dark:divide-gray-700 ">
+                                    {evolucoes?.map((data) => (
+                                        <tr
+                                            key={data.id_evolucao}
+                                            className="cursor-pointer">
+                                            <td onClick={() => toogleShowCadastroEvolucoes(data)} className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.texto}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <div className="flex flex-col mt-10">
                 <div className="-m-1.5 overflow-x-auto">
                     <div className="p-1.5 min-w-full inline-block align-middle">
                         <div className="border rounded-lg shadow overflow-hidden">
@@ -124,6 +205,18 @@ const ListaProcedimento = ({ id_paciente }) => {
 
                 <LoadingOverlay isLoading={isLoading} />
             </div>
+
+            <CadastroEvolucoes
+                showCadastroEvolucoes={showCadastroEvolucoes}
+                toogleShowCadastroEvolucoes={toogleShowCadastroEvolucoes}
+                dados={{
+                    id_paciente,
+                    id_empresa,
+                    id_user
+                }}
+                evolucao={evolucao}
+                getEvolucoes={getEvolucoes}
+            />
 
             <CadastroProcedimento
                 show={show}

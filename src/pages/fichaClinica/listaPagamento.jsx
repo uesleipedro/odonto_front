@@ -1,15 +1,12 @@
 import { useEffect, useState, useMemo, useContext } from "react"
-import { FaCheck, FaTrashAlt, FaEye } from "react-icons/fa"
+import { FaCheck, FaEye } from "react-icons/fa"
 import { ImCancelCircle } from "react-icons/im"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import moment from "moment"
 import api from "../../utils/Api"
 import GeraOrcamento from "./geraOrcamento"
 import { FichaClinicaContext } from '../../context/FichaClinicaContext'
-import { usePaciente } from '../../context/PacienteContext'
 import Toast from '../../components/Toast'
 import PagamentoView from "./view/pagamentoView"
 
@@ -18,10 +15,10 @@ const ListaPagamento = () => {
     const { pagamento, loading, getPagamentoList } = useContext(FichaClinicaContext)
     const [geraOrcamento, setGeraOrcamento] = useState(false)
     const [modal, setModal] = useState(false)
-    const [dataPagamento, setDataPagamento] = useState(new Date())
     const [dadosPagamento, setDadosPagamento] = useState({ "status": "Pago" })
     const [showToast, setShowToast] = useState(false)
     const [showViewPagamento, setShowViewPagamento] = useState(false)
+    const [indexPagamento, setIndexPagamento] = useState()
 
     useEffect(() => {
         const init = async () => {
@@ -37,7 +34,8 @@ const ListaPagamento = () => {
             ?.replace('.', ','))
     }
 
-    const toogleViewPagamento = () => {
+    const toogleViewPagamento = (index) => {
+        setIndexPagamento(index)
         setShowViewPagamento(!showViewPagamento)
     }
 
@@ -110,7 +108,7 @@ const ListaPagamento = () => {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                                        {loading ? <p>Loadnig...</p> : pagamento?.map((data) => (
+                                        {loading ? <p>Loadnig...</p> : pagamento?.map((data, index) => (
                                             <tr key={data.id_pagamento}>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.id_pagamento}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.nr_parcela}</td>
@@ -134,7 +132,7 @@ const ListaPagamento = () => {
                                                     </a>
                                                     <a className="text-purple-800 hover:text-purple-900" title="Visualizar" href="#"
                                                         onClick={() => {
-                                                            toogleViewPagamento()
+                                                            toogleViewPagamento(index)
                                                         }}
                                                     >
                                                         <FaEye />
@@ -148,7 +146,8 @@ const ListaPagamento = () => {
                                                     </a>
                                                 </td>
                                                 <PagamentoView
-                                                    dados={data}
+                                                    dados={pagamento}
+                                                    index={indexPagamento}
                                                     toogleViewPagamento={toogleViewPagamento}
                                                     showViewPagamento={showViewPagamento} />
                                             </tr>

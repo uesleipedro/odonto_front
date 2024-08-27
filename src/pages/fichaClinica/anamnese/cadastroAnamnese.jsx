@@ -1,21 +1,14 @@
 import React, { useEffect, useState } from "react"
 import Link from "next/link"
 import api from "../../../utils/Api"
-import { useRouter } from "next/router";
 
-const cadastroAnamnese = (id_paciente) => {
+const cadastroAnamnese = ({ id_paciente }) => {
 
-    const router = useRouter();
-    // const data = router.query;
-    // const [id_paciente, setId_paciente] = useState(data.id_paciente)
-    const [anamnese, setAnamnese] = useState({ id_paciente: id_paciente.id_paciente })
-
-
-
+    const [anamnese, setAnamnese] = useState({ id_paciente })
 
     useEffect(() => {
         const getAnamnese = async () => {
-            await api.get(`anamnese/${id_paciente.id_paciente}`)
+            await api.get(`anamnese/${id_paciente}`)
                 .then(response => {
                     setAnamnese(response.data)
                 })
@@ -24,25 +17,7 @@ const cadastroAnamnese = (id_paciente) => {
                 })
         }
         getAnamnese()
-
-    }, []);
-
-    // useEffect(() => {
-
-    //     
-    //     const getAnamneseList = async () => {
-    //         await api.get(`anamnese/${id_paciente}`)
-    //             .then(response => {
-    //                 
-    //                 setAnamnese(response.data)
-    //             })
-    //             .catch(function (error) {
-    //                 console.error(error);
-    //             })
-    //     }
-    //     getAnamneseList()
-    //     
-    // }, []);
+    }, [id_paciente])
 
     const updateField = e => {
 
@@ -109,12 +84,11 @@ const cadastroAnamnese = (id_paciente) => {
             .catch(function (error) {
 
             })
-        // router.push('/listaPacientes')
     }
 
     const sendAnamneseData = async () => {
 
-        await api.get(`anamnese/check_exists/${id_paciente.id_paciente}`)
+        await api.get(`anamnese/check_exists/${id_paciente}`)
             .then(response => {
 
                 if (Number(response.data.count) == !0)

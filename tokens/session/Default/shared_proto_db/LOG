@@ -1,3 +1,3 @@
-2024/08/14-22:17:47.643 2326 Reusing MANIFEST /home/ueslei/Project/nextjs/odonto_front/tokens/session/Default/shared_proto_db/MANIFEST-000001
-2024/08/14-22:17:47.643 2326 Recovering log #3
-2024/08/14-22:17:47.644 2326 Reusing old log /home/ueslei/Project/nextjs/odonto_front/tokens/session/Default/shared_proto_db/000003.log 
+2024/08/25-13:02:56.149 226d Reusing MANIFEST /home/ueslei/Project/nextjs/odonto_front/tokens/session/Default/shared_proto_db/MANIFEST-000001
+2024/08/25-13:02:56.150 226d Recovering log #3
+2024/08/25-13:02:56.150 226d Reusing old log /home/ueslei/Project/nextjs/odonto_front/tokens/session/Default/shared_proto_db/000003.log 

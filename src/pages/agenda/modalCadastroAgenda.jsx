@@ -98,7 +98,7 @@ const ModalCadastroAgenda = ({ toogleModal, agendamentoData, insertUpdate, updat
             .post("agenda", agendamento)
             .then(async function (response) {
                 if (response.status === 201) {
-                    await sendWppMessage()
+                    // await sendWppMessage()
                     toogleModal()
                 }
             })

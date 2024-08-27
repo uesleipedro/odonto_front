@@ -25,11 +25,13 @@ const CadastroProcedimento = ({ show, toogleShow, id_paciente, dadosProcedimento
         listaProcedimento()
         getDentes()
         getProfissional()
-    }, [])
+    }, [id_empresa])
 
     useEffect(() => {
         if (dadosProcedimento.id_procedimento || dadosProcedimento.dente) {
+            console.log("entrou no if")
             setPost(dadosProcedimento)
+            return
         } else {
             setPost({
                 face_dente: '',

@@ -10,7 +10,6 @@ import moment from "moment"
 import { FichaClinicaContext } from '../../context/FichaClinicaContext'
 import { usePaciente } from '../../context/PacienteContext'
 import LoadingOverlay from '../../components/LoadingOverlay'
-import TeethDiagram from "../../components/TeethDiagram"
 import CadastroProcedimento from "../../components/CadastroProcedimento"
 
 const PacienteProfile = () => {
@@ -20,26 +19,22 @@ const PacienteProfile = () => {
     const { idPaciente, idEmpresa } = usePaciente()
     const [show, setShow] = useState(false)
     const [numeroDente, setNumeroDente] = useState()
+    const payload = {
+        dente: numeroDente,
+        face_dente: '',
+        estado: 'A realizar',
+        adicionado: moment(Date()).format('YYYY-MM-DD'),
+        id_paciente: Number(idPaciente),
+        preco: "R$ 0,00"
+    }
 
     useEffect(() => {
-        const init = async () => {
-            const { Datepicker, Input, initTE, Modal, Ripple, TEToast, Tab } = await import("tw-elements");
-            initTE({ Datepicker, Input, Modal, Ripple, TEToast, Tab });
-        };
-        init();
-    }, [])
-
-    useEffect(() => {
+        if (!idEmpresa && !idPaciente) return
         getPaciente()
     }, [])
 
     const toogleShow = () => {
         setShow(!show)
-    }
-
-    const setTooth = async (numero_dente) => {
-        setNumeroDente(numero_dente)
-        toogleShow()
     }
 
     const getPaciente = async () => {
@@ -86,28 +81,6 @@ const PacienteProfile = () => {
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <div className="inline-grid grid-cols-1 md:grid-cols-2 gap-4 wrapp w-full">
-                <div className="p-5">
-                    <TeethDiagram
-                        setTooth={setTooth}
-                        id_paciente={idPaciente}
-                    />
-                </div>
-                <div className="w-full">
-                    <h2 className="pb-1 pt-2 text-2xl font-bold">
-                        Andamento
-                    </h2>
-                    <div className="flex flex-col justify-center">
-                        <p className="p-4">O paciente não possui andamentos adicionados.</p>
-                        <button onClick={() => { }}
-                            className="bg-purple-800 hover:bg-purple-500 rounded-lg p-2 text-white font-bold"
-                        >Adicionar andamento</button>
-
-                    </div>
-
                 </div>
             </div>
 
@@ -162,6 +135,7 @@ const PacienteProfile = () => {
                     data-te-tab-active>
                     <ListaProcedimento
                         id_paciente={idPaciente}
+                        id_empresa={idEmpresa}
                         procedimento={procedimento}
                         loading={loading}
                         getProcedimentoList={getProcedimentoList}
@@ -228,7 +202,9 @@ const PacienteProfile = () => {
                     role="tabpanel"
                     aria-labelledby="tabs-anamnese-tab"
                 >
-                    <CadastroAnamnese id_paciente={idPaciente} />
+                    <CadastroAnamnese
+                        id_paciente={idPaciente}
+                    />
                 </div>
 
             </div>
@@ -237,14 +213,7 @@ const PacienteProfile = () => {
                 show={show}
                 toogleShow={toogleShow}
                 id_paciente={idPaciente}
-                dadosProcedimento={{
-                    dente: numeroDente,
-                    face_dente: '',
-                    estado: 'A realizar',
-                    adicionado: moment(Date()).format('YYYY-MM-DD'),
-                    id_paciente: Number(idPaciente),
-                    preco: "R$ 0,00"
-                }}
+                dadosProcedimento={payload}
                 insertUpdate={"insert"}
             />
 
