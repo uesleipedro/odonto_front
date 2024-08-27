@@ -1,6 +1,7 @@
 import { useState } from "react"
 import api from "../utils/Api"
 import Swal from "sweetalert2"
+import LoadingOverlay from "./LoadingOverlay"
 
 const CadastroEvolucoes = ({ toogleShowCadastroEvolucoes, showCadastroEvolucoes, dados, getEvolucoes, evolucao }) => {
 
@@ -8,8 +9,9 @@ const CadastroEvolucoes = ({ toogleShowCadastroEvolucoes, showCadastroEvolucoes,
 
     const [texto, setTexto] = useState()
     const { id_paciente, id_empresa, id_user } = dados
+    const [loading, setLoading] = useState(false)
 
-    const saveEvolucao = () => {
+    const saveEvolucao = async () => {
         api.post(`evolucao`, {
             id_paciente,
             texto,
@@ -17,10 +19,12 @@ const CadastroEvolucoes = ({ toogleShowCadastroEvolucoes, showCadastroEvolucoes,
             id_empresa
         }).then(response => {
             Swal.fire("Evolução salva com sucesso!")
+        }).then(async () => {
+            setLoading(true)
+            await getEvolucoes()
+            setLoading(false)
+            toogleShowCadastroEvolucoes()
         })
-
-        getEvolucoes()
-        toogleShowCadastroEvolucoes()
     }
 
     return (
@@ -31,6 +35,7 @@ const CadastroEvolucoes = ({ toogleShowCadastroEvolucoes, showCadastroEvolucoes,
             tabindex="-1"
             aria-labelledby="exampleModalVaryingLabel"
         >
+            <LoadingOverlay isLoading={loading} />
             <div
                 data-te-modal-dialog-ref
                 className=" pointer-events-none relative w-auto opacity-100 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:my-7 min-[576px]:max-w-[500px]">

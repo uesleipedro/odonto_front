@@ -11,6 +11,7 @@ import CadastroProcedimento from "../../components/CadastroProcedimento"
 import TeethDiagram from "../../components/TeethDiagram"
 import CadastroEvolucoes from "../../components/CadastroEvolucoes"
 import { useAuth } from '../../auth/useAuth'
+import TimeLine from "../../components/TimeLine"
 
 const ListaProcedimento = ({ id_paciente, id_empresa }) => {
     const { procedimento, loading, getProcedimentoList } = useContext(FichaClinicaContext)
@@ -29,10 +30,10 @@ const ListaProcedimento = ({ id_paciente, id_empresa }) => {
         getEvolucoes()
     }, [])
 
-    const getEvolucoes = () => {
-        api.get(`evolucao?id_empresa=${id_empresa}&id_paciente=${id_paciente}`)
+    const getEvolucoes = async () => {
+        console.log("entrou getEvolucoes")
+        await api.get(`evolucao?id_empresa=${id_empresa}&id_paciente=${id_paciente}`)
             .then(response => {
-                console.log("ev", response.data)
                 setEvolucoes([...response.data])
             })
     }
@@ -74,7 +75,7 @@ const ListaProcedimento = ({ id_paciente, id_empresa }) => {
 
     const toogleShowCadastroEvolucoes = (dados) => {
         setEvolucao(dados)
-        if(!dados) setEvolucao(null)
+        if (!dados) setEvolucao(null)
         setShowCadastroEvolucoes(!showCadastroEvolucoes)
 
     }
@@ -131,10 +132,10 @@ const ListaProcedimento = ({ id_paciente, id_empresa }) => {
                     <div className="flex flex-col justify-center">
                         {/* <p className="p-4">O paciente não possui evoluções adicionadas.</p> */}
                         <button onClick={() => toogleShowCadastroEvolucoes(null)}
-                            className="px-6 pb-2 bg-purple-800 hover:bg-purple-500 rounded-lg p-2 text-white font-bold"
-                        >Adicionar Evolução</button>
-                        <div className="border rounded-lg shadow overflow-hidden">
-                            <table className="min-w-full">
+                            className="bg-purple-800 hover:bg-purple-500 rounded-full w-10 h-10 text-white font-bold mb-5"
+                        >+</button>
+                        <div className=" pl-5 border rounded-lg shadow overflow-hidden ">
+                            {/* <table className="min-w-full ">
                                 <thead className="bg-purple-800 dark:bg-purple-700">
                                     <tr className="text-white text-left font-medium">
                                         <th scope="col" className="px-6 py-3">Evoluções</th>
@@ -149,7 +150,8 @@ const ListaProcedimento = ({ id_paciente, id_empresa }) => {
                                         </tr>
                                     ))}
                                 </tbody>
-                            </table>
+                            </table> */}
+                            <TimeLine evolucoes={evolucoes}/>
                         </div>
 
                     </div>
