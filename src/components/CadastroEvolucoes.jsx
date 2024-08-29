@@ -1,21 +1,55 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import api from "../utils/Api"
 import Swal from "sweetalert2"
+import Select from "react-select"
 import LoadingOverlay from "./LoadingOverlay"
 
 const CadastroEvolucoes = ({ toogleShowCadastroEvolucoes, showCadastroEvolucoes, dados, getEvolucoes, evolucao }) => {
 
     if (!showCadastroEvolucoes) return
 
-    const [texto, setTexto] = useState()
-    const { id_paciente, id_empresa, id_user } = dados
+    const [texto, setTexto] = useState(dados?.texto)
+    const { id_paciente, id_empresa, id_user, nome } = dados
     const [loading, setLoading] = useState(false)
+    const [profissional, setProfissional] = useState()
+    const [selectedProfissional, setSelectedProfissional] = useState({ value: dados?.id_profissional, label: dados?.nome })
+
+    useEffect(() => {
+        getProfissional()
+    }, [])
+
+    const profissionalSelecionaldo = (e) => {
+        setSelectedProfissional({ value: e.value, label: e.label })
+    }
 
     const saveEvolucao = async () => {
+        dados?.id_evolucao
+            ? await updateEvolucao()
+            : await addEvolucao()
+    }
+
+    const updateEvolucao = async () => {
+        api.put(`evolucao`, {
+            id_paciente,
+            texto,
+            id_profissional: Number(selectedProfissional?.value),
+            id_empresa,
+            id_evolucao: dados.id_evolucao
+        }).then(response => {
+            Swal.fire("Evolução salva com sucesso!")
+        }).then(async () => {
+            setLoading(true)
+            await getEvolucoes()
+            setLoading(false)
+            toogleShowCadastroEvolucoes()
+        })
+    }
+
+    const addEvolucao = async () => {
         api.post(`evolucao`, {
             id_paciente,
             texto,
-            id_profissional: id_user,
+            id_profissional: Number(selectedProfissional.value),
             id_empresa
         }).then(response => {
             Swal.fire("Evolução salva com sucesso!")
@@ -25,6 +59,17 @@ const CadastroEvolucoes = ({ toogleShowCadastroEvolucoes, showCadastroEvolucoes,
             setLoading(false)
             toogleShowCadastroEvolucoes()
         })
+    }
+
+    const getProfissional = async () => {
+        await api
+            .get(`user/empresa/${id_empresa}`)
+            .then((response) => {
+                setProfissional([...response.data])
+            })
+            .catch(function (error) {
+                console.error(error)
+            })
     }
 
     return (
@@ -71,14 +116,16 @@ const CadastroEvolucoes = ({ toogleShowCadastroEvolucoes, showCadastroEvolucoes,
                     <div className="relative flex-auto p-4" data-te-modal-body-ref>
                         <form>
                             <div className="mb-3">
-                                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-900">Profissional</h3>
-                                <input
-                                    type="text"
-                                    className="relative m-0 -mr-0.5 block w-full flex-auto rounded-l border border-solid border-neutral-300 bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary focus:text-neutral-700 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none dark:border-neutral-400 dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:focus:border-primary"
-                                    id="message-text"
-                                    value={'Admin'}
+                                <label for="profissional" className="text-sm font-medium text-gray-500 dark:text-gray-300">
+                                    Profissional
+                                </label>
+                                <Select
+                                    options={profissional}
+                                    placeholder="Profissional"
                                     name="profissional"
-                                    disabled
+                                    id="profissional"
+                                    value={{ value: selectedProfissional.value, label: selectedProfissional.label }}
+                                    onChange={profissionalSelecionaldo}
                                 />
                             </div>
 
@@ -89,7 +136,7 @@ const CadastroEvolucoes = ({ toogleShowCadastroEvolucoes, showCadastroEvolucoes,
                                     id="message-text"
                                     onChange={e => setTexto(e.target.value)}
                                     name="observacao"
-                                    value={evolucao?.texto}
+                                    value={texto}
                                 ></textarea>
                             </div>
                         </form>

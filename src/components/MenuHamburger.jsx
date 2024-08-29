@@ -6,7 +6,7 @@ import { useAuth } from '../auth/useAuth';
 const MenuHamburger = () => {
     const [isOpen, setIsOpen] = useState(false)
     const router = useRouter()
-    const { logout, user } = useAuth()
+    const { logout } = useAuth()
 
     const toggleMenu = () => {
         setIsOpen(!isOpen);
@@ -20,7 +20,7 @@ const MenuHamburger = () => {
     ]
 
     return (
-        <nav className="block md:hidden bg-purple-800 p-4 mt-1 w-full rounded-lg border-inherit">
+        <nav className="block md:hidden bg-purple-800 p-3 w-full border-inherit">
             <div className="flex items-center justify-between">
                 <div className="text-white text-xl">OdonTIC</div>
                 <button

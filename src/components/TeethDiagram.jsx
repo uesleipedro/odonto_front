@@ -19,6 +19,10 @@ const TeethDiagram = ({ setTooth, id_paciente, id_empresa }) => {
         getDentesComProcedimento()
     }, [])
 
+    useEffect(() => {
+        console.log("lista dentes", listaDentesComProcedimento?.includes(String(11)))
+    },[listaDentesComProcedimento])
+
     const getDentesComProcedimento = async () => {
         await api.get(`dentes/dentesComProcedimento?id_paciente=${id_paciente}&id_empresa=${id_empresa}`)
             .then(response => {
@@ -27,23 +31,26 @@ const TeethDiagram = ({ setTooth, id_paciente, id_empresa }) => {
     }
 
     const comProcedimento = async (tooth_number) => {
-        return ["1", "2"].includes("1")
-            ? "red"
+        console.log("tooth_number", tooth_number)
+        const a = await listaDentesComProcedimento?.includes(String(tooth_number))
+            ? "#F0EB7D"
             : "none"
+        console.log("aa", a)
+        return a
     }
 
     return (
         <div style={{ display: 'grid', gridGap: '30px' }}>
             {/* // Arcada superior */}
             <div style={{ display: 'flex', alignSelf: 'flex-end', flexWrap: 'wrap', gap: 15 }}>
-                <Tooth1 onClick={setTooth} cor_dente={console.log("asdf", comProcedimento())} tooth_number={18} />
-                <Tooth1 onClick={setTooth} tooth_number={17} />
+                <Tooth1 onClick={setTooth} cor_dente={listaDentesComProcedimento?.includes(18)} tooth_number={18} />
+                <Tooth1 onClick={setTooth} tooth_number={17} cor_dente="none" />
                 <Tooth1 onClick={setTooth} tooth_number={16} />
                 <Tooth2 onClick={setTooth} tooth_number={15} />
                 <Tooth3 onClick={setTooth} tooth_number={14} />
                 <Tooth4 onClick={setTooth} tooth_number={13} />
                 <Tooth5 onClick={setTooth} tooth_number={12} />
-                <Tooth5 onClick={setTooth} tooth_number={11} />
+                <Tooth5 onClick={setTooth} tooth_number={11} cor_dente={async () => await comProcedimento("11")} />
                 <Tooth5 onClick={setTooth} tooth_number={21} />
                 <Tooth5 onClick={setTooth} tooth_number={22} />
                 <Tooth4 onClick={setTooth} tooth_number={23} />

@@ -50,8 +50,6 @@ const CadastroPacientes = () => {
     }
 
     const sendPacienteData = async () => {
-        // let dados = paciente
-        // dados.id_empresa = id_empresa
         if (typeof paciente?.nome !== "string") {
             Swal.fire("preencha o campo nome")
             return
@@ -67,11 +65,10 @@ const CadastroPacientes = () => {
 
     const cleanInput = (input) => input?.replace(/\D/g, '')
 
-    const cleanData = (dataArray) => {
-        console.log("dataArray", dataArray)
+    const cleanData = async (dataArray) => {
         if (dataArray === null) return
 
-        return dataArray?.map(item => ({
+        return await dataArray?.map(item => ({
             ...item,
             cpf: cleanInput(item.cpf),
             telefone_fixo: cleanInput(item.telefone_fixo),
@@ -81,11 +78,7 @@ const CadastroPacientes = () => {
     }
 
     const cadastroPaciente = async (dados) => {
-        let dadosTratados = cleanData([dados])
-        // dadosTratados.cpf = dados.cpf?.replace(/\D/g, '')
-        // dadosTratados.telefone_fixo = dados.telefone_fixo?.replace(/\D/g, '')
-        // dadosTratados.telefone_movel = dados.telefone_movel?.replace(/\D/g, '')
-        // dadosTratados.telefone_responsavel = dados.telefone_responsavel?.replace(/\D/g, '')
+        let dadosTratados = await cleanData([dados])
 
         await api.post('paciente', dadosTratados[0])
             .then(function (response) {
@@ -99,7 +92,9 @@ const CadastroPacientes = () => {
     }
 
     const updatePaciente = async (dados) => {
-        await api.put('paciente', dados)
+        let dadosTratados = await cleanData([dados])
+
+        await api.put('paciente', dadosTratados[0])
             .then(function (response) {
                 if (response.status === 201)
                     Swal.fire("Salvo com sucesso")
@@ -149,7 +144,7 @@ const CadastroPacientes = () => {
                             showYearDropdown
                             scrollableYearDropdown={true}
                             className="form-input rounded-lg text-gray-600 w-full"
-                            selected={dataNascimento}
+                            selected={paciente?.dt_nascimento}
                             name="dt_nascimento"
                             id="dt_nascimento"
                             onChange={(e) =>
@@ -223,7 +218,7 @@ const CadastroPacientes = () => {
             <div className="w-full pl-6 mb-8 flex flex-row flex-wrap justify-between">
                 <div className="w-full md:w-2/4 pr-2 pt-3">
                     <label className="text-gray-700 ">Nome do reponsável</label>
-                    <input value={paciente?.nome_responsavel} type="text" id="nome_responsavel" name="nome_reponsavel" onChange={updateField} className="form-input rounded-lg text-gray-600 w-full" placeholder="Ex: João da Cunha" />
+                    <input value={paciente?.nome_responsavel} type="text" id="nome_responsavel" name="nome_responsavel" onChange={updateField} className="form-input rounded-lg text-gray-600 w-full" placeholder="Ex: João da Cunha" />
                 </div>
 
                 <div className="w-full md:w-2/4 pt-3">

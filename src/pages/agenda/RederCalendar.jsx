@@ -13,7 +13,7 @@ import { useAuth } from "../../auth/useAuth"
 
 const RenderCalendar = ({ events, updateEvents }) => {
   const { user } = useAuth()
-  const id_empresa = user?.user?.foundUser.id_empresa
+  const id_empresa = user?.user?.foundUser.id_empresa 
   const [modal, setModal] = useState(false)
   const [paciente, setPaciente] = useState([])
   const [insertUpdate, setInsertUpdate] = useState('')
@@ -53,7 +53,7 @@ const RenderCalendar = ({ events, updateEvents }) => {
       })
       .catch((e) => {
         console.error(e);
-      });
+      })
   }
 
   const handleSelect = (info) => {
@@ -72,38 +72,28 @@ const RenderCalendar = ({ events, updateEvents }) => {
       },
     });
     setInsertUpdate('insert')
-    setModal(true);
-    info.jsEvent;
-  };
+    setModal(true)
+  }
 
   const updateField = (e) => {
-    if (typeof e?.target?.name === "undefined") return;
-
-    if (e.target.name === "dia_inteiro") {
-      let check = e.target.checked ? true : false;
-
-      setAgendamento((existingValues) => ({
-        ...existingValues,
-        ["dia_inteiro"]: check,
-      }));
-
-      return;
-    }
+    if (typeof e?.target?.name === "undefined") return
 
     const fieldName = e.target.name;
     setAgendamento((existingValues) => ({
       ...existingValues,
       [fieldName]: e.target.value,
-    }));
+    }))
 
-  };
+  }
 
   const filterEventsById = (list, id) => {
-    return list[list.findIndex((obj) => obj.id == id)];
+    return list[list?.findIndex((obj) => obj?.id == id)];
   }
 
   const handleEventClick = async (data) => {
-    setAgendamento(filterEventsById(events, data.event.id))
+    const todosOsEventos = await events.flatMap(obj => obj.events);
+
+    setAgendamento(filterEventsById(todosOsEventos, data.event.id))
     setInsertUpdate('update')
     setModal(true)
     await updateEvents()
@@ -159,7 +149,7 @@ const RenderCalendar = ({ events, updateEvents }) => {
         }}
         customButtons={{
           customButton: {
-            text: 'Incluir Agendamento', // Texto do botão
+            text: 'Incluir Agendamento',
             click: () => handleSelect({
               info: {
                 startStr: new Date,
@@ -170,13 +160,14 @@ const RenderCalendar = ({ events, updateEvents }) => {
         }}
         selectable
         editable
-        eventSources={[
-          {
-            events,
-            color: '#7c3aed', // Cor da agenda de trabalho (azul)
-            textColor: '#ffffff', // Cor do texto
-          }
-        ]}
+        eventSources={events}
+        // {[
+        //   {
+        //     events,
+        //     color: "blue", // Cor da agenda de trabalho (azul)
+        //     textColor: '#ffffff', // Cor do texto
+        //   }
+        // ]}
         select={handleSelect}
         eventClick={handleEventClick}
         eventDrop={alteraData}

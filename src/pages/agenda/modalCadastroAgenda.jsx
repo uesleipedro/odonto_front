@@ -125,7 +125,7 @@ const ModalCadastroAgenda = ({ toogleModal, agendamentoData, insertUpdate, updat
             .put("agenda", agendamento)
             .then(function (response) {
                 if (response.status === 201) {
-                    alert("Salvo com sucesso")
+                    Swal.fire("Salvo com sucesso")
                     toogleModal()
                 }
             })

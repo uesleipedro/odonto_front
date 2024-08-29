@@ -8,13 +8,21 @@ import { PacienteProvider } from '../context/PacienteContext';
 import { FichaClinicaProvider } from '../context/FichaClinicaContext'
 import MenuHamburger from '../components/MenuHamburger'
 import { noNavegable } from '../router/routes';
+import { Roboto } from 'next/font/google'
+
+const roboto = Roboto({
+  weight: '400',
+  subsets: ['latin'],
+  weight: '300',
+  subsets: ['latin'],
+})
 
 export default function App({ Component, pageProps }) {
   const router = useRouter()
   const noNav = noNavegable
 
   return (
-    <div>
+    <div className={roboto.className}>
 
       <AuthProvider>
         <PacienteProvider>
@@ -23,9 +31,8 @@ export default function App({ Component, pageProps }) {
               :
               <>
                 <Header />
-
+                <MenuHamburger />
                 <Sidebar>
-                  <MenuHamburger />
                   <Component {...pageProps} />
                 </Sidebar>
               </>

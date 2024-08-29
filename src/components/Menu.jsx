@@ -16,10 +16,10 @@ const Menu = () => {
     ]
 
     const handleItemClick = (name) => {
-        setSelectedItem(name);
+        setSelectedItem(name)
     }
 
-    const style = "flex flex-col ml-2 items-center transition font-bold delay-100 hover:text-purple-800 hover:bg-white cursor-pointer my-4 rounded-l-lg inline-block"
+    const style = "flex flex-col pl-1 pr-1 items-center transition font-bold delay-100 hover:text-purple-800 hover:bg-white cursor-pointer my-4 inline-block"
     return (
         <>
             {

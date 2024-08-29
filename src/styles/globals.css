@@ -3,47 +3,47 @@
 @tailwind utilities;
 
 .menu {
-    display: block;
-  }
-  
-  .menu.open {
-    display: flex;
-    flex-direction: column;
-  }
+  display: block;
+}
 
-  .hamburger {
-    display: block;
-    background: none;
-    border: none;
-    cursor: pointer;
-    margin-bottom: 10px;
-    padding: 10px;
-    color: #fff;
-    font-size: 24px;
-  }
-  
-  /* Estilos de ícone do hambúrguer (pode variar dependendo do ícone usado) */
-  .hamburger .icon {
-    /* Estilos do ícone, por exemplo, usando font-awesome ou react-icons */
-  }
+.menu.open {
+  display: flex;
+  flex-direction: column;
+}
 
-  .swal2-styled.swal2-deny {
-    background-color: #5b21b6;
-    color: white;
-  }
+.hamburger {
+  display: block;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 10px;
+  padding: 10px;
+  color: #fff;
+  font-size: 24px;
+}
 
-  .swal2-styled.swal2-cancel {
-    background-color: #EF4444;
-    color: white;
-  }
-  
-  .swal2-styled.swal2-confirm {
-    background-color: #5b21b6;
-    color: white;
-  }
+/* Estilos de ícone do hambúrguer (pode variar dependendo do ícone usado) */
+.hamburger .icon {
+  /* Estilos do ícone, por exemplo, usando font-awesome ou react-icons */
+}
+
+.swal2-styled.swal2-deny {
+  background-color: #5b21b6;
+  color: white;
+}
+
+.swal2-styled.swal2-cancel {
+  background-color: #EF4444;
+  color: white;
+}
+
+.swal2-styled.swal2-confirm {
+  background-color: #5b21b6;
+  color: white;
+}
 
 
-  /* FullCalendar Custom */
+/* FullCalendar Custom */
 /* Botões de navegação no toolbar */
 .fc .fc-button {
   background-color: #4c1d95;
@@ -63,10 +63,13 @@
 }
 
 /* Estilo para botões ativos ou focados (selecionados) */
-.fc .fc-button:focus, .fc .fc-button:active {
-  background-color: #9f7aea; /* purple-500 */
+.fc .fc-button:focus,
+.fc .fc-button:active {
+  background-color: #9f7aea;
+  /* purple-500 */
   color: #ffffff;
-  outline: none; /* Remove a borda de foco padrão */
+  outline: none;
+  /* Remove a borda de foco padrão */
 }
 
 /* Estilo dos dias */
@@ -86,37 +89,112 @@
 /* Estilos gerais da toolbar */
 .fc .fc-toolbar {
   display: flex;
-  flex-wrap: wrap; /* Permite que os elementos sejam quebrados em múltiplas linhas */
-  justify-content: space-between; /* Espaça os elementos na linha */
+  flex-wrap: wrap;
+  /* Permite que os elementos sejam quebrados em múltiplas linhas */
+  justify-content: space-between;
+  /* Espaça os elementos na linha */
   padding: 10px;
 }
 
 /* Cada grupo de elementos da toolbar */
-.fc .fc-toolbar > .fc-toolbar-chunk {
-  flex: 1 1 100%; /* Garante que cada grupo ocupe 100% da largura em telas menores */
-  text-align: center; /* Centraliza o conteúdo */
-  margin-bottom: 10px; /* Adiciona espaço entre as linhas */
+.fc .fc-toolbar>.fc-toolbar-chunk {
+  flex: 1 1 100%;
+  /* Garante que cada grupo ocupe 100% da largura em telas menores */
+  text-align: center;
+  /* Centraliza o conteúdo */
+  margin-bottom: 10px;
+  /* Adiciona espaço entre as linhas */
 }
 
 /* Ajustes para botões individuais em dispositivos móveis */
 @media (max-width: 600px) {
   .fc .fc-toolbar button {
-    flex: 1 1 100%; /* Faz com que os botões ocupem 100% da largura do container */
-    margin-bottom: 5px; /* Espaçamento entre os botões */
+    flex: 1 1 100%;
+    /* Faz com que os botões ocupem 100% da largura do container */
+    margin-bottom: 5px;
+    /* Espaçamento entre os botões */
   }
 }
 
 /* Customizações adicionais (opcional) */
 .fc .fc-toolbar-title {
-  font-size: 1.25rem; /* Ajuste o tamanho da fonte do título conforme necessário */
+  font-size: 1.25rem;
+  /* Ajuste o tamanho da fonte do título conforme necessário */
 }
 
 
 /* Botão incluir  */
-.fc-toolbar-chunk{
+.fc-toolbar-chunk {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: left;
   gap: 10px;
+  left: 0;
+}
+
+.fc-day-today {
+  background: #f1ebfc !important;
+  border: none !important;
+
+} 
+
+/* TESTE Fullcalendar */
+.fc-event {
+  font-size: inherit !important;
+  font-weight: bold !important;
+}
+
+/* Remove the header border from Schedule */
+/* .fc td, .fc th {
+  border-style: none !important;
+  border-width: 1px !important;
+  padding: 0 !important;
+  vertical-align: top !important;
+} */
+.fc-button {
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+  min-height: 36px;
+  min-width: 88px;
+  line-height: 36px;
+  vertical-align: middle;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  align-items: center;
+  text-align: center;
+  border-radius: 2px;
+  box-sizing: border-box;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  outline: none;
+  border: 0;
+  padding: 0 6px;
+  margin: 6px 8px;
+  letter-spacing: .01em;
+  background: transparent;
+  color: currentColor;
+  white-space: nowrap;
+  text-transform: uppercase;
+  font-weight: 500;
+  font-size: 14px;
+  font-style: inherit;
+  font-variant: inherit;
+  font-family: inherit;
+  text-decoration: none;
+  overflow: hidden;
+  -webkit-transition: box-shadow .4s cubic-bezier(.25, .8, .25, 1), background-color .4s cubic-bezier(.25, .8, .25, 1);
+  transition: box-shadow .4s cubic-bezier(.25, .8, .25, 1), background-color .4s cubic-bezier(.25, .8, .25, 1);
+}
+
+.fc-scrollgrid-sync-inner a {
+  font-size: 20px;
+}
+
+/* DATAPICKER */
+.react-datepicker-wrapper {
+  width: 100%;
 }

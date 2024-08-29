@@ -134,24 +134,8 @@ const ListaProcedimento = ({ id_paciente, id_empresa }) => {
                         <button onClick={() => toogleShowCadastroEvolucoes(null)}
                             className="bg-purple-800 hover:bg-purple-500 rounded-full w-10 h-10 text-white font-bold mb-5"
                         >+</button>
-                        <div className=" pl-5 border rounded-lg shadow overflow-hidden ">
-                            {/* <table className="min-w-full ">
-                                <thead className="bg-purple-800 dark:bg-purple-700">
-                                    <tr className="text-white text-left font-medium">
-                                        <th scope="col" className="px-6 py-3">Evoluções</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-200 dark:divide-gray-700 ">
-                                    {evolucoes?.map((data) => (
-                                        <tr
-                                            key={data.id_evolucao}
-                                            className="cursor-pointer">
-                                            <td onClick={() => toogleShowCadastroEvolucoes(data)} className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.texto}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table> */}
-                            <TimeLine evolucoes={evolucoes}/>
+                        <div className=" pl-5 border rounded-lg shadow overflow-scroll max-h-96">
+                            <TimeLine evolucoes={evolucoes} getEvolucoes={getEvolucoes} />
                         </div>
 
                     </div>

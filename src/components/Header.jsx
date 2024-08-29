@@ -1,6 +1,5 @@
 import React, { useEffect } from "react"
 import { FiSettings, FiHelpCircle, FiPhone } from "react-icons/fi"
-// import UseAuth from "../auth/useAuth";
 import { useRouter } from 'next/navigation'
 import { useAuth } from "../auth/useAuth"
 
@@ -24,7 +23,7 @@ const Header = () => {
     }, [])
 
     return (
-        <div className='hidden md:flex items-center justify-between px-4 pt-4 pb-4 font-bold text-gray-600 text-white bg-purple-800 rounded-lg m-1'>
+        <div className='hidden md:flex items-center justify-between px-2 pt-2 pb-2 pr-3 font-bold text-gray-600 text-white bg-purple-700'>
             <h2 className="text-3xl">OdonTIC</h2>
             <div className="flex gap-4 items-center text-lg text-white">
                 <h2>Bem-vindo, {user?.user?.foundUser?.nome}</h2>
@@ -49,7 +48,7 @@ const DropMenu = () => {
     return (
         <div className="relative" data-te-dropdown-ref>
             <button
-                className="flex items-center whitespace-nowrap rounded bg-primary px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_#3b71ca] transition duration-150 ease-in-out hover:bg-primary-600 hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:bg-primary-600 focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:outline-none focus:ring-0 active:bg-primary-700 active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] motion-reduce:transition-none dark:shadow-[0_4px_9px_-4px_rgba(59,113,202,0.5)] dark:hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)]"
+                className="flex items-center whitespace-nowrap rounded bg-primary px-6 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_#3b71ca] transition duration-150 ease-in-out hover:bg-primary-600 hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:bg-primary-600 focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:outline-none focus:ring-0 active:bg-primary-700 active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] motion-reduce:transition-none dark:shadow-[0_4px_9px_-4px_rgba(59,113,202,0.5)] dark:hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)]"
                 type="button"
                 id="dropdownMenuButton1"
                 data-te-dropdown-toggle-ref

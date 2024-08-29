@@ -1,47 +1,40 @@
-import React, { use, useEffect, useState, useMemo } from "react"
-import { FaPencilAlt, FaBookMedical, FaTrashAlt } from "react-icons/fa"
-import { BiSolidFileDoc } from "react-icons/bi"
-import { MdAttachMoney } from "react-icons/md"
+import React, { useEffect, useState, useMemo } from "react"
+import { FaPencilAlt, FaTrashAlt } from "react-icons/fa"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import api from "../../utils/Api"
-import Cookies from "js-cookie"
 import { useAuth } from "../../auth/useAuth"
 import { usePaciente } from "../../context/PacienteContext"
+import LoadingOverlay from "../../components/LoadingOverlay"
 import moment from "moment"
 
 const ListaPacientes = () => {
 
     const [paciente, setPaciente] = useState([])
     const [searchVal, setSearchVal] = useState('')
+    const [isLoading, setIsLoading] = useState(false)
     const { user } = useAuth()
     const { saveIdPaciente, saveIdEmpresa } = usePaciente()
     const id_empresa = user?.user?.foundUser.id_empresa
     const router = useRouter()
 
     useEffect(() => {
-        const init = async () => {
-            const { Datepicker, Input, initTE, Modal, Ripple } = await import("tw-elements");
-            initTE({ Datepicker, Input, Modal, Ripple });
-        };
-        init();
-    }, [])
-
-    useEffect(() => {
-        const getPacientList = async () => {
-            await api.get(`paciente/${id_empresa}`)
-                .then(response => {
-                    setPaciente([...paciente, ...response.data])
-                })
-                .catch(function (error) {
-                    console.error(error);
-                })
-        }
         getPacientList()
     }, [user, id_empresa]);
 
+    const getPacientList = async () => {
+        setIsLoading(true)
+        await api.get(`paciente/${id_empresa}`)
+            .then(response => {
+                setPaciente([...paciente, ...response.data])
+            })
+            .catch(function (error) {
+                console.error(error);
+            })
+        setIsLoading(false)
+    }
 
     const handleDeletePaciente = async (id_paciente) => {
         await api.delete(`paciente/${id_paciente}`)
@@ -85,6 +78,8 @@ const ListaPacientes = () => {
     return (
 
         <div className="m-5 p-5  rounded-lg shadow-lg">
+            <LoadingOverlay isLoading={isLoading} />
+
             <div className="mb-5 flex flex-row flex-wrap w-full justify-between items-center">
                 <input type="text" onChange={e => setSearchVal(e.target.value)} className="form-input mr-4 rounded-lg text-gray-600" placeholder="Buscar paciente" />
                 <Link onClick={() => sessionStorage.removeItem("cadastroPacientes")} href="./cadastroPacientes">
