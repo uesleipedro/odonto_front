@@ -20,27 +20,20 @@ const ListaUsuarios = () => {
     const router = useRouter()
 
     useEffect(() => {
-        const init = async () => {
-            const { Datepicker, Input, initTE, Modal, Ripple } = await import("tw-elements");
-            initTE({ Datepicker, Input, Modal, Ripple });
-        };
-        init();
-    }, [])
+        getUsuarios()
+        sessionStorage.removeItem('cadastroUsuario')
+    }, [user])
 
-    useEffect(() => {
-        const getPacientList = async () => {
-            await api.get(`user/empresa2/${id_empresa}`)
-                .then(response => {
-                    console.log('response', response.data)
-                    setUsers([...users, ...response.data])
-                })
-                .catch(function (error) {
-                    console.error(error);
-                })
-        }
-        getPacientList()
-    }, [user]);
-
+    const getUsuarios = async () => {
+        await api.get(`user/empresa2/${id_empresa}`)
+            .then(response => {
+                console.log('response', response.data)
+                setUsers([...users, ...response.data])
+            })
+            .catch(function (error) {
+                console.error(error);
+            })
+    }
 
     const handleDeleteUser = async (id_user) => {
         await api.delete(`user/${id_user}/${id_empresa}`)
@@ -124,9 +117,10 @@ const ListaUsuarios = () => {
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data?.access_level}</td>
                                             <td className="flex flex-row gap-3 px-6 py-4 whitespace-nowrap text-right text-md font-medium">
                                                 <Link
-                                                    href={{
-                                                        pathname: "/cadastroUsuarioInterno",
-                                                        query: data
+                                                    href={{ pathname: "/usuario/cadastroUsuarioInterno" }}
+                                                    onClick={() => {
+                                                        sessionStorage.removeItem("cadastroUsuario")
+                                                        sessionStorage.setItem('cadastroUsuario', JSON.stringify(data))
                                                     }}
                                                     className="text-purple-800 hover:text-purple-900"
                                                 >

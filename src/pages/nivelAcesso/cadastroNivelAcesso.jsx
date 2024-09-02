@@ -15,6 +15,11 @@ const CadastroNivelAcesso = () => {
     const [screensToSave, setScreensToSave] = useState()
 
     useEffect(() => {
+        const data = sessionStorage.getItem('cadastroNivelAcesso')
+        data && setNivelAcesso(JSON.parse(data))
+    }, [])
+
+    useEffect(() => {
         if (!id_empresa) return
         getScreens()
 
@@ -101,6 +106,7 @@ const CadastroNivelAcesso = () => {
                         type="text"
                         id="level_name"
                         name="level_name"
+                        value={nivelAcesso?.level_name}
                         onChange={updateName}
                         className="form-input rounded-lg text-gray-600 w-full placeholder-gray-300"
                         placeholder="Ex.: Atendente" />
@@ -112,6 +118,7 @@ const CadastroNivelAcesso = () => {
                         type="text"
                         id="description"
                         name="description"
+                        value={nivelAcesso?.description}
                         onChange={updateName}
                         className="form-input rounded-lg text-gray-600 w-full placeholder-gray-300"
                         placeholder="Ex: Atendente da recepção" />

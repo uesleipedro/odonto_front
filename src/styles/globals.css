@@ -137,9 +137,10 @@
   background: #f1ebfc !important;
   border: none !important;
 
-} 
+}
 
 /* TESTE Fullcalendar */
+/* tamanho fonte do evento */
 .fc-event {
   font-size: inherit !important;
   font-weight: bold !important;
@@ -190,8 +191,10 @@
   transition: box-shadow .4s cubic-bezier(.25, .8, .25, 1), background-color .4s cubic-bezier(.25, .8, .25, 1);
 }
 
-.fc-scrollgrid-sync-inner a {
-  font-size: 20px;
+@media (min-width:600px) {
+  .fc-scrollgrid-sync-inner a {
+    font-size: 20px
+  }
 }
 
 /* DATAPICKER */

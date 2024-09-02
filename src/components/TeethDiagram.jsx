@@ -20,8 +20,8 @@ const TeethDiagram = ({ setTooth, id_paciente, id_empresa }) => {
     }, [])
 
     useEffect(() => {
-        console.log("lista dentes", listaDentesComProcedimento?.includes(String(11)))
-    },[listaDentesComProcedimento])
+        console.log("lista dentes ", listaDentesComProcedimento?.[11])
+    }, [listaDentesComProcedimento])
 
     const getDentesComProcedimento = async () => {
         await api.get(`dentes/dentesComProcedimento?id_paciente=${id_paciente}&id_empresa=${id_empresa}`)
@@ -30,53 +30,44 @@ const TeethDiagram = ({ setTooth, id_paciente, id_empresa }) => {
             })
     }
 
-    const comProcedimento = async (tooth_number) => {
-        console.log("tooth_number", tooth_number)
-        const a = await listaDentesComProcedimento?.includes(String(tooth_number))
-            ? "#F0EB7D"
-            : "none"
-        console.log("aa", a)
-        return a
-    }
-
     return (
         <div style={{ display: 'grid', gridGap: '30px' }}>
             {/* // Arcada superior */}
             <div style={{ display: 'flex', alignSelf: 'flex-end', flexWrap: 'wrap', gap: 15 }}>
-                <Tooth1 onClick={setTooth} cor_dente={listaDentesComProcedimento?.includes(18)} tooth_number={18} />
-                <Tooth1 onClick={setTooth} tooth_number={17} cor_dente="none" />
-                <Tooth1 onClick={setTooth} tooth_number={16} />
-                <Tooth2 onClick={setTooth} tooth_number={15} />
-                <Tooth3 onClick={setTooth} tooth_number={14} />
-                <Tooth4 onClick={setTooth} tooth_number={13} />
-                <Tooth5 onClick={setTooth} tooth_number={12} />
-                <Tooth5 onClick={setTooth} tooth_number={11} cor_dente={async () => await comProcedimento("11")} />
-                <Tooth5 onClick={setTooth} tooth_number={21} />
-                <Tooth5 onClick={setTooth} tooth_number={22} />
-                <Tooth4 onClick={setTooth} tooth_number={23} />
-                <Tooth3 onClick={setTooth} tooth_number={24} />
-                <Tooth2 onClick={setTooth} tooth_number={25} />
-                <Tooth1 onClick={setTooth} tooth_number={26} />
-                <Tooth1 onClick={setTooth} tooth_number={27} />
-                <Tooth1 onClick={setTooth} tooth_number={28} />
+                <Tooth1 onClick={setTooth} tooth_number={18} cor_dente={listaDentesComProcedimento?.[18]} />
+                <Tooth1 onClick={setTooth} tooth_number={17} cor_dente={listaDentesComProcedimento?.[17]} />
+                <Tooth1 onClick={setTooth} tooth_number={16} cor_dente={listaDentesComProcedimento?.[16]} />
+                <Tooth2 onClick={setTooth} tooth_number={15} cor_dente={listaDentesComProcedimento?.[15]} />
+                <Tooth3 onClick={setTooth} tooth_number={14} cor_dente={listaDentesComProcedimento?.[14]} />
+                <Tooth4 onClick={setTooth} tooth_number={13} cor_dente={listaDentesComProcedimento?.[13]} />
+                <Tooth5 onClick={setTooth} tooth_number={12} cor_dente={listaDentesComProcedimento?.[12]} />
+                <Tooth5 onClick={setTooth} tooth_number={11} cor_dente={listaDentesComProcedimento?.[11]} />
+                <Tooth5 onClick={setTooth} tooth_number={21} cor_dente={listaDentesComProcedimento?.[21]} />
+                <Tooth5 onClick={setTooth} tooth_number={22} cor_dente={listaDentesComProcedimento?.[22]} />
+                <Tooth4 onClick={setTooth} tooth_number={23} cor_dente={listaDentesComProcedimento?.[23]} />
+                <Tooth3 onClick={setTooth} tooth_number={24} cor_dente={listaDentesComProcedimento?.[24]} />
+                <Tooth2 onClick={setTooth} tooth_number={25} cor_dente={listaDentesComProcedimento?.[25]} />
+                <Tooth1 onClick={setTooth} tooth_number={26} cor_dente={listaDentesComProcedimento?.[26]} />
+                <Tooth1 onClick={setTooth} tooth_number={27} cor_dente={listaDentesComProcedimento?.[27]} />
+                <Tooth1 onClick={setTooth} tooth_number={28} cor_dente={listaDentesComProcedimento?.[28]} />
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 15 }}>
-                <Tooth6 onClick={setTooth} tooth_number={48} />
-                <Tooth6 onClick={setTooth} tooth_number={47} />
-                <Tooth6 onClick={setTooth} tooth_number={46} />
-                <Tooth6 onClick={setTooth} tooth_number={45} />
-                <Tooth7 onClick={setTooth} tooth_number={44} />
-                <Tooth8 onClick={setTooth} tooth_number={43} />
-                <Tooth9 onClick={setTooth} tooth_number={42} />
-                <Tooth9 onClick={setTooth} tooth_number={41} />
-                <Tooth9 onClick={setTooth} tooth_number={31} />
-                <Tooth9 onClick={setTooth} tooth_number={32} />
-                <Tooth8 onClick={setTooth} tooth_number={33} />
-                <Tooth7 onClick={setTooth} tooth_number={34} />
-                <Tooth6 onClick={setTooth} tooth_number={35} />
-                <Tooth6 onClick={setTooth} tooth_number={36} />
-                <Tooth6 onClick={setTooth} tooth_number={37} />
-                <Tooth6 onClick={setTooth} tooth_number={38} />
+                <Tooth6 onClick={setTooth} tooth_number={48} cor_dente={listaDentesComProcedimento?.[48]} />
+                <Tooth6 onClick={setTooth} tooth_number={47} cor_dente={listaDentesComProcedimento?.[47]} />
+                <Tooth6 onClick={setTooth} tooth_number={46} cor_dente={listaDentesComProcedimento?.[46]} />
+                <Tooth6 onClick={setTooth} tooth_number={45} cor_dente={listaDentesComProcedimento?.[45]} />
+                <Tooth7 onClick={setTooth} tooth_number={44} cor_dente={listaDentesComProcedimento?.[44]} />
+                <Tooth8 onClick={setTooth} tooth_number={43} cor_dente={listaDentesComProcedimento?.[43]} />
+                <Tooth9 onClick={setTooth} tooth_number={42} cor_dente={listaDentesComProcedimento?.[42]} />
+                <Tooth9 onClick={setTooth} tooth_number={41} cor_dente={listaDentesComProcedimento?.[41]} />
+                <Tooth9 onClick={setTooth} tooth_number={31} cor_dente={listaDentesComProcedimento?.[31]} />
+                <Tooth9 onClick={setTooth} tooth_number={32} cor_dente={listaDentesComProcedimento?.[32]} />
+                <Tooth8 onClick={setTooth} tooth_number={33} cor_dente={listaDentesComProcedimento?.[33]} />
+                <Tooth7 onClick={setTooth} tooth_number={34} cor_dente={listaDentesComProcedimento?.[34]} />
+                <Tooth6 onClick={setTooth} tooth_number={35} cor_dente={listaDentesComProcedimento?.[35]} />
+                <Tooth6 onClick={setTooth} tooth_number={36} cor_dente={listaDentesComProcedimento?.[36]} />
+                <Tooth6 onClick={setTooth} tooth_number={37} cor_dente={listaDentesComProcedimento?.[37]} />
+                <Tooth6 onClick={setTooth} tooth_number={38} cor_dente={listaDentesComProcedimento?.[38]} />
             </div>
         </div>
     );

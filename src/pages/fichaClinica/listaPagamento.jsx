@@ -4,6 +4,7 @@ import { ImCancelCircle } from "react-icons/im"
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import moment from "moment"
+import Link from "next/link"
 import api from "../../utils/Api"
 import GeraOrcamento from "./geraOrcamento"
 import { FichaClinicaContext } from '../../context/FichaClinicaContext'
@@ -137,6 +138,16 @@ const ListaPagamento = () => {
                                                     >
                                                         <FaEye />
                                                     </a>
+                                                    <Link
+                                                        href={{ pathname: "/fichaClinica/pagamento/view/ReciboPagamento" }}
+                                                        onClick={async () => {
+                                                            sessionStorage.removeItem("viewReciboPagamento")
+                                                            sessionStorage.setItem('viewReciboPagamento', JSON.stringify(data))
+                                                        }}
+                                                        className="text-purple-800 hover:text-purple-900"
+                                                    >
+                                                        <FaEye />
+                                                    </Link>
                                                     <a className="text-purple-800 hover:text-purple-900" title="Cancelar Pagamento" rel="noopener noreferrer" href="#"
                                                         onClick={() => {
                                                             showSwalWithLink(data.id_pagamento, data.nr_parcela)

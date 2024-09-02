@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react"
 import Link from "next/link"
 import api from "../../utils/Api"
-import { maskPhone } from "../../utils/mask"
 import Swal from "sweetalert2"
 import { useRouter } from 'next/router'
 import { useAuth } from '../../auth/useAuth'
@@ -12,6 +11,11 @@ const CadastroUsuario = () => {
     const [userData, setUserData] = useState()
     const [accessLevels, setAccessLevels] = useState([])
     const id_empresa = user?.user?.foundUser?.id_empresa
+
+    useEffect(() => {
+        const data = sessionStorage.getItem('cadastroUsuario')
+        setUserData(JSON.parse(data))
+    }, [])
 
     useEffect(() => {
         if (!id_empresa) return
@@ -35,16 +39,34 @@ const CadastroUsuario = () => {
         }))
     }
 
-    const sendPacienteData = async () => {
+    const updateUser = async () => {
         if (!userData?.access_levels) {
             Swal.fire("Selecione um nível de acesso!")
             return
         }
 
-        let userToSend = userData
-        userToSend.cnpj_cpf = userData.cnpj_cpf?.replace(/\D/g, '')
-        userToSend.telefone_movel = userData.telefone_movel?.replace(/\D/g, '')
-        userToSend.access_levels = Number(userData.access_levels)
+        const userToSend = new URLSearchParams(userData).toString()
+
+        await api.put(`/user?${userToSend}`)
+            .then(function (response) {
+                if (response.status === 201)
+                    Swal.fire("Salvo com sucesso!")
+            })
+            .catch(e => {
+                alert(e)
+                console.error(e.error)
+            })
+        sessionStorage.removeItem('cadastroUsuario')
+        router.push('/usuario/listaUsuarios')
+    }
+
+    const saveUser = async () => {
+        if (!userData?.access_levels) {
+            Swal.fire("Selecione um nível de acesso!")
+            return
+        }
+
+        const userToSend = userData
         userToSend.id_empresa = id_empresa
 
         await api.post('/user', userToSend)
@@ -56,8 +78,14 @@ const CadastroUsuario = () => {
                 alert(e)
                 console.error(e.error)
             })
-
+        sessionStorage.removeItem('cadastroUsuario')
         router.push('/usuario/listaUsuarios')
+    }
+
+    const sendUser = async () => {
+        userData?.id_user
+            ? updateUser()
+            : saveUser()
     }
 
     return (
@@ -73,6 +101,7 @@ const CadastroUsuario = () => {
                         type="text"
                         id="nome"
                         name="nome"
+                        value={userData?.nome}
                         onChange={updateName}
                         className="form-input rounded-lg text-gray-600 w-full placeholder-gray-300"
                         placeholder="Ex.: Marcelo Algusto" />
@@ -84,21 +113,10 @@ const CadastroUsuario = () => {
                         type="email"
                         id="email"
                         name="email"
+                        value={userData?.email}
                         onChange={updateName}
                         className="form-input rounded-lg text-gray-600 w-full placeholder-gray-300"
                         placeholder="Ex: antonio@gmail.com" />
-                </div>
-
-                <div className="w-full md:w-2/5 pr-2 pt-3">
-                    <label className="text-gray-700 ">Celular</label>
-                    <input
-                        type="text"
-                        id="telefone_movel"
-                        name="telefone_movel"
-                        value={maskPhone(userData?.telefone_movel)}
-                        onChange={updateName}
-                        className="form-input rounded-lg text-gray-600 w-full placeholder-gray-300"
-                        placeholder="Ex: (61) 99999-9999" />
                 </div>
 
                 <div className="w-full md:w-1/5 pt-3">
@@ -107,6 +125,7 @@ const CadastroUsuario = () => {
                         id="access_levels"
                         name="access_levels"
                         onChange={updateName}
+                        value={userData?.access_levels}
                         className="form-input rounded-lg text-gray-600 w-full"
                         placeholder="">
                         <option value={0}></option>
@@ -132,7 +151,7 @@ const CadastroUsuario = () => {
             <hr />
             <div className="flex justify-end gap-3">
                 <button
-                    onClick={sendPacienteData}
+                    onClick={sendUser}
                     className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full mt-5">
                     Salvar
                 </button>
