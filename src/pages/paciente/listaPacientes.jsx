@@ -111,10 +111,11 @@ const ListaPacientes = () => {
                                                 }}
 
                                             >
-                                                <td onClick={() => {
-                                                    saveIdPaciente(data.id_paciente)
-                                                    saveDadosPaciente(data)
-                                                    saveIdEmpresa(data.id_empresa)
+                                                <td onClick={async () => {
+                                                    await saveIdPaciente(data.id_paciente)
+                                                    await saveDadosPaciente(data)
+                                                    console.log("dada paciente", data)
+                                                    await saveIdEmpresa(data.id_empresa)
                                                 }}
                                                     className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.nome}</td>
                                             </Link>

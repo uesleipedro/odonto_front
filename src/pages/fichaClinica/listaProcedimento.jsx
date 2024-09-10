@@ -25,13 +25,21 @@ const ListaProcedimento = ({ id_paciente, id_empresa }) => {
     const id_user = user?.user?.foundUser.id_user
     const [evolucoes, setEvolucoes] = useState()
     const [evolucao, setEvolucao] = useState()
+    const [listaDentesComProcedimento, setListaDentesComProcedimento] = useState()
 
     useEffect(() => {
         getEvolucoes()
+        getDentesComProcedimento()
     }, [])
 
+    const getDentesComProcedimento = async () => {
+        await api.get(`dentes/dentesComProcedimento?id_paciente=${id_paciente}&id_empresa=${id_empresa}`)
+            .then(response => {
+                setListaDentesComProcedimento(response.data[0]?.dentes)
+            })
+    }
+
     const getEvolucoes = async () => {
-        console.log("entrou getEvolucoes")
         await api.get(`evolucao?id_empresa=${id_empresa}&id_paciente=${id_paciente}`)
             .then(response => {
                 setEvolucoes([...response.data])
@@ -100,30 +108,32 @@ const ListaProcedimento = ({ id_paciente, id_empresa }) => {
 
     return (
         <div className=" p-5  rounded-lg shadow-lg">
-            <div className="mb-5 flex flex-row flex-wrap w-full justify-between items-center">
-                <button onClick={() => {
-                    setPost({
-                        face_dente: '',
-                        estado: 'A realizar',
-                        adicionado: moment(Date()).format('YYYY-MM-DD'),
-                        id_paciente: Number(id_paciente),
-                        preco: "R$ 0,00"
-                    })
-                    setToggleInsertUpdate('insert')
-                    toogleShow()
-                }} className="bg-purple-800 hover:bg-purple-500 rounded-lg p-2 text-white font-bold">
-                    Novo procedimento
-                </button>
-
-            </div>
-
             <div className="inline-grid grid-cols-1 md:grid-cols-2 gap-4 wrapp w-full">
-                <div className="pt-5 pl-5 pr-5">
-                    <TeethDiagram
-                        setTooth={setTooth}
-                        id_paciente={id_paciente}
-                        id_empresa={id_empresa}
-                    />
+                <div>
+                    <div className="mb-5 flex flex-row flex-wrap justify-between items-center">
+                        <button onClick={() => {
+                            setPost({
+                                face_dente: '',
+                                estado: 'A realizar',
+                                adicionado: moment(Date()).format('YYYY-MM-DD'),
+                                id_paciente: Number(id_paciente),
+                                preco: "R$ 0,00"
+                            })
+                            setToggleInsertUpdate('insert')
+                            toogleShow()
+                        }} className="bg-purple-800 hover:bg-purple-500 rounded-lg p-2 text-white font-bold">
+                            Novo procedimento
+                        </button>
+
+                    </div>
+                    <div className="pt-5 pl-5 pr-5">
+                        <TeethDiagram
+                            setTooth={setTooth}
+                            id_paciente={id_paciente}
+                            id_empresa={id_empresa}
+                            listaDentesComProcedimento={listaDentesComProcedimento}
+                        />
+                    </div>
                 </div>
                 <div className="w-full">
                     <h2 className="pb-1 pt-2 text-2xl font-bold">
@@ -210,6 +220,7 @@ const ListaProcedimento = ({ id_paciente, id_empresa }) => {
                 id_paciente={id_paciente}
                 dadosProcedimento={post}
                 insertUpdate={toggleInsertUpdate}
+                getDentesComProcedimento={getDentesComProcedimento}
             />
         </div >
     )

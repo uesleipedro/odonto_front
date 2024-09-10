@@ -6,7 +6,7 @@ import Swal from "sweetalert2"
 
 const CadastroUsuario = () => {
 
-    const [user, setUser] = useState({access_levels: 1})
+    const [user, setUser] = useState({ access_levels: 28 })
 
     const updateName = e => {
         const fieldName = e.target.name
@@ -16,10 +16,26 @@ const CadastroUsuario = () => {
         }))
     }
 
-    const sendPacienteData = async () => {
+    const updateCep = e => {
+        updateName(e)
+
+        if (e.target.value.length == 8)
+            buscaEndereco(e.target.value)
+    }
+
+    const buscaEndereco = async (cep) => {
+        if (cep.length < 8) return
+
+        const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+        const dados = await response.json()
+        setUser({ ...user, ...dados })
+    }
+
+    const sendUserData = async () => {
         let userToSend = user
         userToSend.cnpj_cpf = user.cnpj_cpf?.replace(/\D/g, '')
         userToSend.telefone_movel = user.telefone_movel?.replace(/\D/g, '')
+        console.log("user", userToSend)
         await api.post('/user', userToSend)
             .then(function (response) {
                 if (response.status === 201)
@@ -83,6 +99,65 @@ const CadastroUsuario = () => {
                         placeholder="Ex: (61) 99999-9999" />
                 </div>
 
+                <div className="w-full md:w-3/4 pr-2 pt-3">
+                    <label className="text-gray-700 ">CEP</label>
+                    <input
+                        type="text"
+                        id="cep"
+                        name="cep"
+                        onChange={updateCep}
+                        placeholder="Ex.: 72000-000"
+                        className="form-input rounded-lg text-gray-600 w-full placeholder-gray-300" />
+                </div>
+
+                <div className="w-full md:w-3/4 pr-2 pt-3">
+                    <label className="text-gray-700 ">Logradouro</label>
+                    <input
+                        type="text"
+                        id="logradouro"
+                        name="logradouro"
+                        value={user?.logradouro}
+                        onChange={updateName}
+                        className="form-input rounded-lg text-gray-600 w-full placeholder-gray-300"
+                        placeholder="Ex.: Avenida Marechal" />
+                </div>
+
+                <div className="w-full md:w-3/4 pr-2 pt-3">
+                    <label className="text-gray-700 ">Bairro</label>
+                    <input
+                        type="text"
+                        id="bairro"
+                        name="bairro"
+                        value={user?.bairro}
+                        onChange={updateName}
+                        className="form-input rounded-lg text-gray-600 w-full placeholder-gray-300"
+                        placeholder="Ex.: Vila São José" />
+                </div>
+
+                <div className="w-full md:w-3/4 pr-2 pt-3">
+                    <label className="text-gray-700 ">Cidade</label>
+                    <input
+                        type="text"
+                        id="cidade"
+                        name="cidade"
+                        value={user?.localidade}
+                        onChange={updateName}
+                        className="form-input rounded-lg text-gray-600 w-full placeholder-gray-300"
+                        placeholder="Ex.: Brasília" />
+                </div>
+
+                <div className="w-full md:w-3/4 pr-2 pt-3">
+                    <label className="text-gray-700 ">UF</label>
+                    <input
+                        type="text"
+                        id="uf"
+                        name="uf"
+                        value={user?.uf}
+                        onChange={updateName}
+                        className="form-input rounded-lg text-gray-600 w-full placeholder-gray-300"
+                        placeholder="Ex.: DF" />
+                </div>
+
             </div>
 
             <p className="text-gray-600 font-bold">Dados da clínica</p>
@@ -137,7 +212,7 @@ const CadastroUsuario = () => {
             <hr />
             <div className="flex justify-end gap-3">
                 <button
-                    onClick={sendPacienteData}
+                    onClick={sendUserData}
                     className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full mt-5">
                     Salvar
                 </button>

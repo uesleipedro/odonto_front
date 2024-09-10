@@ -7,12 +7,16 @@ import Swal from "sweetalert2"
 import api from "../utils/Api"
 import Toast from "../components/Toast"
 import withReactContent from 'sweetalert2-react-content'
+import LoadingOverlay from "../components/LoadingOverlay"
 
 const login = () => {
     const [usuario, setUsuario] = useState("")
     const [passwd, setPasswd] = useState("")
     const [showToast, setShowToast] = useState(false)
     const [solicitado, setSolicitado] = useState(false)
+    const [isAuthenticated, setIsAuthenticated] = useState()
+    const [isCssLoaded, setCssLoaded] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
     const router = new useRouter()
     const { login } = useAuth()
 
@@ -22,14 +26,19 @@ const login = () => {
             return
         }
 
+        setIsLoading(true)
+
         const authorized = await login({ usuario, passwd })
+        setIsAuthenticated(authorized)
 
         if (!authorized) {
             Swal.fire("Erro na autenticação!")
             return
         }
-        router.push("/")
+        setIsLoading(false)
+        router.push("/agenda")
     }
+
 
     const recuperarSenha = async () => {
         await api.post(`user/recuperarSenha`, { email: usuario })
@@ -101,6 +110,7 @@ const login = () => {
 
     return (
         <>
+            <LoadingOverlay isLoading={isLoading} />
             <Head>
                 <title>Login</title>
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
@@ -159,7 +169,7 @@ const login = () => {
                         </div>
                         <div className="flex items-center justify-center">
                             <p className="text-sm flex text-white items-center justify-center mb-4">
-                                <Link className="inline-block align-baseline font-bold text-sm text-white hover:text-white" href="/usuario/cadastroUsuario">
+                                <Link className="inline-block align-baseline font-bold text-sm text-white hover:text-white" href="/public/cadastroUsuario">
                                     Crie sua conta
                                 </Link>
                             </p>

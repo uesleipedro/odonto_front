@@ -48,7 +48,6 @@ export function AuthProvider({ children }) {
             .then(async (response) => {
                 if (response.status === 201) {
                     // api.defaults.headers.Authorization = `Bearer ${token}`
-                    console.log("response login:", response.data)
                     api.defaults.headers.Authorization = `Bearer ${JSON.stringify(response.data).token}`
                     Cookies.set("user", JSON.stringify(response.data))
                     setUser(response.data)

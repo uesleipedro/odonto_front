@@ -8,7 +8,7 @@ import { useAuth } from "../auth/useAuth"
 import { toDecimalNumeric, formatarMoedaBRL } from "../utils/mask"
 import moment from "moment"
 
-const CadastroProcedimento = ({ show, toogleShow, id_paciente, dadosProcedimento, insertUpdate }) => {
+const CadastroProcedimento = ({ show, toogleShow, id_paciente, dadosProcedimento, insertUpdate, getDentesComProcedimento }) => {
 
     const { getProcedimentoList } = useContext(FichaClinicaContext)
     const [procedimentoList, setProcedimentoList] = useState([])
@@ -29,19 +29,18 @@ const CadastroProcedimento = ({ show, toogleShow, id_paciente, dadosProcedimento
 
     useEffect(() => {
         if (dadosProcedimento.id_procedimento || dadosProcedimento.dente) {
-            console.log("entrou no if")
+            getSetFacesDente(dadosProcedimento?.dente)
             setPost(dadosProcedimento)
             return
-        } else {
-            setPost({
-                face_dente: '',
-                estado: 'A realizar',
-                adicionado: moment(Date()).format('YYYY-MM-DD'),
-                id_paciente: Number(id_paciente),
-                preco: "R$ 0,00"
-            })
         }
-        getSetFacesDente(dadosProcedimento?.dente)
+
+        setPost({
+            face_dente: '',
+            estado: 'A realizar',
+            adicionado: moment(Date()).format('YYYY-MM-DD'),
+            id_paciente: Number(id_paciente),
+            preco: "R$ 0,00"
+        })
     }, [dadosProcedimento])
 
     const listaProcedimento = async () => {
@@ -138,6 +137,7 @@ const CadastroProcedimento = ({ show, toogleShow, id_paciente, dadosProcedimento
         }
         setPost({})
         await getProcedimentoList()
+        await getDentesComProcedimento()
         setIsLoading(false)
         setShowToast(true)
 

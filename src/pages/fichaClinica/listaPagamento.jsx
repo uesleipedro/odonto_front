@@ -5,39 +5,34 @@ import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import moment from "moment"
 import Link from "next/link"
+import { useRouter } from 'next/router'
 import api from "../../utils/Api"
 import GeraOrcamento from "./geraOrcamento"
 import { FichaClinicaContext } from '../../context/FichaClinicaContext'
 import Toast from '../../components/Toast'
-import PagamentoView from "./view/pagamentoView"
 
-const ListaPagamento = () => {
+const ListaPagamento = ({ dadosPaciente }) => {
 
     const { pagamento, loading, getPagamentoList } = useContext(FichaClinicaContext)
     const [geraOrcamento, setGeraOrcamento] = useState(false)
     const [modal, setModal] = useState(false)
     const [dadosPagamento, setDadosPagamento] = useState({ "status": "Pago" })
     const [showToast, setShowToast] = useState(false)
-    const [showViewPagamento, setShowViewPagamento] = useState(false)
-    const [indexPagamento, setIndexPagamento] = useState()
+    const router = useRouter()
 
+    //Necessário para funcionamento das abas
     useEffect(() => {
         const init = async () => {
-            const { Datepicker, Input, initTE, Modal, Ripple, TEToast, Tab } = await import("tw-elements");
-            initTE({ Datepicker, Input, Modal, Ripple, TEToast, Tab });
+            const { Datepicker, Input, initTE, Modal, Ripple, TEToast, Tab } = await import("tw-elements")
+            initTE({ Datepicker, Input, Modal, Ripple, TEToast, Tab })
         };
-        init();
+        init()
     }, [])
 
     const toCurrency = (num) => {
         return ('R$ ' + num
             ?.toString()
             ?.replace('.', ','))
-    }
-
-    const toogleViewPagamento = (index) => {
-        setIndexPagamento(index)
-        setShowViewPagamento(!showViewPagamento)
     }
 
     const finalizarPagamento = async () => {
@@ -55,6 +50,16 @@ const ListaPagamento = () => {
         setShowToast(true)
     }
 
+    const handleRedirectRecibo = async (data) => {
+        if (!data.dt_recebimento) {
+            Swal.fire("O recibo só pode ser gerado após o pagamento!")
+            return
+        }
+        sessionStorage.removeItem("viewReciboPagamento")
+        sessionStorage.setItem('viewReciboPagamento', JSON.stringify({ ...data, ...dadosPaciente }))
+        window.open('/fichaClinica/pagamento/view/ReciboPagamento', '_blank')
+    }
+
     const estornarPagamento = async (id_pagamento, nr_parcela) => {
         await api.put(`contas_receber/estornar`,
             {
@@ -62,10 +67,6 @@ const ListaPagamento = () => {
                 'nr_parcela': nr_parcela
             }).then()
         getPagamentoList()
-    }
-
-    const estornarOrcamento = async (id_orcamento) => {
-        await api.put(`orcamento/estornar/${id_orcamento}`)
     }
 
     const MySwal = withReactContent(Swal)
@@ -131,23 +132,12 @@ const ListaPagamento = () => {
                                                     >
                                                         <FaCheck />
                                                     </a>
-                                                    <a className="text-purple-800 hover:text-purple-900" title="Visualizar" href="#"
-                                                        onClick={() => {
-                                                            toogleViewPagamento(index)
-                                                        }}
-                                                    >
+                                                    <a
+                                                        className="text-purple-800 hover:text-purple-900 cursor-pointer"
+                                                        onClick={() => handleRedirectRecibo(data)}>
                                                         <FaEye />
                                                     </a>
-                                                    <Link
-                                                        href={{ pathname: "/fichaClinica/pagamento/view/ReciboPagamento" }}
-                                                        onClick={async () => {
-                                                            sessionStorage.removeItem("viewReciboPagamento")
-                                                            sessionStorage.setItem('viewReciboPagamento', JSON.stringify(data))
-                                                        }}
-                                                        className="text-purple-800 hover:text-purple-900"
-                                                    >
-                                                        <FaEye />
-                                                    </Link>
+
                                                     <a className="text-purple-800 hover:text-purple-900" title="Cancelar Pagamento" rel="noopener noreferrer" href="#"
                                                         onClick={() => {
                                                             showSwalWithLink(data.id_pagamento, data.nr_parcela)
@@ -156,11 +146,6 @@ const ListaPagamento = () => {
                                                         <ImCancelCircle />
                                                     </a>
                                                 </td>
-                                                <PagamentoView
-                                                    dados={pagamento}
-                                                    index={indexPagamento}
-                                                    toogleViewPagamento={toogleViewPagamento}
-                                                    showViewPagamento={showViewPagamento} />
                                             </tr>
                                         ))}
                                     </tbody>

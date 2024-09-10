@@ -12,23 +12,28 @@ import {
 import { useEffect, useState } from 'react'
 import api from '../utils/Api'
 
-const TeethDiagram = ({ setTooth, id_paciente, id_empresa }) => {
-    const [listaDentesComProcedimento, setListaDentesComProcedimento] = useState()
+const TeethDiagram = ({ setTooth, id_paciente, id_empresa, listaDentesComProcedimento }) => {
+    // const [listaDentesComProcedimento, setListaDentesComProcedimento] = useState()
+    const arcadas = [
+        "Arcada Inferior",
+        "Arcada Superior",
+        "Face",
+        "Mandíbula",
+        "Maxila",
+        "Todos",
+    ]
 
-    useEffect(() => {
-        getDentesComProcedimento()
-    }, [])
+    // useEffect(() => {
+    //     getDentesComProcedimento()
+    // }, [])
 
-    useEffect(() => {
-        console.log("lista dentes ", listaDentesComProcedimento?.[11])
-    }, [listaDentesComProcedimento])
 
-    const getDentesComProcedimento = async () => {
-        await api.get(`dentes/dentesComProcedimento?id_paciente=${id_paciente}&id_empresa=${id_empresa}`)
-            .then(response => {
-                setListaDentesComProcedimento(response.data[0]?.dentes)
-            })
-    }
+    // const getDentesComProcedimento = async () => {
+    //     await api.get(`dentes/dentesComProcedimento?id_paciente=${id_paciente}&id_empresa=${id_empresa}`)
+    //         .then(response => {
+    //             setListaDentesComProcedimento(response.data[0]?.dentes)
+    //         })
+    // }
 
     return (
         <div style={{ display: 'grid', gridGap: '30px' }}>
@@ -68,6 +73,15 @@ const TeethDiagram = ({ setTooth, id_paciente, id_empresa }) => {
                 <Tooth6 onClick={setTooth} tooth_number={36} cor_dente={listaDentesComProcedimento?.[36]} />
                 <Tooth6 onClick={setTooth} tooth_number={37} cor_dente={listaDentesComProcedimento?.[37]} />
                 <Tooth6 onClick={setTooth} tooth_number={38} cor_dente={listaDentesComProcedimento?.[38]} />
+            </div>
+            <div className='flex flex-wrap space-x-4'>
+                {arcadas.map(e => (
+                    <p
+                        onClick={() =>
+                            setTooth(e)
+                        }
+                        className={`${listaDentesComProcedimento?.[e] === 'none' ? '' : 'bg-amber-200'} p-1 border text-purple-800 font-bold rounded-full cursor-pointer`}>{e}</p>
+                ))}
             </div>
         </div>
     );

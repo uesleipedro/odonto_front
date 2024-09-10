@@ -1,22 +1,22 @@
 import React, { useEffect, useState } from "react"
 import Link from "next/link"
-import api from "../../utils/Api"
+import api from "../../../utils/Api"
 import Swal from "sweetalert2"
-import { useAuth } from '../../auth/useAuth'
+import { useAuth } from '../../../auth/useAuth'
 import Select from 'react-select'
 
 const CadastroNivelAcesso = () => {
 
     const { user } = useAuth()
     const [nivelAcesso, setNivelAcesso] = useState({ id_empresa: user?.user?.foundUser?.id_empresa })
-    const [selectedOptions, setSelectedOptions] = useState([]);
+    const [selectedOptions, setSelectedOptions] = useState();
     const id_empresa = user?.user?.foundUser?.id_empresa
     const [screens, setScreens] = useState()
-    const [screensToSave, setScreensToSave] = useState()
 
     useEffect(() => {
         const data = sessionStorage.getItem('cadastroNivelAcesso')
         data && setNivelAcesso(JSON.parse(data))
+        setSelectedOptions(JSON.parse(data)?.screens)
     }, [])
 
     useEffect(() => {
@@ -30,7 +30,7 @@ const CadastroNivelAcesso = () => {
     }, [user, id_empresa])
 
     const getScreens = () => {
-        api.get(`screens/${id_empresa}`)
+        api.get(`screens`)
             .then((response) => {
                 setScreens([...response.data])
             })
@@ -38,6 +38,7 @@ const CadastroNivelAcesso = () => {
 
     const saveAccessLevelScreen = async (id_access_level) => {
         const obj = await renameKeys(selectedOptions, id_access_level)
+
         api.post(`access_level_screen`, {
             screens: obj,
             id_empresa: id_empresa,
@@ -47,9 +48,29 @@ const CadastroNivelAcesso = () => {
         })
     }
 
+    //     const updateAccessLevelScreen = async (id_access_level) => {
+    //         const obj = await renameKeys(selectedOptions, id_access_level)
+
+    //         const nivelAcessoScreenToSend = new URLSearchParams(
+    //             {
+    //                 screens: obj,
+    //                 id_empresa: id_empresa,
+    //                 id_access_levels: id_access_level
+    //             }
+    //         ).toString()
+    // console.log(">>>", {
+    //     screens: obj,
+    //     id_empresa: id_empresa,
+    //     id_access_levels: id_access_level
+    // }   )
+    // return
+    //         api.put(`/access_level_screen?${nivelAcessoScreenToSend}`).then((res) => {
+    //             return res
+    //         })
+    //     }
+
     const handleChange = (selected) => {
         setSelectedOptions(selected)
-        console.log("Selecte", selected)
     }
 
     const updateName = e => {
@@ -61,7 +82,12 @@ const CadastroNivelAcesso = () => {
     }
 
     const sendNivelAcesso = async () => {
+        nivelAcesso?.access_level_id
+            ? updateNivelAcesso()
+            : saveNivelAcesso()
+    }
 
+    const saveNivelAcesso = async () => {
         await api.post('/access_level', nivelAcesso)
             .then(async function (response) {
                 try {
@@ -72,7 +98,30 @@ const CadastroNivelAcesso = () => {
 
                 } catch (error) {
                     Swal.fire("Erro ao cadastrar o nível de acesso")
-                    console.log(error)
+                    console.error(error)
+                }
+            })
+            .catch(e => {
+                alert(e)
+                console.error(e.error)
+            })
+    }
+
+    const updateNivelAcesso = async () => {
+
+        const nivelAcessoToSend = new URLSearchParams(nivelAcesso).toString()
+
+        await api.put(`/access_level?${nivelAcessoToSend}`)
+            .then(async function (response) {
+                try {
+                    const res = await saveAccessLevelScreen(nivelAcesso?.access_level_id)
+
+                    if (response.status === 201)
+                        Swal.fire("Salvo com sucesso!")
+
+                } catch (error) {
+                    Swal.fire("Erro ao cadastrar o nível de acesso")
+                    console.error(error)
                 }
             })
             .catch(e => {
@@ -148,10 +197,10 @@ const CadastroNivelAcesso = () => {
                     Salvar
                 </button>
 
-                <Link href="/">
+                <Link href="/opcoes/nivelAcesso/listaNivelAcesso">
                     <button
                         className="bg-white hover:bg-gray-200 text-purple-800 border font-bold py-2 px-4 rounded-full mt-5">
-                        Cancelar
+                        Voltar
                     </button>
                 </Link>
             </div>

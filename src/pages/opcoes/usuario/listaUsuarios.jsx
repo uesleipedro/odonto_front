@@ -6,13 +6,13 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
-import api from "../../utils/Api"
-import { useAuth } from "../../auth/useAuth"
-import { usePaciente } from "../../context/PacienteContext"
+import api from "../../../utils/Api"
+import { useAuth } from "../../../auth/useAuth"
+import { usePaciente } from "../../../context/PacienteContext"
 
-const ListaNivelAcesso = () => {
+const ListaUsuarios = () => {
 
-    const [accessLevel, setAccessLevel] = useState([])
+    const [users, setUsers] = useState([])
     const [searchVal, setSearchVal] = useState('')
     const { user } = useAuth()
     const { saveIdPaciente, saveIdEmpresa } = usePaciente()
@@ -20,22 +20,23 @@ const ListaNivelAcesso = () => {
     const router = useRouter()
 
     useEffect(() => {
-        getAccessLevels()
-        sessionStorage.removeItem('cadastroAccessLevels')
+        getUsuarios()
+        sessionStorage.removeItem('cadastroUsuario')
     }, [user])
 
-    const getAccessLevels = async () => {
-        await api.get(`access_level/${id_empresa}`)
+    const getUsuarios = async () => {
+        await api.get(`user/empresa2/${id_empresa}`)
             .then(response => {
-                setAccessLevel([...accessLevel, ...response.data])
+                console.log('response', response.data)
+                setUsers([...users, ...response.data])
             })
             .catch(function (error) {
                 console.error(error);
             })
     }
 
-    const handleDeleteAccessLevel = async (id_user) => {
-        await api.delete(`access_level/${id_empresa}`)
+    const handleDeleteUser = async (id_user) => {
+        await api.delete(`user/${id_user}/${id_empresa}`)
             .then(response => {
                 if (response.status === 204)
                     return
@@ -48,14 +49,14 @@ const ListaNivelAcesso = () => {
 
     const filteredData = useMemo(() => {
         if (searchVal.trim() === '') {
-            return accessLevel
+            return users
         }
-        return accessLevel.filter(dataItem => dataItem.nome.toLowerCase().includes(searchVal.toLocaleLowerCase()))
-    }, [accessLevel, searchVal])
+        return users.filter(dataItem => dataItem.nome.toLowerCase().includes(searchVal.toLocaleLowerCase()))
+    }, [users, searchVal])
 
 
     const MySwal = withReactContent(Swal)
-    const showSwalWithLink = (id_access_level) => {
+    const showSwalWithLink = (id_user) => {
         MySwal.fire({
             title: 'Deseja realmente excluir?',
             showDenyButton: true,
@@ -64,7 +65,7 @@ const ListaNivelAcesso = () => {
             denyButtonText: `Cancelar`,
         }).then((result) => {
             if (result.isConfirmed) {
-                handleDeleteAccessLevel(id_access_level)
+                handleDeleteUser(id_user)
                 Swal.fire('Excluído!', '', 'success')
             } else if (result.isDenied) {
                 Swal.fire('Nenhuma alteração foi realizada', '', 'info')
@@ -76,10 +77,10 @@ const ListaNivelAcesso = () => {
 
         <div className="m-5 p-5  rounded-lg shadow-lg">
             <div className="mb-5 flex flex-row flex-wrap w-full justify-between items-center">
-                <input type="text" onChange={e => setSearchVal(e.target.value)} className="form-input mr-4 rounded-lg text-gray-600" placeholder="Buscar nível de acesso" />
-                <Link href="/nivelAcesso/cadastroNivelAcesso">
+                <input type="text" onChange={e => setSearchVal(e.target.value)} className="form-input mr-4 rounded-lg text-gray-600" placeholder="Buscar usuário" />
+                <Link href="cadastroUsuarioInterno">
                     <button className="bg-purple-800 hover:bg-purple-500 rounded-lg p-2 text-white font-bold">
-                        Novo Nível de Acesso
+                        Novo Usuário
                     </button>
                 </Link>
             </div>
@@ -91,42 +92,36 @@ const ListaNivelAcesso = () => {
                             <table className="min-w-full">
                                 <thead className="bg-purple-800 dark:bg-purple-700">
                                     <tr className="text-white text-left font-medium">
-                                        <th scope="col" className="px-6 py-3">ID</th>
-                                        <th scope="col" className="px-6 py-3 ">Nome do Nível de Acesso</th>
-                                        <th scope="col" className="px-6 py-3">Descrição</th>
+                                        <th scope="col" className="px-6 py-3">Nome</th>
+                                        <th scope="col" className="px-6 py-3 ">Email</th>
+                                        <th scope="col" className="px-6 py-3">Nível de Acesso</th>
                                         <th scope="col" className="px-6 py-3">Ações</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                                     {filteredData.map((data) => (
-                                        <tr key={data.access_level_id}>
-                                            <Link
-                                                href={{
-                                                    pathname: `/nivelAcesso/cadastro/`,
-                                                }}
+                                        <tr key={data.nome}>
+                                            <td onClick={() => {
+                                                saveIdPaciente(data.id_paciente)
+                                                saveIdEmpresa(data.id_empresa)
+                                            }}
+                                                className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.nome}</td>
 
-                                            >
-                                                <td onClick={() => {
-                                                    saveIdPaciente(data.id_paciente)
-                                                    saveIdEmpresa(data.id_empresa)
-                                                }}
-                                                    className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data?.access_level_id}</td>
-                                            </Link>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.level_name}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data?.description}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.email}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data?.access_level}</td>
                                             <td className="flex flex-row gap-3 px-6 py-4 whitespace-nowrap text-right text-md font-medium">
                                                 <Link
-                                                    href={{ pathname: "/nivelAcesso/cadastroNivelAcesso" }}
+                                                    href={{ pathname: "cadastroUsuarioInterno" }}
                                                     onClick={() => {
-                                                        sessionStorage.removeItem("cadastroNivelAcesso")
-                                                        sessionStorage.setItem('cadastroNivelAcesso', JSON.stringify(data))
+                                                        sessionStorage.removeItem("cadastroUsuario")
+                                                        sessionStorage.setItem('cadastroUsuario', JSON.stringify(data))
                                                     }}
                                                     className="text-purple-800 hover:text-purple-900"
                                                 >
                                                     <FaPencilAlt />
                                                 </Link>
                                                 <a className="text-purple-800 hover:text-purple-900" href="#"
-                                                    onClick={() => showSwalWithLink(data.access_level_id)}
+                                                    onClick={() => showSwalWithLink(data.id_user)}
                                                 >
                                                     <FaTrashAlt />
                                                 </a>
@@ -143,4 +138,4 @@ const ListaNivelAcesso = () => {
     )
 }
 
-export default ListaNivelAcesso
+export default ListaUsuarios

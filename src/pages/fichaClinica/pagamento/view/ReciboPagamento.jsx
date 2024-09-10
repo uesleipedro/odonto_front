@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from "react"
+import { useRouter } from 'next/router'
 import n2words from "n2words"
+import moment from "moment"
 import { useAuth } from "../../../../auth/useAuth"
+import LoadingOverlay from "../../../../components/LoadingOverlay"
 import { formatarMoedaBRL, maskCPF_CNPJ } from "../../../../utils/mask"
 import { usePaciente } from "../../../../context/PacienteContext"
 
@@ -8,33 +11,31 @@ const ReciboPagamento = () => {
     const printRef = useRef()
     const [reciboPagamento, setReciboPagamento] = useState()
     const [valorPorExtenso, setValorPorExtenso] = useState()
+    const [isLoading, setIsLoading] = useState(false)
     const { dadosPaciente } = usePaciente()
     const { user } = useAuth()
     const dadosEmpresa = user?.user?.foundUser
+    const router = useRouter()
 
     useEffect(() => {
-        const data = sessionStorage.getItem('viewReciboPagamento')
-        setReciboPagamento(JSON.parse(data))
-        console.log("dadosempresa", dadosEmpresa)
+        const carregarValores = () => {
+            const data = sessionStorage.getItem('viewReciboPagamento')
+            setReciboPagamento(JSON.parse(data))
+            setIsLoading(true)
+        }
+        carregarValores()
     }, [])
+
+    useEffect(() => {
+        console.log("dadosPaciente",JSON.stringify(dadosPaciente))
+    }, dadosPaciente)
 
     useEffect(() => {
         if (reciboPagamento !== null && reciboPagamento !== undefined) {
             const words = n2words(reciboPagamento?.valor, { lang: 'pt' });
             setValorPorExtenso(words)
         }
-    }, [reciboPagamento]);
-
-    const receiptInfo = {
-        companyLogo: "/logo.png",
-        companyName: "Empresa Exemplo Ltda.",
-        receiptNumber: "12345",
-        amountReceived: "R$ 1.000,00",
-        date: "31/08/2024",
-        payerName: "João da Silva",
-        payerCPF: "123.456.789-00",
-    }
-
+    }, [reciboPagamento])
 
     const handlePrint = () => {
         const printContents = printRef.current.innerHTML
@@ -45,7 +46,7 @@ const ReciboPagamento = () => {
     }
 
     const receiptVia = (index) => (
-        <div key={index} className="border border-gray-300 p-1 mb-1">
+        < div key={index} className="border border-gray-300 p-1 mb-1" >
 
             <div className="flex flex-column gap-10">
                 <div className="flex items-center ml-20">
@@ -56,7 +57,7 @@ const ReciboPagamento = () => {
                 <div>
                     <div className="text-xl font-semibold">{dadosEmpresa?.nome_fantasia}</div>
                     <p> <span className="font-semibold">CNPJ: </span>{maskCPF_CNPJ(dadosEmpresa?.cnpj_cpf)}</p>
-                    <p>{dadosEmpresa?.endereco}</p>
+                    <p>{`${dadosEmpresa?.logradouro} ${dadosEmpresa?.bairro} ${dadosEmpresa?.cidade} ${dadosEmpresa?.uf}`}</p>
                     <p>{dadosEmpresa?.cep}</p>
                     <p>{dadosEmpresa?.email}</p>
                     <p className="basis-1/4">Recibo Nº: <span className="font-semibold">{reciboPagamento?.id_pagamento}</span></p>
@@ -68,23 +69,28 @@ const ReciboPagamento = () => {
                 <div className="flex flex-row w-full justify-center mb-5">
 
                 </div>
-                <p>Recebemos de {dadosPaciente?.nome}, com CPF {maskCPF_CNPJ(dadosPaciente?.cpf)}, a quantidade de {valorPorExtenso} reais, referente a tratamento odontológico e por ser verdade,
+                <p>Recebemos de {reciboPagamento?.nome}, com CPF {maskCPF_CNPJ(reciboPagamento?.cpf)}, a quantidade de {valorPorExtenso} reais, referente a tratamento odontológico e por ser verdade,
                     afirmamos o presente recibo.
                 </p>
             </div>
 
             <div className="flex justify-between items-end mt-3">
                 <div className="text-right">
-                    <p>Data: <span className="font-semibold">{receiptInfo.date}</span></p>
+                    <p>Data: <span className="font-semibold">{moment(reciboPagamento?.dt_recebimento).format("DD/MM/YYYY") ?? ''}</span></p>
                 </div>
                 <div className="border-t border-gray-400 w-48 text-center mt-2">
                     <p>Assinatura</p>
                 </div>
             </div>
-        </div>
-    );
+        </div >
+    )
+
+    if (reciboPagamento === '') {
+        return <LoadingOverlay isLoading={true} />
+    }
 
     return (
+
         <>
             <div className="flex items-center justify-center w-full m-5">
                 <button
@@ -94,7 +100,7 @@ const ReciboPagamento = () => {
                 </button>
             </div>
             <div ref={printRef} className="container mx-auto mt-8">
-                {[1, 2, 3].map((via) => receiptVia(via))}
+                {[1].map((via) => receiptVia(via))}
             </div>
         </>
     )

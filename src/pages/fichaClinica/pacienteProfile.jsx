@@ -16,7 +16,7 @@ const PacienteProfile = () => {
     const [paciente, setPaciente] = useState({})
     const [isLoading, setIsloading] = useState(true)
     const { procedimento, loading, getProcedimentoList } = useContext(FichaClinicaContext)
-    const { idPaciente, idEmpresa } = usePaciente()
+    const { idPaciente, idEmpresa, dadosPaciente } = usePaciente()
     const [show, setShow] = useState(false)
     const [numeroDente, setNumeroDente] = useState()
     const payload = {
@@ -190,7 +190,7 @@ const PacienteProfile = () => {
                             id="tabs-pagamento"
                             role="tabpanel"
                             aria-labelledby="tabs-pagamento-tab">
-                            <ListaPagamento id_paciente={idPaciente} />
+                            <ListaPagamento dadosPaciente={dadosPaciente} />
                         </div>
                     </div>
 

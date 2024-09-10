@@ -19,10 +19,10 @@ const agenda = () => {
     await api
       .get(`agenda/${id_empresa}`)
       .then((response) => {
-        setEvents([events, ...response.data]);
+        setEvents([events, ...response.data])
       })
       .catch(function (error) {
-        console.error(error);
+        console.error(error)
       })
     setIsLoading(false)
   };

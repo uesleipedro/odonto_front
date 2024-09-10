@@ -3,7 +3,7 @@ import "tw-elements/dist/css/tw-elements.min.css"
 import Sidebar from '../components/Sidebar'
 import Header from '../components/Header'
 import { useRouter } from 'next/router';
-import { useAuth, AuthProvider } from '../auth/useAuth'
+import { AuthProvider } from '../auth/useAuth'
 import { PacienteProvider } from '../context/PacienteContext';
 import { FichaClinicaProvider } from '../context/FichaClinicaContext'
 import MenuHamburger from '../components/MenuHamburger'
@@ -23,7 +23,6 @@ export default function App({ Component, pageProps }) {
 
   return (
     <div className={roboto.className}>
-
       <AuthProvider>
         <PacienteProvider>
           <FichaClinicaProvider>

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react"
 import Link from "next/link"
-import api from "../../utils/Api"
+import api from "../../../utils/Api"
 import Swal from "sweetalert2"
 import { useRouter } from 'next/router'
-import { useAuth } from '../../auth/useAuth'
+import { useAuth } from '../../../auth/useAuth'
 
 const CadastroUsuario = () => {
     const router = useRouter()
@@ -57,7 +57,7 @@ const CadastroUsuario = () => {
                 console.error(e.error)
             })
         sessionStorage.removeItem('cadastroUsuario')
-        router.push('/usuario/listaUsuarios')
+        router.push('/opcoes/usuario/listaUsuarios')
     }
 
     const saveUser = async () => {
@@ -79,7 +79,7 @@ const CadastroUsuario = () => {
                 console.error(e.error)
             })
         sessionStorage.removeItem('cadastroUsuario')
-        router.push('/usuario/listaUsuarios')
+        router.push('/opcoes/usuario/listaUsuarios')
     }
 
     const sendUser = async () => {
@@ -156,10 +156,10 @@ const CadastroUsuario = () => {
                     Salvar
                 </button>
 
-                <Link href="/usuario/listaUsuarios">
+                <Link href="/opcoes/usuario/listaUsuarios">
                     <button
                         className="bg-white hover:bg-gray-200 text-purple-800 border font-bold py-2 px-4 rounded-full mt-5">
-                        Cancelar
+                        Voltar
                     </button>
                 </Link>
             </div>
