@@ -1,9 +1,11 @@
+import { useMemo } from "react"
 import FullCalendar from "@fullcalendar/react"
 import dayGridPlugin from "@fullcalendar/daygrid"
 import timeGridPlugin from "@fullcalendar/timegrid"
 import interactionPlugin from "@fullcalendar/interaction"
 import ptBr from "@fullcalendar/core/locales/pt-br"
 import moment from "moment"
+import Select from "react-select"
 import { useEffect, useState } from "react"
 import api from "../../utils/Api"
 import ModalCadastroAgenda from "./modalCadastroAgenda"
@@ -13,9 +15,10 @@ import { useAuth } from "../../auth/useAuth"
 
 const RenderCalendar = ({ events, updateEvents }) => {
   const { user } = useAuth()
-  const id_empresa = user?.user?.foundUser.id_empresa 
+  const id_empresa = user?.user?.foundUser.id_empresa
   const [modal, setModal] = useState(false)
   const [paciente, setPaciente] = useState([])
+  const [searchVal, setSearchVal] = useState({})
   const [insertUpdate, setInsertUpdate] = useState('')
   const payload = {
     id_empresa,
@@ -27,21 +30,38 @@ const RenderCalendar = ({ events, updateEvents }) => {
   useEffect(() => {
     const init = async () => {
       const { Modal, Ripple, Datepicker, Input, Datetimepicker, initTE } =
-        await import("tw-elements");
+        await import("tw-elements")
       initTE({
         Modal,
         Ripple,
         Datepicker,
         Input,
         Datetimepicker,
-      });
-    };
-    init();
+      })
+    }
+    init()
   }, [])
 
   const limparAgendamento = () => {
     setAgendamento(payload)
   }
+
+  const setProfissional = (e) => {
+    setSearchVal({
+      value: e.id_profissional,
+      label: e.nome_profissional
+    })
+  }
+
+  const filteredEvents = useMemo(() => {
+    if (searchVal.value === undefined) {
+      return events
+    }
+
+    return events.filter(dataItem => {
+      return dataItem.id_profissional === searchVal?.value
+    })
+  }, [events, searchVal])
 
   const updateDataHora = async (agendamento) => {
     await api
@@ -52,7 +72,7 @@ const RenderCalendar = ({ events, updateEvents }) => {
         }
       })
       .catch((e) => {
-        console.error(e);
+        console.error(e)
       })
   }
 
@@ -135,8 +155,29 @@ const RenderCalendar = ({ events, updateEvents }) => {
     })
   }
 
+  const SelectProfissional = () => {
+    return (
+      <div className="m-3 w-96">
+        <label for="paciente" className="text-sm font-medium text-gray-500 dark:text-gray-300">
+          Profissional
+        </label>
+        <Select
+          name="profissional"
+          id="profissional"
+          getOptionLabel={option => option.nome_profissional}
+          getOptionValue={option => option.id_profissional}
+          options={events}
+          value={{ id_profissional: searchVal?.value, nome_profissional: searchVal?.label }}
+          placeholder="Profissional"
+          onChange={(e) => setProfissional(e)}
+        />
+      </div>
+    )
+  }
+
   return (
     <div>
+      <SelectProfissional />
       <FullCalendar
         locales={[ptBr]}
         locale="pt-br"
@@ -160,7 +201,7 @@ const RenderCalendar = ({ events, updateEvents }) => {
         }}
         selectable
         editable
-        eventSources={events}
+        eventSources={filteredEvents}
         // {[
         //   {
         //     events,

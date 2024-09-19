@@ -24,11 +24,18 @@ const ListaOrcamento = ({ id_paciente, id_empresa }) => {
         getOrcamentoList()
     }
 
+    const statusColor = {
+        "finalizado": "text-success",
+        "Pendente pagamento": "text-warning",
+        "Cancelado": "text-danger",
+    }
+
+
     const handleDeleteOrcamento = async (id_orcamento, id_paciente) => {
         await api.delete(`orcamento/${id_orcamento}`)
             .then(async response => {
                 await estornaProcedimento(id_orcamento)
-                let a = await deletePagamento(id_orcamento)
+                await deletePagamento(id_orcamento)
                 await deleteProcedimentoOrcamentoByOrcamento(id_orcamento)
 
                 if (response.status === 204)
@@ -121,7 +128,7 @@ const ListaOrcamento = ({ id_paciente, id_empresa }) => {
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{moment(data.date).format('DD/MM/YYYY')}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.nome_profissional}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{formatarMoedaBRL(data?.preco)}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.status}</td>
+                                                <td className={`px-6 py-4 whitespace-nowrap text-sm font-bold ${statusColor[data.status]}`}>{data.status}</td>
                                                 <td className="flex flex-row gap-3 px-6 py-4 whitespace-nowrap text-right text-md font-medium">
 
                                                     <a href={`/fichaClinica/view/orcamentoView/${data.id_orcamento}`} target="_blank" className="text-purple-800 hover:text-purple-900">

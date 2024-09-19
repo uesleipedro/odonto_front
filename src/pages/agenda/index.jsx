@@ -25,12 +25,14 @@ const agenda = () => {
         console.error(error)
       })
     setIsLoading(false)
-  };
+  }
 
   return (
     <div>
       <LoadingOverlay isLoading={isLoading} />
-      <RenderCalendar events={events} updateEvents={getEvents} />
+      <RenderCalendar
+        events={events}
+        updateEvents={getEvents} />
     </div>
   )
 }

@@ -7,6 +7,7 @@ const SubMenu = () => {
     const menuItems = [
         { name: 'Usuário', link: '/opcoes/usuario/listaUsuarios' },
         { name: 'Nível Acesso', link: '/opcoes/nivelAcesso/listaNivelAcesso' },
+        { name: 'Credenciais Boleto', link: '/opcoes/boleto/credenciais' },
     ]
 
     const handleClick = async (item) => {

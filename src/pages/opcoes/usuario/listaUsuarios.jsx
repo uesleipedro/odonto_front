@@ -1,7 +1,5 @@
 import React, { use, useEffect, useState, useMemo } from "react"
-import { FaPencilAlt, FaBookMedical, FaTrashAlt } from "react-icons/fa"
-import { BiSolidFileDoc } from "react-icons/bi"
-import { MdAttachMoney } from "react-icons/md"
+import { FaPencilAlt, FaTrashAlt } from "react-icons/fa"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import Swal from 'sweetalert2'
@@ -31,7 +29,7 @@ const ListaUsuarios = () => {
                 setUsers([...users, ...response.data])
             })
             .catch(function (error) {
-                console.error(error);
+                console.error(error)
             })
     }
 
@@ -42,7 +40,7 @@ const ListaUsuarios = () => {
                     return
             })
             .catch(error => {
-                console.error(error);
+                console.error(error)
             })
         router.refresh()
     }

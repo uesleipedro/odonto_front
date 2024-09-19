@@ -1,15 +1,15 @@
-import { useEffect, useState, useMemo, useContext } from "react"
-import { FaCheck, FaEye } from "react-icons/fa"
+import { useEffect, useState, useContext } from "react"
+import { FaCheck, FaEye, FaBarcode } from "react-icons/fa"
 import { ImCancelCircle } from "react-icons/im"
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import moment from "moment"
-import Link from "next/link"
 import { useRouter } from 'next/router'
 import api from "../../utils/Api"
 import GeraOrcamento from "./geraOrcamento"
 import { FichaClinicaContext } from '../../context/FichaClinicaContext'
 import Toast from '../../components/Toast'
+import LoadingOverlay from "../../components/LoadingOverlay"
 
 const ListaPagamento = ({ dadosPaciente }) => {
 
@@ -18,6 +18,7 @@ const ListaPagamento = ({ dadosPaciente }) => {
     const [modal, setModal] = useState(false)
     const [dadosPagamento, setDadosPagamento] = useState({ "status": "Pago" })
     const [showToast, setShowToast] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
     const router = useRouter()
 
     //Necessário para funcionamento das abas
@@ -27,12 +28,19 @@ const ListaPagamento = ({ dadosPaciente }) => {
             initTE({ Datepicker, Input, Modal, Ripple, TEToast, Tab })
         };
         init()
+
     }, [])
 
     const toCurrency = (num) => {
         return ('R$ ' + num
             ?.toString()
             ?.replace('.', ','))
+    }
+
+    const status = {
+        Pago: "text-success",
+        Pendente: "text-warning",
+        Cancelado: "text-danger",
     }
 
     const finalizarPagamento = async () => {
@@ -69,6 +77,40 @@ const ListaPagamento = ({ dadosPaciente }) => {
         getPagamentoList()
     }
 
+    const handleGeraBoleto = async (e) => {
+        setIsLoading(true)
+        if (!dadosPaciente.nome || !dadosPaciente.cpf) {
+            Swal.fire("O nome e CPF do paciente devem estar cadastrado para emissão de boletos")
+            return
+        }
+
+        await api.post(`/efi/createBoleto`, {
+            dadosPagamento: e,
+            dadosBoleto: {
+                items: [
+                    {
+                        name: "Tratamento clínico",
+                        value: Number(String(e.valor.toFixed(2)).replace('.', '')),
+                        amount: 1
+                    }
+                ],
+                payment: {
+                    banking_billet: {
+                        expire_at: moment(e.dt_vencimento).format("YYYY-MM-DD"),
+                        customer: {
+                            name: dadosPaciente.nome,
+                            cpf: dadosPaciente.cpf
+                        }
+                    }
+                }
+            }
+        })
+            .then((res) => {
+                window.open(res.data?.data?.billet_link, '_blank')
+            })
+        setIsLoading(false)
+    }
+
     const MySwal = withReactContent(Swal)
     const showSwalWithLink = (id_pagamento, id_parcela) => {
         MySwal.fire({
@@ -89,6 +131,7 @@ const ListaPagamento = ({ dadosPaciente }) => {
 
     return (
         <div className="m-5 p-5  rounded-lg shadow-lg">
+            <LoadingOverlay isLoading={isLoading} />
             <div className="mb-5 flex flex-row flex-wrap w-full justify-between items-center">
 
             </div>
@@ -117,7 +160,7 @@ const ListaPagamento = ({ dadosPaciente }) => {
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{moment(data.dt_vencimento).format('DD/MM/YYYY')}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{toCurrency(data.valor)}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.dt_recebimento && moment(data.dt_recebimento).format('DD/MM/YYYY')}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.status}</td>
+                                                <td className={`px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold ${status[data.status]}`}>{data.status}</td>
                                                 <td className="flex flex-row gap-3 px-6 py-4 whitespace-nowrap text-right text-md font-medium">
 
                                                     <a className="text-purple-800 hover:text-purple-900" title="Confirmar pagamento" href="#"
@@ -145,6 +188,20 @@ const ListaPagamento = ({ dadosPaciente }) => {
                                                     >
                                                         <ImCancelCircle />
                                                     </a>
+                                                    {data.forma_pagamento === 5 &&
+                                                        <a className="text-purple-800 hover:text-purple-900" title="Gerar Boleto" rel="noopener noreferrer" href="#"
+                                                            onClick={() => {
+                                                                if (data.link_boleto) {
+                                                                    window.open(data.link_boleto, '_blank')
+                                                                    return
+                                                                }
+
+                                                                handleGeraBoleto(data)
+                                                            }}
+                                                        >
+                                                            <FaBarcode />
+                                                        </a>
+                                                    }
                                                 </td>
                                             </tr>
                                         ))}

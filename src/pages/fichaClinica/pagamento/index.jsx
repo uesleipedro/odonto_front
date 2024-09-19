@@ -9,20 +9,14 @@ import { registerLocale, setDefaultLocale } from 'react-datepicker'
 import Swal from "sweetalert2"
 import ptBR from 'date-fns/locale/pt-BR'
 import 'react-datepicker/dist/react-datepicker.css'
-import { formatarMoedaBRL, porcentagemMask, teste } from "../../../utils/mask";
+import { formatarMoedaBRL } from "../../../utils/mask";
 
 registerLocale('pt-BR', ptBR)
 setDefaultLocale('pt-BR')
 
 const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empresa }) => {
 
-    const [formaPagamento, setFormaPagamento] = useState([
-        { label: "Dinheiro", value: 1 },
-        { label: "Transferência ou PIX", value: 2 },
-        { label: "Cartão de crédito", value: 3 },
-        { label: "Cartão de débito", value: 4 },
-        { label: "outro", value: 5 },
-    ])
+    const [formaPagamento, setFormaPagamento] = useState([])
     const [parcelas, setParcelas] = useState([
         { label: 1, value: 1 },
         { label: 2, value: 2 },
@@ -44,7 +38,7 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
         tipo_desconto: "real"
     })
     const [idPagamento, setIdPagamento] = useState(0)
-    const { getPagamentoList, getOrcamentoList, idEmpresa } = useContext(FichaClinicaContext)
+    const { getPagamentoList, getOrcamentoList } = useContext(FichaClinicaContext)
     const [loadingOverlay, setLoadingOverlay] = useState(false)
     const [primeiroVencimento, setPrimeiroVencimento] = useState(moment(new (Date)).format("YYYY-MM-DD"))
     const [valorFinal, setValorFinal] = useState(orcamento?.preco)
@@ -52,21 +46,30 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
     useEffect(() => {
         const init = async () => {
             const { Collapse, initTE } =
-                await import("tw-elements");
+                await import("tw-elements")
             initTE({
                 Collapse,
                 initTE,
-            });
+            })
         }
 
-
         init()
+    }, [])
+
+    useEffect(() => {
+        getFormaPagamento()
     }, [])
 
     useEffect(() => {
         calculoTotal()
     }, [dados?.desconto])
 
+    const getFormaPagamento = () => {
+        api.get(`formaPagamento`)
+            .then(res => {
+                setFormaPagamento([...res.data])
+            })
+    }
 
     const calculoTotal = async () => {
         let valor_com_desconto = await calculoDesconto(orcamento?.preco)
@@ -112,7 +115,8 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
                 valor_total: toDecimalNumeric(orcamento?.preco),
                 status: "Aberto",
                 id_paciente: orcamento?.id_paciente,
-                valor_total: orcamento?.preco
+                valor_total: orcamento?.preco,
+                forma_pagamento: dados?.forma_pagamento
             }
         )
             .then(async function (response) {
@@ -137,7 +141,8 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
                 dt_vencimento: contas.dt_vencimento,
                 status: "Pendente",
                 id_paciente: contas.id_paciente,
-                id_empresa: id_empresa
+                id_empresa: id_empresa,
+                forma_pagamento: dados?.forma_pagamento
             }
         )
             .then(async function (response) {
@@ -155,6 +160,8 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
             ...existingValues,
             [fieldName]: e.target.value,
         }))
+
+        console.log("updateField", dados)
     }
 
     const changeDate = (date) => {
@@ -274,16 +281,16 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
                             <Select
                                 className="text-gray-500 w-12/12"
                                 name="paciente"
+                                getOptionLabel={option => option.descricao}
+                                getOptionValue={option => option.id_forma_pagamento}
                                 options={formaPagamento}
                                 placeholder="Forma de pagamento"
                                 required
                                 onChange={(e) => {
-                                    updateField({
-                                        target: {
-                                            name: "forma_pagamento",
-                                            value: e.value,
-                                        },
-                                    });
+                                    setDados(existingValues => ({
+                                        ...existingValues,
+                                        ["forma_pagamento"]: e.id_forma_pagamento,
+                                    }))
                                 }}
                             />
                         </div>

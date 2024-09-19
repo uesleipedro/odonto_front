@@ -56,13 +56,13 @@ const ModalCadastroAgenda = ({ toogleModal, agendamentoData, insertUpdate, updat
 
     const updateField = (e) => {
         if (typeof e?.target?.name === "undefined") return
-        const fieldName = e.target.name;
+        const fieldName = e.target.name
 
         if (fieldName == "start" || fieldName == "end") {
             setAgendamento((existingValues) => ({
                 ...existingValues,
                 [fieldName]: moment(e.target.value).format("YYYY-MM-DD HH:mm"),
-            }));
+            }))
 
             return
         }
@@ -98,7 +98,6 @@ const ModalCadastroAgenda = ({ toogleModal, agendamentoData, insertUpdate, updat
             .post("agenda", agendamento)
             .then(async function (response) {
                 if (response.status === 201) {
-                    // await sendWppMessage()
                     toogleModal()
                 }
             })
