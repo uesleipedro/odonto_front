@@ -9,7 +9,7 @@ async function getUserRole(req) {
 }
 
 const startsWithAny = async (url, prefixes) => {
-
+console.log('<><>', url, prefixes)
     if (prefixes === null) return true
 
     for (const prefix of prefixes) {

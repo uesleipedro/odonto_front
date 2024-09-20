@@ -6,15 +6,11 @@ export const protectedRoutes = [
     "/financeiro",
     "/fichaClinica",
     "/opcoes",
-    "/opcoes/usuario/listaUsuarios",
-    "/opcoes/usuario/cadastroUsuarioInterno",
-    "/opcoes/nivelAcesso/listaNivelAcesso",
-    "/opcoes/nivelAcesso/cadastroNivelAcesso",
-    "/opcoes/boleto/credenciais",
     "/usuario"
 ]
 export const authRoutes = ["/login",]
-export const publicRoutes = ["/about",
+export const publicRoutes = [
+    "/about",
     "/usuario/cadastroUsuario",
     "/fichaClinica/view/orcamentoView/[id_orcamento]",
     "/usuario/redefinirSenha/[email]"

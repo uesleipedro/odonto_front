@@ -2,12 +2,12 @@ import '../styles/globals.css'
 import "tw-elements/dist/css/tw-elements.min.css"
 import Sidebar from '../components/Sidebar'
 import Header from '../components/Header'
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/router'
 import { AuthProvider } from '../auth/useAuth'
-import { PacienteProvider } from '../context/PacienteContext';
+import { PacienteProvider } from '../context/PacienteContext'
 import { FichaClinicaProvider } from '../context/FichaClinicaContext'
 import MenuHamburger from '../components/MenuHamburger'
-import { noNavegable } from '../router/routes';
+import { noNavegable } from '../router/routes'
 import { Roboto } from 'next/font/google'
 
 const roboto = Roboto({

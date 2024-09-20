@@ -202,13 +202,6 @@ const RenderCalendar = ({ events, updateEvents }) => {
         selectable
         editable
         eventSources={filteredEvents}
-        // {[
-        //   {
-        //     events,
-        //     color: "blue", // Cor da agenda de trabalho (azul)
-        //     textColor: '#ffffff', // Cor do texto
-        //   }
-        // ]}
         select={handleSelect}
         eventClick={handleEventClick}
         eventDrop={alteraData}
@@ -235,5 +228,5 @@ const RenderCalendar = ({ events, updateEvents }) => {
   );
 };
 
-export default RenderCalendar;
+export default RenderCalendar
 
