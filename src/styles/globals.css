@@ -47,9 +47,9 @@
 /* Botões de navegação no toolbar */
 .fc .fc-button {
   background-color: #4c1d95 !important;
-  /* purple-900 */
+ 
   color: #f3f4f6 !important;
-  /* gray-100 */
+ 
   border: none !important;
   border-radius: 4px !important;
   padding: 5px 10px !important;
@@ -87,51 +87,49 @@
 
 
 /* Estilos gerais da toolbar */
-.fc .fc-toolbar {
+/* .fc .fc-toolbar {
   display: flex !important;
   flex-wrap: wrap !important;
-  /* Permite que os elementos sejam quebrados em múltiplas linhas */
   justify-content: space-between !important;
-  /* Espaça os elementos na linha */
   padding: 10px !important;
-}
+} */
 
 /* Cada grupo de elementos da toolbar */
-.fc .fc-toolbar>.fc-toolbar-chunk {
+/* .fc .fc-toolbar>.fc-toolbar-chunk {
   flex: 1 1 100% !important;
-  /* Garante que cada grupo ocupe 100% da largura em telas menores */
+  
   text-align: center !important;
-  /* Centraliza o conteúdo */
+  
   margin-bottom: 10px !important;
-  /* Adiciona espaço entre as linhas */
-}
+  
+} */
 
 /* Ajustes para botões individuais em dispositivos móveis */
-@media (max-width: 600px) {
+/* @media (max-width: 600px) {
   .fc .fc-toolbar button {
     flex: 1 1 100% !important;
-    /* Faz com que os botões ocupem 100% da largura do container */
+   
     margin-bottom: 5px !important;
-    /* Espaçamento entre os botões */
+   
   }
-}
+} */
 
 /* Customizações adicionais (opcional) */
 .fc .fc-toolbar-title {
-  font-size: 1.25rem !important;
+  /* font-size: 1.25rem !important; */
   /* Ajuste o tamanho da fonte do título conforme necessário */
 }
 
 
 /* Botão incluir  */
-.fc-toolbar-chunk {
+/* .fc-toolbar-chunk {
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
   justify-content: left !important;
   gap: 10px !important;
   left: 0 !important;
-}
+} */
 
 .fc-day-today {
   background: #f1ebfc !important;
@@ -153,7 +151,7 @@
   padding: 0 !important;
   vertical-align: top !important;
 } */
-.fc-button {
+/* .fc-button {
   display: inline-block !important;
   position: relative !important;
   cursor: pointer !important;
@@ -189,15 +187,15 @@
   overflow: hidden !important;
   -webkit-transition: box-shadow .4s cubic-bezier(.25, .8, .25, 1), background-color .4s cubic-bezier(.25, .8, .25, 1) !important;
   transition: box-shadow .4s cubic-bezier(.25, .8, .25, 1), background-color .4s cubic-bezier(.25, .8, .25, 1) !important;
-}
+} */
 
-@media (min-width:600px) {
+/* @media (min-width:600px) {
   .fc-scrollgrid-sync-inner a {
     font-size: 20px !important;
   }
-}
+} */
 
 /* DATAPICKER */
-.react-datepicker-wrapper {
+/* .react-datepicker-wrapper {
   width: 100% !important;
-}
+} */

@@ -157,7 +157,7 @@ const RenderCalendar = ({ events, updateEvents }) => {
 
   const SelectProfissional = () => {
     return (
-      <div className="m-3 w-96">
+      <div className="m-3 w-96 index-99">
         <label for="paciente" className="text-sm font-medium text-gray-500 dark:text-gray-300">
           Profissional
         </label>
@@ -185,7 +185,7 @@ const RenderCalendar = ({ events, updateEvents }) => {
         initialView="timeGridWeek"
         headerToolbar={{
           left: "prev,today,next",
-          center: "title",
+          // center: "title",
           right: "dayGridMonth,timeGridWeek,timeGridDay customButton",
         }}
         customButtons={{
