@@ -157,11 +157,14 @@ const RenderCalendar = ({ events, updateEvents }) => {
 
   const SelectProfissional = () => {
     return (
-      <div className="m-3 w-96 index-99">
+      <div className="m-3 w-96">
         <label for="paciente" className="text-sm font-medium text-gray-500 dark:text-gray-300">
           Profissional
         </label>
         <Select
+          styles={{
+            menu: provided => ({ ...provided, zIndex: 9999 })
+          }}
           name="profissional"
           id="profissional"
           getOptionLabel={option => option.nome_profissional}
@@ -178,55 +181,58 @@ const RenderCalendar = ({ events, updateEvents }) => {
   return (
     <div>
       <SelectProfissional />
-      <FullCalendar
-        locales={[ptBr]}
-        locale="pt-br"
-        plugins={[dayGridPlugin, interactionPlugin, timeGridPlugin]}
-        initialView="timeGridWeek"
-        headerToolbar={{
-          left: "prev,today,next",
-          // center: "title",
-          right: "dayGridMonth,timeGridWeek,timeGridDay customButton",
-        }}
-        customButtons={{
-          customButton: {
-            text: 'Incluir Agendamento',
-            click: () => handleSelect({
-              info: {
-                startStr: new Date,
-                endStr: new Date
-              }
-            })
-          }
-        }}
-        selectable
-        editable
-        eventSources={filteredEvents}
-        select={handleSelect}
-        eventClick={handleEventClick}
-        eventDrop={alteraData}
-        eventResize={alteraData}
-        eventTimeFormat={{
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit',
-          meridiem: false,
-          hour12: false
-        }}
-      />
-
-      {modal && (
-        <ModalCadastroAgenda
-          paciente={paciente}
-          toogleModal={() => toogleModal()}
-          agendamentoData={agendamento}
-          insertUpdate={insertUpdate}
-          updateEvents={updateEvents}
+      <div className="z-0">
+        <FullCalendar
+          locales={[ptBr]}
+          locale="pt-br"
+          plugins={[dayGridPlugin, interactionPlugin, timeGridPlugin]}
+          initialView="timeGridWeek"
+          headerToolbar={{
+            left: "prev,today,next",
+            // center: "title",
+            right: "dayGridMonth,timeGridWeek,timeGridDay customButton",
+          }}
+          customButtons={{
+            customButton: {
+              text: 'Incluir Agendamento',
+              click: () => handleSelect({
+                info: {
+                  startStr: new Date,
+                  endStr: new Date
+                }
+              })
+            }
+          }}
+          selectable
+          editable
+          eventSources={filteredEvents}
+          select={handleSelect}
+          eventClick={handleEventClick}
+          eventDrop={alteraData}
+          eventResize={alteraData}
+          eventTimeFormat={{
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            meridiem: false,
+            hour12: false
+          }}
         />
-      )}
+
+        {modal && (
+          <ModalCadastroAgenda
+            paciente={paciente}
+            toogleModal={() => toogleModal()}
+            agendamentoData={agendamento}
+            insertUpdate={insertUpdate}
+            updateEvents={updateEvents}
+          />
+
+        )}
+      </div>
     </div>
-  );
-};
+  )
+}
 
 export default RenderCalendar
 
