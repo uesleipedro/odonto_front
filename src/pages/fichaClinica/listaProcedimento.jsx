@@ -49,6 +49,7 @@ const ListaProcedimento = ({ id_paciente, id_empresa }) => {
     const updateProcedimento = async (id_procedimento) => {
         let procedimentoFiltrado = await procedimento.filter(dataItem => dataItem.id_procedimento === id_procedimento)
         setPost(procedimentoFiltrado[0])
+        setEvolucao(procedimentoFiltrado[0])
         toogleShow()
     }
 
@@ -60,7 +61,7 @@ const ListaProcedimento = ({ id_paciente, id_empresa }) => {
             estado: 'A realizar',
             adicionado: moment(Date()).format('YYYY-MM-DD'),
             id_paciente: Number(id_paciente),
-            preco: "R$ 0,00"
+            preco: 0
         })
         toogleShow()
     }
@@ -117,11 +118,11 @@ const ListaProcedimento = ({ id_paciente, id_empresa }) => {
                                 estado: 'A realizar',
                                 adicionado: moment(Date()).format('YYYY-MM-DD'),
                                 id_paciente: Number(id_paciente),
-                                preco: "R$ 0,00"
+                                preco: 0
                             })
                             setToggleInsertUpdate('insert')
                             toogleShow()
-                        }} className="bg-purple-800 hover:bg-purple-500 rounded-lg p-2 text-white font-bold">
+                        }} className="bg-success hover:bg-success-600 rounded-lg p-2 text-white font-bold">
                             Novo procedimento
                         </button>
 
@@ -140,12 +141,14 @@ const ListaProcedimento = ({ id_paciente, id_empresa }) => {
                         Evolução
                     </h2>
                     <div className="flex flex-col justify-center">
-                        {/* <p className="p-4">O paciente não possui evoluções adicionadas.</p> */}
                         <button onClick={() => toogleShowCadastroEvolucoes(null)}
-                            className="bg-purple-800 hover:bg-purple-500 rounded-full w-10 h-10 text-white font-bold mb-5"
+                            className="bg-success hover:bg-success-600 rounded-full w-10 h-10 text-white font-bold mb-5"
                         >+</button>
                         <div className=" pl-5 border rounded-lg shadow overflow-scroll max-h-96">
+                            {/* {evolucoes
+                                ? <p className="p-4">O paciente não possui evoluções adicionadas.</p> */}
                             <TimeLine evolucoes={evolucoes} getEvolucoes={getEvolucoes} />
+                            {/* } */}
                         </div>
 
                     </div>

@@ -83,7 +83,7 @@ const ListaPacientes = () => {
             <div className="mb-5 flex flex-row flex-wrap w-full justify-between items-center">
                 <input type="text" onChange={e => setSearchVal(e.target.value)} className="form-input mr-4 rounded-lg text-gray-600" placeholder="Buscar paciente" />
                 <Link onClick={() => sessionStorage.removeItem("cadastroPacientes")} href="./cadastroPacientes">
-                    <button className="bg-purple-800 hover:bg-purple-500 rounded-lg p-2 text-white font-bold">
+                    <button className="bg-success hover:bg-success-700 rounded-lg p-2 text-white font-bold">
                         Novo paciente
                     </button>
                 </Link>
@@ -128,11 +128,11 @@ const ListaPacientes = () => {
                                                         sessionStorage.removeItem("cadastroPacientes")
                                                         sessionStorage.setItem('cadastroPacientes', JSON.stringify(data))
                                                     }}
-                                                    className="text-purple-800 hover:text-purple-900"
+                                                    className="text-warning hover:text-warning-800"
                                                 >
                                                     <FaPencilAlt />
                                                 </Link>
-                                                <a className="text-purple-800 hover:text-purple-900" href="#"
+                                                <a className="text-danger hover:text-danger-800" href="#"
                                                     onClick={() => showSwalWithLink(data.id_paciente)}
                                                 >
                                                     <FaTrashAlt />

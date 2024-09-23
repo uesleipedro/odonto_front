@@ -14,18 +14,19 @@ import withReactContent from 'sweetalert2-react-content'
 import { useAuth } from "../../auth/useAuth"
 
 const RenderCalendar = ({ events, updateEvents }) => {
-  const { user } = useAuth()
-  const id_empresa = user?.user?.foundUser.id_empresa
+  let { user } = useAuth()
+  user = user?.user?.foundUser
   const [modal, setModal] = useState(false)
   const [paciente, setPaciente] = useState([])
   const [searchVal, setSearchVal] = useState({})
   const [insertUpdate, setInsertUpdate] = useState('')
   const payload = {
-    id_empresa,
+    id_empresa: user.id_empresa,
     status: 3,
     dia_inteiro: false,
   }
   const [agendamento, setAgendamento] = useState(payload)
+  const [listaProfissionais, setListaProfissionais] = useState()
 
   useEffect(() => {
     const init = async () => {
@@ -42,6 +43,27 @@ const RenderCalendar = ({ events, updateEvents }) => {
     init()
   }, [])
 
+  useEffect(() => {
+    if(!user.acessa_todas_agendas){
+      setSearchVal({
+        value: user.id_user,
+        label: ""
+      })
+      setListaProfissionais([{id_profissional: user.id_user, nome_profissional: user?.nome}])
+      return
+    }
+
+    setSearchVal({
+      value: 0,
+      label: "Todos"
+    })
+
+    let arr = events
+    arr.splice(0, 1)
+    arr.unshift({ id_profissional: 0, nome_profissional: "Todos" })
+    setListaProfissionais(arr)
+  }, [events])
+
   const limparAgendamento = () => {
     setAgendamento(payload)
   }
@@ -54,7 +76,7 @@ const RenderCalendar = ({ events, updateEvents }) => {
   }
 
   const filteredEvents = useMemo(() => {
-    if (searchVal.value === undefined) {
+    if (searchVal.value === 0 || searchVal.value === undefined) {
       return events
     }
 
@@ -157,23 +179,38 @@ const RenderCalendar = ({ events, updateEvents }) => {
 
   const SelectProfissional = () => {
     return (
-      <div className="m-3 w-96">
-        <label for="paciente" className="text-sm font-medium text-gray-500 dark:text-gray-300">
-          Profissional
-        </label>
-        <Select
-          styles={{
-            menu: provided => ({ ...provided, zIndex: 9999 })
-          }}
-          name="profissional"
-          id="profissional"
-          getOptionLabel={option => option.nome_profissional}
-          getOptionValue={option => option.id_profissional}
-          options={events}
-          value={{ id_profissional: searchVal?.value, nome_profissional: searchVal?.label }}
-          placeholder="Profissional"
-          onChange={(e) => setProfissional(e)}
-        />
+      <div className="m-3 w-full flex flex-wrapp flex-row justify-start">
+        <div className="basis-2/4">
+          <label for="paciente" className="text-sm font-medium text-gray-500 dark:text-gray-300">
+            Profissional
+          </label>
+          <Select
+            styles={{
+              menu: provided => ({ ...provided, zIndex: 9999 })
+            }}
+            name="profissional"
+            id="profissional"
+            getOptionLabel={option => option.nome_profissional}
+            getOptionValue={option => option.id_profissional}
+            options={listaProfissionais}
+            value={{ id_profissional: searchVal?.value, nome_profissional: searchVal?.label }}
+            placeholder="Profissional"
+            onChange={(e) => setProfissional(e)}
+          />
+        </div>
+        <div className="pl-2 pt-5">
+          <button
+            className="rounded-full bg-success w-10 h-10 text-white text-bold "
+            onClick={() => {
+              handleSelect({
+                info: {
+                  startStr: new Date,
+                  endStr: new Date
+                }
+              })
+            }
+            }>+</button>
+        </div>
       </div>
     )
   }
@@ -189,19 +226,7 @@ const RenderCalendar = ({ events, updateEvents }) => {
           initialView="timeGridWeek"
           headerToolbar={{
             left: "prev,today,next",
-            // center: "title",
-            right: "dayGridMonth,timeGridWeek,timeGridDay customButton",
-          }}
-          customButtons={{
-            customButton: {
-              text: 'Incluir Agendamento',
-              click: () => handleSelect({
-                info: {
-                  startStr: new Date,
-                  endStr: new Date
-                }
-              })
-            }
+            right: "dayGridMonth,timeGridWeek,timeGridDay",
           }}
           selectable
           editable

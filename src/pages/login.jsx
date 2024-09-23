@@ -32,7 +32,7 @@ const login = () => {
         setIsAuthenticated(authorized)
 
         if (!authorized) {
-            Swal.fire("Erro na autenticação!")
+            Swal.fire("Login ou senha incorretos!")
             return
         }
         setIsLoading(false)
@@ -48,7 +48,7 @@ const login = () => {
                 Swal.fire("Verifique o nome de usuário e tente novamente!")
             })
 
-        router.push(`/usuario/redefinirSenha/${usuario}`)
+        router.push(`/public/redefinirSenha/${usuario}`)
     }
 
     const inputToken = () => {

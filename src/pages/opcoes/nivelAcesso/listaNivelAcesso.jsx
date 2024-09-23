@@ -96,7 +96,7 @@ const ListaNivelAcesso = () => {
                     className="form-input mr-4 rounded-lg text-gray-600"
                     placeholder="Buscar nível de acesso" />
                 <Link href="cadastroNivelAcesso" onClick={() => sessionStorage.removeItem("cadastroNivelAcesso")}>
-                    <button className="bg-purple-800 hover:bg-purple-500 rounded-lg p-2 text-white font-bold">
+                    <button className="bg-success hover:bg-success-700 rounded-lg p-2 text-white font-bold">
                         Novo Nível de Acesso
                     </button>
                 </Link>
@@ -139,11 +139,11 @@ const ListaNivelAcesso = () => {
                                                         sessionStorage.removeItem("cadastroNivelAcesso")
                                                         sessionStorage.setItem('cadastroNivelAcesso', JSON.stringify(data))
                                                     }}
-                                                    className="text-purple-800 hover:text-purple-900"
+                                                    className="text-warning hover:text-warning-700"
                                                 >
                                                     <FaPencilAlt />
                                                 </Link>
-                                                <a className="text-purple-800 hover:text-purple-900" href="#"
+                                                <a className="text-danger hover:text-danger-700" href="#"
                                                     onClick={() => showSwalWithLink(data)}
                                                 >
                                                     <FaTrashAlt />

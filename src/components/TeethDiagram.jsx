@@ -9,11 +9,8 @@ import {
     Tooth8,
     Tooth9
 } from '../pages/fichaClinica/dentes'
-import { useEffect, useState } from 'react'
-import api from '../utils/Api'
 
 const TeethDiagram = ({ setTooth, id_paciente, id_empresa, listaDentesComProcedimento }) => {
-    // const [listaDentesComProcedimento, setListaDentesComProcedimento] = useState()
     const arcadas = [
         "Arcada Inferior",
         "Arcada Superior",
@@ -22,18 +19,6 @@ const TeethDiagram = ({ setTooth, id_paciente, id_empresa, listaDentesComProcedi
         "Maxila",
         "Todos",
     ]
-
-    // useEffect(() => {
-    //     getDentesComProcedimento()
-    // }, [])
-
-
-    // const getDentesComProcedimento = async () => {
-    //     await api.get(`dentes/dentesComProcedimento?id_paciente=${id_paciente}&id_empresa=${id_empresa}`)
-    //         .then(response => {
-    //             setListaDentesComProcedimento(response.data[0]?.dentes)
-    //         })
-    // }
 
     return (
         <div style={{ display: 'grid', gridGap: '30px' }}>
@@ -56,6 +41,8 @@ const TeethDiagram = ({ setTooth, id_paciente, id_empresa, listaDentesComProcedi
                 <Tooth1 onClick={setTooth} tooth_number={27} cor_dente={listaDentesComProcedimento?.[27]} />
                 <Tooth1 onClick={setTooth} tooth_number={28} cor_dente={listaDentesComProcedimento?.[28]} />
             </div>
+
+            {/* // Arcada inferior */}
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 15 }}>
                 <Tooth6 onClick={setTooth} tooth_number={48} cor_dente={listaDentesComProcedimento?.[48]} />
                 <Tooth6 onClick={setTooth} tooth_number={47} cor_dente={listaDentesComProcedimento?.[47]} />

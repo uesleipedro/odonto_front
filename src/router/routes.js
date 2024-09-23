@@ -13,10 +13,11 @@ export const publicRoutes = [
     "/about",
     "/usuario/cadastroUsuario",
     "/fichaClinica/view/orcamentoView/[id_orcamento]",
-    "/usuario/redefinirSenha/[email]"
+    "/public/redefinirSenha/[email]"
 ]
 export const noNavegable = [
     '/login',
+    '/public/redefinirSenha/[email]',
     '/public',
     '/public/cadastroUsuario',
     '/fichaClinica/view/orcamentoView/[id_orcamento]',

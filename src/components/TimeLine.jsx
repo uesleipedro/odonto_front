@@ -25,7 +25,7 @@ const TimeLine = ({ evolucoes, getEvolucoes }) => {
             .then(response => {
                 if(response.status === 204){
                     getEvolucoes()
-                    Swal.fire("Excluído com")
+                    Swal.fire("Excluído com sucesso!")
                 }
             })
             .catch(error => {
@@ -56,24 +56,24 @@ const TimeLine = ({ evolucoes, getEvolucoes }) => {
             <ol className="border-s border-neutral-300 dark:border-neutral-500">
                 {evolucoes?.map((e) => (
                     <li>
-                        <div className="flex-start flex items-center pt-3">
+                        <div className="flex-start flex items-center pt-2">
                             <div
                                 className="-ms-[5px] me-3 h-[9px] w-[9px] rounded-full bg-neutral-300 dark:bg-neutral-500"></div>
                             <p className="text-sm text-neutral-500 dark:text-neutral-300">{moment(e.updated_at).format("DD/MM/YYYY")}</p>
                         </div>
-                        <div className="mb-6 ms-4 mt-2 border">
-                            <div className="flex justify-end p-5" >
+                        <div className="p-1 border">
+                            <div className="flex justify-end" >
                                 <button onClick={() => editEvolucao(e)}
-                                    className="flex justify-center items-center bg-purple-500 hover:bg-purple-500 rounded-full w-10 h-10 text-white font-bold mb-5"
+                                    className="flex justify-center items-center bg-purple-500 hover:bg-purple-500 rounded-full w-8 h-8 text-white font-bold"
                                 ><FaPencilAlt /></button>
 
                                 <button onClick={() => showSwalWithLink(e)}
-                                    className="flex justify-center items-center bg-red-500 hover:bg-red-500 rounded-full w-10 h-10 text-white font-bold mb-5"
+                                    className="flex justify-center items-center bg-red-500 hover:bg-red-500 rounded-full w-8 h-8 text-white font-bold"
                                 ><FaTrash /></button>
                             </div>
 
-                            <p className="mb-3 text-neutral-500 dark:text-neutral-300">{e.texto}</p>
-                            <p><span className="mb-3 text-neutral-500 dark:text-neutral-300">Profissional: </span>{e.nome}</p>
+                            <p className="mb-1 text-neutral-500 dark:text-neutral-300">{e.texto}</p>
+                            <p><span className="mb-1 text-neutral-500 dark:text-neutral-300">Profissional: </span>{e.nome}</p>
                         </div>
                     </li>
                 ))}

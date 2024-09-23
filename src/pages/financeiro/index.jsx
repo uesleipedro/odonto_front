@@ -8,7 +8,6 @@ import moment from "moment"
 import withReactContent from 'sweetalert2-react-content'
 import api from "../../utils/Api"
 import { useAuth } from "../../auth/useAuth"
-import { usePaciente } from "../../context/PacienteContext"
 import LoadingOverlay from "../../components/LoadingOverlay"
 
 const ListaUsuarios = () => {
@@ -17,7 +16,6 @@ const ListaUsuarios = () => {
     const [searchVal, setSearchVal] = useState('')
     const [isLoading, setIsLoading] = useState(false)
     const { user } = useAuth()
-    const { saveIdPaciente, saveIdEmpresa } = usePaciente()
     const id_empresa = user?.user?.foundUser.id_empresa
     const router = useRouter()
     const status = {
@@ -59,12 +57,11 @@ const ListaUsuarios = () => {
             id
         })
             .then(async (response) => {
-                
+
             })
             .catch(error => {
                 console.error(error)
             })
-        router.refresh()
     }
 
     const filteredData = useMemo(() => {
@@ -87,6 +84,7 @@ const ListaUsuarios = () => {
             if (result.isConfirmed) {
                 setIsLoading(true)
                 await handleCancelaBoleto(id)
+                await getBoletos()
                 setIsLoading(false)
                 Swal.fire('Cancelado!', '', 'success')
             } else if (result.isDenied) {
@@ -100,15 +98,6 @@ const ListaUsuarios = () => {
     return (
 
         <div className="m-5 p-5  rounded-lg shadow-lg">
-            <div className="mb-5 flex flex-row flex-wrap w-full justify-between items-center">
-                <input type="text" onChange={e => setSearchVal(e.target.value)} className="form-input mr-4 rounded-lg text-gray-600" placeholder="Buscar Paciente" />
-                <Link href="cadastroUsuarioInterno">
-                    <button className="bg-green-600 hover:bg-green-500 rounded-lg p-2 text-white font-bold">
-                        Sincronizar com EFI Bank
-                    </button>
-                </Link>
-            </div>
-
             <div className="flex flex-col">
                 <div className="-m-1.5 overflow-x-auto">
                     <div className="p-1.5 min-w-full inline-block align-middle">
@@ -149,14 +138,15 @@ const ListaUsuarios = () => {
                                                     <FaBarcode />
                                                 </a>
 
-
-                                                <a className="text-red-800 hover:text-red-900" title="Cancelar Pagamento" rel="noopener noreferrer" href="#"
-                                                    onClick={() => {
-                                                        showSwalWithLink(data?.id)
-                                                    }}
-                                                >
-                                                    <ImCancelCircle />
-                                                </a>
+                                                {data?.status !== "canceled" &&
+                                                    <a className="text-danger hover:text-danger-800" title="Cancelar Boleto" rel="noopener noreferrer" href="#"
+                                                        onClick={() => {
+                                                            showSwalWithLink(data?.id)
+                                                        }}
+                                                    >
+                                                        <ImCancelCircle />
+                                                    </a>
+                                                }
                                             </td>
                                         </tr>
                                     ))}

@@ -101,7 +101,7 @@ const ListaOrcamento = ({ id_paciente, id_empresa }) => {
                 {screen !== "pagamento" &&
                     <button
                         onClick={() => setScreen("geraOrcamento")}
-                        className="bg-purple-800 hover:bg-purple-500 rounded-lg p-2 text-white font-bold">
+                        className="bg-success hover:bg-success-600 rounded-lg p-2 text-white font-bold">
                         Novo Orçamento
                     </button>
                 }
@@ -134,7 +134,7 @@ const ListaOrcamento = ({ id_paciente, id_empresa }) => {
                                                     <a href={`/fichaClinica/view/orcamentoView/${data.id_orcamento}`} target="_blank" className="text-purple-800 hover:text-purple-900">
                                                         <IoEyeSharp />
                                                     </a>
-                                                    <a className="text-purple-800 hover:text-purple-900" href="#"
+                                                    <a className="text-danger hover:text-danger-600" href="#"
                                                         onClick={() => showSwalWithLink(data.id_paciente, data.id_orcamento)}
                                                     >
                                                         <FaTrashAlt />

@@ -31,7 +31,7 @@ const CadastroUsuario = () => {
             })
     }
 
-    const updateName = e => {
+    const updateField = e => {
         const fieldName = e.target.name
         setUserData(existingValues => ({
             ...existingValues,
@@ -75,8 +75,12 @@ const CadastroUsuario = () => {
                     Swal.fire("Salvo com sucesso!")
             })
             .catch(e => {
-                alert(e)
-                console.error(e.error)
+                if (e?.response?.data?.status === 400)
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: e?.response?.data?.error
+                    })
             })
         sessionStorage.removeItem('cadastroUsuario')
         router.push('/opcoes/usuario/listaUsuarios')
@@ -102,7 +106,7 @@ const CadastroUsuario = () => {
                         id="nome"
                         name="nome"
                         value={userData?.nome}
-                        onChange={updateName}
+                        onChange={updateField}
                         className="form-input rounded-lg text-gray-600 w-full placeholder-gray-300"
                         placeholder="Ex.: Marcelo Algusto" />
                 </div>
@@ -114,7 +118,7 @@ const CadastroUsuario = () => {
                         id="email"
                         name="email"
                         value={userData?.email}
-                        onChange={updateName}
+                        onChange={updateField}
                         className="form-input rounded-lg text-gray-600 w-full placeholder-gray-300"
                         placeholder="Ex: antonio@gmail.com" />
                 </div>
@@ -124,7 +128,7 @@ const CadastroUsuario = () => {
                     <select
                         id="access_levels"
                         name="access_levels"
-                        onChange={updateName}
+                        onChange={updateField}
                         value={userData?.access_levels}
                         className="form-input rounded-lg text-gray-600 w-full"
                         placeholder="">
@@ -141,7 +145,7 @@ const CadastroUsuario = () => {
                         type="password"
                         id="senha"
                         name="senha"
-                        onChange={updateName}
+                        onChange={updateField}
                         className="form-input rounded-lg text-gray-600 w-full placeholder-gray-300"
                         placeholder="**********" />
                 </div>

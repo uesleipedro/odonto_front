@@ -47,8 +47,8 @@ export function AuthProvider({ children }) {
         const response = await api.post('user/login', { email: usuario, senha: passwd })
             .then(async (response) => {
                 if (response.status === 201) {
-                    // api.defaults.headers.Authorization = `Bearer ${token}`
-                    api.defaults.headers.Authorization = `Bearer ${JSON.stringify(response.data).token}`
+                    api.defaults.headers.Authorization = `Bearer ${response.data.token}`
+                    localStorage.setItem("token", response.data.token)
                     Cookies.set("user", JSON.stringify(response.data))
                     setUser(response.data)
                     return true
@@ -69,6 +69,7 @@ export function AuthProvider({ children }) {
     const logout = () => {
         setUser(null)
         Cookies.remove("user")
+        localStorage.removeItem("token")
         router.refresh()
     };
 

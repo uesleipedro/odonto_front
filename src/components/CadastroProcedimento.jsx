@@ -39,7 +39,7 @@ const CadastroProcedimento = ({ show, toogleShow, id_paciente, dadosProcedimento
             estado: 'A realizar',
             adicionado: moment(Date()).format('YYYY-MM-DD'),
             id_paciente: Number(id_paciente),
-            preco: "R$ 0,00"
+            preco: 0
         })
     }, [dadosProcedimento])
 

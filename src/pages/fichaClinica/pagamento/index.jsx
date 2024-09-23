@@ -64,6 +64,15 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
         calculoTotal()
     }, [dados?.desconto])
 
+    useEffect(() => {
+        if (dados?.forma_pagamento !== 3) return
+
+        setDados(existingValues => ({
+            ...existingValues,
+            ["quantidade_parcelas"]: 1,
+        }))
+    }, [dados.forma_pagamento])
+
     const getFormaPagamento = () => {
         api.get(`formaPagamento`)
             .then(res => {
@@ -160,8 +169,6 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
             ...existingValues,
             [fieldName]: e.target.value,
         }))
-
-        console.log("updateField", dados)
     }
 
     const changeDate = (date) => {
@@ -444,9 +451,10 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
                                         className="text-gray-500 w-full"
                                         name="paciente"
                                         options={parcelas}
+                                        value={{ value: dados?.quantidade_parcelas, label: dados?.quantidade_parcelas }}
                                         required
                                         placeholder="Parcelas"
-                                        defaultValue={parcelas[0]}
+                                        isDisabled={dados.forma_pagamento === 3 && true}
                                         onChange={(e) => {
                                             updateField({
                                                 target: {

@@ -5,11 +5,11 @@ import Select from "react-select"
 import LoadingOverlay from "./LoadingOverlay"
 
 const CadastroEvolucoes = ({ toogleShowCadastroEvolucoes, showCadastroEvolucoes, dados, getEvolucoes, evolucao }) => {
-
+    console.log('dados evolucao', dados, evolucao)
     if (!showCadastroEvolucoes) return
 
     const [texto, setTexto] = useState(dados?.texto)
-    const { id_paciente, id_empresa, id_user, nome } = dados
+    const { id_paciente, id_empresa } = dados
     const [loading, setLoading] = useState(false)
     const [profissional, setProfissional] = useState()
     const [selectedProfissional, setSelectedProfissional] = useState({ value: dados?.id_profissional, label: dados?.nome })
@@ -23,6 +23,8 @@ const CadastroEvolucoes = ({ toogleShowCadastroEvolucoes, showCadastroEvolucoes,
     }
 
     const saveEvolucao = async () => {
+        console.log("id_evolucao", dados?.id_evolucao)
+        return
         dados?.id_evolucao
             ? await updateEvolucao()
             : await addEvolucao()

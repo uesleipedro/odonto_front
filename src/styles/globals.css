@@ -47,9 +47,9 @@
 /* Botões de navegação no toolbar */
 .fc .fc-button {
   background-color: #4c1d95 !important;
- 
+
   color: #f3f4f6 !important;
- 
+
   border: none !important;
   border-radius: 4px !important;
   padding: 5px 10px !important;
@@ -60,6 +60,7 @@
   background-color: #7c3aed !important;
   /* purple-600 */
   color: #ffffff !important;
+  z-index: 1;
 }
 
 /* Estilo para botões ativos ou focados (selecionados) */
@@ -134,7 +135,6 @@
 .fc-day-today {
   background: #f1ebfc !important;
   border: none !important;
-
 }
 
 /* TESTE Fullcalendar */
@@ -198,4 +198,16 @@
 /* DATAPICKER */
 /* .react-datepicker-wrapper {
   width: 100% !important;
+} */
+
+/* .fc-customButton-button {
+  position: absolute !important;
+  top: 90px;
+  left: 500px !important;
+} */
+
+/* @media (min-width:600px) {
+  .fc-customButton-button {
+    position: relative !important;
+  }
 } */
