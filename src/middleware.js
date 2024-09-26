@@ -44,6 +44,7 @@ export async function middleware(request) {
 
 export const config = {
     matcher: [
+        "/",
         "/agenda/:path*",
         "/paciente",
         "/paciente/:path*",

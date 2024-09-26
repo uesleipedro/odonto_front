@@ -100,7 +100,6 @@ const login = () => {
         }).then((result) => {
             if (result.isConfirmed) {
                 recuperarSenha()
-                //Swal.fire('Alterado!', '', 'success')
             } else if (result.isDenied) {
                 updateEvents()
                 Swal.fire('Nenhuma alteração foi realizada', '', 'info')
