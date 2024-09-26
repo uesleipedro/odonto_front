@@ -43,6 +43,7 @@ export function AuthProvider({ children }) {
             .then(async (response) => {
                 if (response.status === 500) {
                     Cookies.remove("user")
+                    localStorage.removeItem("token")
                     setUser(null)
                     return false
                 }
