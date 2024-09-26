@@ -13,12 +13,13 @@ export const FichaClinicaProvider = ({ children }) => {
   const [orcamento, setOrcamento] = useState()
   const { idPaciente, idEmpresa } = usePaciente()
   const { user } = useAuth()
+  const token = localStorage.getItem("token")
 
   useEffect(() => {
     getPagamentoList()
     getProcedimentoList()
     getOrcamentoList()
-  }, [idPaciente, user])
+  }, [idPaciente, token])
 
   const getPagamentoList = async () => {
     await api.get(`contas_receber/paciente/${idPaciente}/${idEmpresa}`)
