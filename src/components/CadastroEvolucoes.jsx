@@ -23,8 +23,6 @@ const CadastroEvolucoes = ({ toogleShowCadastroEvolucoes, showCadastroEvolucoes,
     }
 
     const saveEvolucao = async () => {
-        console.log("id_evolucao", dados?.id_evolucao)
-        return
         dados?.id_evolucao
             ? await updateEvolucao()
             : await addEvolucao()

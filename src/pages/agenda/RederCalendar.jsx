@@ -222,6 +222,7 @@ const RenderCalendar = ({ events, updateEvents }) => {
         <FullCalendar
           locales={[ptBr]}
           locale="pt-br"
+          initialDate={new Date}
           plugins={[dayGridPlugin, interactionPlugin, timeGridPlugin]}
           initialView="timeGridWeek"
           headerToolbar={{

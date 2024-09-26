@@ -26,7 +26,7 @@ const CadastroUsuario = () => {
     const buscaEndereco = async (cep) => {
         if (cep.length < 8) return
 
-        const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+        const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`)
         const dados = await response.json()
         setUser({ ...user, ...dados })
     }
@@ -40,10 +40,15 @@ const CadastroUsuario = () => {
             .then(function (response) {
                 if (response.status === 201)
                     Swal.fire("Salvo com sucesso!")
+
             })
             .catch(e => {
-                alert(e)
-                console.error(e.error)
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: e?.response?.data?.error,
+                })
+                console.error(e)
             })
     }
 
