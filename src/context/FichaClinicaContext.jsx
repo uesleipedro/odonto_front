@@ -1,6 +1,7 @@
 import { createContext, useState, useContext, useEffect } from 'react'
 import api from "../utils/Api"
 import { usePaciente } from './PacienteContext'
+import { useAuth } from '../auth/useAuth'
 
 export const FichaClinicaContext = createContext()
 
@@ -11,12 +12,13 @@ export const FichaClinicaProvider = ({ children }) => {
   const [procedimentoList, setProcedimentoList] = useState()
   const [orcamento, setOrcamento] = useState()
   const { idPaciente, idEmpresa } = usePaciente()
+  const { user } = useAuth()
 
   useEffect(() => {
     getPagamentoList()
     getProcedimentoList()
     getOrcamentoList()
-  }, [idPaciente])
+  }, [idPaciente, user])
 
   const getPagamentoList = async () => {
     await api.get(`contas_receber/paciente/${idPaciente}/${idEmpresa}`)
