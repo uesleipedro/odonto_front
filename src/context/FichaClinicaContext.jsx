@@ -13,7 +13,12 @@ export const FichaClinicaProvider = ({ children }) => {
   const [orcamento, setOrcamento] = useState()
   const { idPaciente, idEmpresa } = usePaciente()
   const { user } = useAuth()
-  const token = localStorage.getItem("token")
+  const [token, setToken] = useState()
+
+  useEffect(() => {
+    let token = localStorage.getItem("token")
+    setToken(token)
+  },[])
 
   useEffect(() => {
     getPagamentoList()
