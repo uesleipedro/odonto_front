@@ -3,10 +3,12 @@ import Link from "next/link"
 import api from "../../utils/Api"
 import { maskCPF_CNPJ, maskPhone } from "../../utils/mask"
 import Swal from "sweetalert2"
+import { useRouter } from "next/navigation"
 
 const CadastroUsuario = () => {
 
-    const [user, setUser] = useState({ access_levels: 28 })
+    const [user, setUser] = useState({ access_levels: 1 })
+    const router = useRouter()
 
     const updateName = e => {
         const fieldName = e.target.name
@@ -35,11 +37,12 @@ const CadastroUsuario = () => {
         let userToSend = user
         userToSend.cnpj_cpf = user.cnpj_cpf?.replace(/\D/g, '')
         userToSend.telefone_movel = user.telefone_movel?.replace(/\D/g, '')
-        console.log("user", userToSend)
-        await api.post('/user', userToSend)
+        await api.post('/user/userEmpresa', userToSend)
             .then(function (response) {
                 if (response.status === 201)
                     Swal.fire("Salvo com sucesso!")
+
+                router.push("/login")
 
             })
             .catch(e => {

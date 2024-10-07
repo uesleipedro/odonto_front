@@ -22,6 +22,7 @@ const Credenciais = ({ data }) => {
         await api.get(`efiCredential/getCredential?id_empresa=${id_empresa}`)
             .then((res) => {
                 setCredentialData(res.data[0])
+            }).catch((e) =>{
             })
         setIsLoading(false)
     }
@@ -133,7 +134,7 @@ const Credenciais = ({ data }) => {
             <div className="flex justify-end gap-3">
                 <button
                     onClick={sendUser}
-                    className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full mt-5">
+                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full mt-5">
                     Salvar
                 </button>
             </div>

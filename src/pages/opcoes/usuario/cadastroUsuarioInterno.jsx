@@ -37,11 +37,17 @@ const CadastroUsuario = () => {
             ...existingValues,
             [fieldName]: e.target.value,
         }))
+        console.log(userData)
     }
 
     const updateUser = async () => {
-        if (!userData?.access_levels) {
-            Swal.fire("Selecione um nível de acesso!")
+        if (
+            !userData?.access_levels ||
+            !userData?.email ||
+            !userData?.nome ||
+            !userData?.senha
+        ) {
+            Swal.fire("Preencha todos os campos!")
             return
         }
 
@@ -50,7 +56,7 @@ const CadastroUsuario = () => {
         await api.put(`/user?${userToSend}`)
             .then(function (response) {
                 if (response.status === 201)
-                    Swal.fire("Salvo com sucesso!")
+                    Swal.fire("Atualizado com sucesso!")
             })
             .catch(e => {
                 alert(e)
@@ -61,8 +67,13 @@ const CadastroUsuario = () => {
     }
 
     const saveUser = async () => {
-        if (!userData?.access_levels) {
-            Swal.fire("Selecione um nível de acesso!")
+        if (
+            !userData?.access_levels ||
+            !userData?.email ||
+            !userData?.nome ||
+            !userData?.senha
+        ) {
+            Swal.fire("Preencha todos os campos!")
             return
         }
 
@@ -75,7 +86,10 @@ const CadastroUsuario = () => {
                     Swal.fire("Salvo com sucesso!")
             })
             .catch(e => {
-                if (e?.response?.data?.status === 400)
+                if (
+                    e?.response?.data?.status === 400 ||
+                    e?.response?.status === 409
+                )
                     Swal.fire({
                         icon: "error",
                         title: "Oops...",

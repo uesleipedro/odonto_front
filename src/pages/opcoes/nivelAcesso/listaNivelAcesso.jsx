@@ -1,21 +1,17 @@
-import React, { use, useEffect, useState, useMemo } from "react"
-import { FaPencilAlt, FaBookMedical, FaTrashAlt } from "react-icons/fa"
-import { BiSolidFileDoc } from "react-icons/bi"
-import { MdAttachMoney } from "react-icons/md"
+import React, { useEffect, useState, useMemo } from "react"
+import { FaPencilAlt, FaTrashAlt } from "react-icons/fa"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import api from "../../../utils/Api"
 import { useAuth } from "../../../auth/useAuth"
-import { usePaciente } from "../../../context/PacienteContext"
 
 const ListaNivelAcesso = () => {
 
     const [accessLevel, setAccessLevel] = useState([])
     const [searchVal, setSearchVal] = useState('')
     const { user } = useAuth()
-    const { saveIdPaciente, saveIdEmpresa } = usePaciente()
     const id_empresa = user?.user?.foundUser.id_empresa
     const router = useRouter()
 
@@ -46,7 +42,6 @@ const ListaNivelAcesso = () => {
                 }
 
                 if (response.response.status === 400) {
-                    // Swal.fire(response.message)
                     console.log(response.message)
                 }
 
@@ -109,7 +104,6 @@ const ListaNivelAcesso = () => {
                             <table className="min-w-full">
                                 <thead className="bg-purple-800 dark:bg-purple-700">
                                     <tr className="text-white text-left font-medium">
-                                        <th scope="col" className="px-6 py-3">ID</th>
                                         <th scope="col" className="px-6 py-3 ">Nome do Nível de Acesso</th>
                                         <th scope="col" className="px-6 py-3">Descrição</th>
                                         <th scope="col" className="px-6 py-3">Ações</th>
@@ -118,18 +112,6 @@ const ListaNivelAcesso = () => {
                                 <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                                     {filteredData.map((data) => (
                                         <tr key={data.access_level_id}>
-                                            <Link
-                                                href={{
-                                                    pathname: `/nivelAcesso/cadastro/`,
-                                                }}
-
-                                            >
-                                                <td onClick={() => {
-                                                    saveIdPaciente(data.id_paciente)
-                                                    saveIdEmpresa(data.id_empresa)
-                                                }}
-                                                    className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data?.access_level_id}</td>
-                                            </Link>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.level_name}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data?.description}</td>
                                             <td className="flex flex-row gap-3 px-6 py-4 whitespace-nowrap text-right text-md font-medium">

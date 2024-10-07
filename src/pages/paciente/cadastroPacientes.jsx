@@ -138,15 +138,17 @@ const CadastroPacientes = () => {
                 <div className="w-full md:w-2/5 pr-2 pt-3">
                     <label for="dt_nascimento" className="text-gray-700 ">Data de nascimento</label>
                     <div className="w-full">
+
                         <DatePicker
+                            className="form-input rounded-lg text-gray-600 w-full"
+                            name="dt_nascimento"
+                            id="dt_nascimento"
                             peekNextMonth
                             showMonthDropdown
                             showYearDropdown
                             scrollableYearDropdown={true}
-                            className="form-input rounded-lg text-gray-600 w-full"
+                            dateFormat="dd/MM/yyyy"
                             selected={paciente?.dt_nascimento}
-                            name="dt_nascimento"
-                            id="dt_nascimento"
                             onChange={(e) =>
                                 changeDate(
                                     {
@@ -156,7 +158,6 @@ const CadastroPacientes = () => {
                                         }
                                     }
                                 )}
-                            dateFormat="dd/MM/yyyy"
                         />
                     </div>
                 </div>

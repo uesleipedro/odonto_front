@@ -106,7 +106,7 @@ const ListaUsuarios = () => {
                                                 className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.nome}</td>
 
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.email}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data?.access_level}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data?.level_name}</td>
                                             <td className="flex flex-row gap-3 px-6 py-4 whitespace-nowrap text-right text-md font-medium">
                                                 <Link
                                                     href={{ pathname: "cadastroUsuarioInterno" }}

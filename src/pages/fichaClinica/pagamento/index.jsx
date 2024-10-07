@@ -151,7 +151,8 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
                 status: "Pendente",
                 id_paciente: contas.id_paciente,
                 id_empresa: id_empresa,
-                forma_pagamento: dados?.forma_pagamento
+                forma_pagamento: dados?.forma_pagamento,
+                qtd_parcelas: contas.qtd_parcelas
             }
         )
             .then(async function (response) {
@@ -229,6 +230,7 @@ const Pagamento = ({ orcamento, changeScreen, setShowToast, id_paciente, id_empr
                         valor: valor_parcela,
                         dt_vencimento: datas_prestacoes[contador - 1],
                         id_paciente: Number(orcamento.id_paciente),
+                        qtd_parcelas: qtd_parcelas
                     })
                 }
 

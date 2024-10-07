@@ -4,6 +4,7 @@ import api from "../../../utils/Api"
 import Swal from "sweetalert2"
 import { useAuth } from '../../../auth/useAuth'
 import Select from 'react-select'
+import { useRouter } from "next/router"
 
 const CadastroNivelAcesso = () => {
 
@@ -12,6 +13,7 @@ const CadastroNivelAcesso = () => {
     const [selectedOptions, setSelectedOptions] = useState();
     const id_empresa = user?.user?.foundUser?.id_empresa
     const [screens, setScreens] = useState()
+    const router = useRouter()
 
     useEffect(() => {
         const data = sessionStorage.getItem('cadastroNivelAcesso')
@@ -52,10 +54,13 @@ const CadastroNivelAcesso = () => {
         setSelectedOptions(selected)
     }
 
-    const updateName = e => {
+    const updateField = e => {
         const fieldName = e.target.name
 
-        if (fieldName === "acessa_todas_agendas") {
+        if (
+            fieldName === "acessa_todas_agendas" ||
+            fieldName === "acessa_financeiro_paciente"
+        ) {
             setNivelAcesso(existingValues => ({
                 ...existingValues,
                 [fieldName]: e.target.checked,
@@ -67,7 +72,6 @@ const CadastroNivelAcesso = () => {
             ...existingValues,
             [fieldName]: e.target.value,
         }))
-        console.log(nivelAcesso)
     }
 
     const sendNivelAcesso = async () => {
@@ -84,6 +88,8 @@ const CadastroNivelAcesso = () => {
 
                     if (response.status === 201)
                         Swal.fire("Salvo com sucesso!")
+
+                    router.push("/opcoes/nivelAcesso/listaNivelAcesso")
 
                 } catch (error) {
                     Swal.fire("Erro ao cadastrar o nível de acesso")
@@ -108,9 +114,11 @@ const CadastroNivelAcesso = () => {
                     if (response.status === 201)
                         Swal.fire("Salvo com sucesso!")
 
+                    router.push("/opcoes/nivelAcesso/listaNivelAcesso")
+
                 } catch (error) {
                     Swal.fire("Erro ao cadastrar o nível de acesso")
-                    console.error(error)
+                    console.error(error.message)
                 }
             })
             .catch(e => {
@@ -145,7 +153,7 @@ const CadastroNivelAcesso = () => {
                         id="level_name"
                         name="level_name"
                         value={nivelAcesso?.level_name}
-                        onChange={updateName}
+                        onChange={updateField}
                         className="form-input rounded-lg text-gray-600 w-full placeholder-gray-300"
                         placeholder="Ex.: Atendente" />
                 </div>
@@ -157,7 +165,7 @@ const CadastroNivelAcesso = () => {
                         id="description"
                         name="description"
                         value={nivelAcesso?.description}
-                        onChange={updateName}
+                        onChange={updateField}
                         className="form-input rounded-lg text-gray-600 w-full placeholder-gray-300"
                         placeholder="Ex: Atendente da recepção" />
                 </div>
@@ -181,7 +189,7 @@ const CadastroNivelAcesso = () => {
                     <label
                         class="inline-block ps-[0.15rem] hover:cursor-pointer"
                         for="acessa_todas_agendas"
-                    >Acessa todas as telas?</label>
+                    >Acessa a todas as agendas?</label>
                     <input
                         class="me-2 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-black/25 before:pointer-events-none before:absolute before:h-3.5 before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5 after:w-5 after:rounded-full after:border-none after:bg-white after:shadow-switch-2 after:transition-[background-color_0.2s,transform_0.2s] after:content-[''] checked:bg-purple-800 checked:after:absolute checked:after:z-[2] checked:after:-mt-[3px] checked:after:ms-[1.0625rem] checked:after:h-5 checked:after:w-5 checked:after:rounded-full checked:after:border-none checked:after:bg-purple-800 checked:after:shadow-switch-1 checked:after:transition-[background-color_0.2s,transform_0.2s] checked:after:content-[''] hover:cursor-pointer focus:outline-none focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-switch-3 focus:before:shadow-black/60 focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-5 focus:after:w-5 focus:after:rounded-full focus:after:content-[''] checked:focus:border-purple-800 checked:focus:bg-purple-800 checked:focus:before:ms-[1.0625rem] checked:focus:before:scale-100 checked:focus:before:shadow-switch-3 checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] dark:bg-gray-300 dark:after:bg-surface-dark dark:checked:bg-purple-800 dark:checked:after:bg-purple-800"
                         type="checkbox"
@@ -189,7 +197,22 @@ const CadastroNivelAcesso = () => {
                         id="acessa_todas_agendas"
                         name="acessa_todas_agendas"
                         checked={nivelAcesso?.acessa_todas_agendas}
-                        onChange={updateName} />
+                        onChange={updateField} />
+                </div>
+
+                <div className="flex flex-row gap-2 items-center w-full mt-10">
+                    <label
+                        class="inline-block ps-[0.15rem] hover:cursor-pointer"
+                        for="acessa_financeiro_paciente"
+                    >Acessa financeiro do paciente?</label>
+                    <input
+                        class="me-2 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-black/25 before:pointer-events-none before:absolute before:h-3.5 before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5 after:w-5 after:rounded-full after:border-none after:bg-white after:shadow-switch-2 after:transition-[background-color_0.2s,transform_0.2s] after:content-[''] checked:bg-purple-800 checked:after:absolute checked:after:z-[2] checked:after:-mt-[3px] checked:after:ms-[1.0625rem] checked:after:h-5 checked:after:w-5 checked:after:rounded-full checked:after:border-none checked:after:bg-purple-800 checked:after:shadow-switch-1 checked:after:transition-[background-color_0.2s,transform_0.2s] checked:after:content-[''] hover:cursor-pointer focus:outline-none focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-switch-3 focus:before:shadow-black/60 focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-5 focus:after:w-5 focus:after:rounded-full focus:after:content-[''] checked:focus:border-purple-800 checked:focus:bg-purple-800 checked:focus:before:ms-[1.0625rem] checked:focus:before:scale-100 checked:focus:before:shadow-switch-3 checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] dark:bg-gray-300 dark:after:bg-surface-dark dark:checked:bg-purple-800 dark:checked:after:bg-purple-800"
+                        type="checkbox"
+                        role="switch"
+                        id="acessa_financeiro_paciente"
+                        name="acessa_financeiro_paciente"
+                        checked={nivelAcesso?.acessa_financeiro_paciente}
+                        onChange={updateField} />
                 </div>
             </div>
 
@@ -197,7 +220,7 @@ const CadastroNivelAcesso = () => {
             <div className="flex justify-end gap-3">
                 <button
                     onClick={sendNivelAcesso}
-                    className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full mt-5">
+                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full mt-5">
                     Salvar
                 </button>
 

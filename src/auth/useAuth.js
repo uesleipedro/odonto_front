@@ -24,10 +24,15 @@ export function AuthProvider({ children }) {
             const data = Cookies.get('user')
             const token = localStorage.getItem("token")
 
-            if (data && token) {
-                api.defaults.headers.Authorization = `Bearer ${token}`
-                setUser(JSON.parse(data))
+            if (!data || !token) {
+                Cookies.remove("user")
+                localStorage.removeItem("token")
+                setUser(null)
+                return
             }
+
+            api.defaults.headers.Authorization = `Bearer ${token}`
+            setUser(JSON.parse(data))
         }
         loadUserFromCookies()
     }, [])

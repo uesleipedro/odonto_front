@@ -211,3 +211,22 @@
     position: relative !important;
   }
 } */
+
+/* Garantir que a linha principal não mude de tamanho */
+tr {
+  transition: all 0.3s ease;
+  /* Altura mínima para que a linha principal tenha um tamanho fixo */
+  min-height: 50px;
+}
+
+/* Estilo para a linha expandida */
+.expandable-row {
+  transition: max-height 0.3s ease;
+}
+
+/* O conteúdo expandido não afeta o layout da linha principal */
+.expandable-content {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react"
+import React, { useEffect, useState, useMemo, use } from "react"
 import { FaBarcode } from "react-icons/fa"
 import { ImCancelCircle } from "react-icons/im"
 import Link from "next/link"
@@ -21,24 +21,23 @@ const ListaUsuarios = () => {
     const status = {
         paid: "Pago",
         waiting: "Pendente",
-        canceled: "Cancelado"
+        canceled: "Cancelado",
+        unpaid: "Não pago"
     }
     const coresStatus = {
         paid: "text-success",
         waiting: "text-warning",
-        canceled: "text-danger",
+        unpaid: "text-danger",
     }
 
     useEffect(() => {
         getBoletos()
     }, [])
 
-
     const getBoletos = async () => {
         setIsLoading(true)
         await api.get(`/efi/listaBoletos?id_empresa=${id_empresa}`)
             .then(response => {
-                console.log('response', response.data.data)
                 setBoletos([...response.data.data])
             })
             .catch(function (error) {
@@ -105,12 +104,13 @@ const ListaUsuarios = () => {
                             <table className="min-w-full">
                                 <thead className="bg-purple-800 dark:bg-purple-700">
                                     <tr className="text-white text-left font-medium">
-                                        <th scope="col" className="px-6 py-3">Nº</th>
+                                        <th scope="col" className="px-6 py-3">Nº Boleto</th>
+                                        <th scope="col" className="px-6 py-3">Nº Pagamento</th>
                                         <th scope="col" className="px-6 py-3 ">Valor</th>
-                                        <th scope="col" className="px-6 py-3">status</th>
                                         <th scope="col" className="px-6 py-3">Paciente</th>
                                         <th scope="col" className="px-6 py-3">Dt Vencimento</th>
                                         <th scope="col" className="px-6 py-3">Dt Pagamento</th>
+                                        <th scope="col" className="px-6 py-3">status</th>
                                         <th scope="col" className="px-6 py-3">Opções</th>
                                     </tr>
                                 </thead>
@@ -118,16 +118,17 @@ const ListaUsuarios = () => {
                                     {filteredData.map((data) => (
                                         <tr key={data.id}>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data?.id}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data?.custom_id}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">R$ {setVirgulaDecimal(data?.total)}</td>
-                                            <td onClick={() => { }}
-                                                className={`px-6 py-4 whitespace-nowrap text-sm font-bold ${coresStatus[data?.status]}`}>{status[data?.status]}</td>
-
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.customer?.name}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">
                                                 {moment(data?.payment?.banking_billet?.expire_at).format("DD/MM/YYYY")}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">
                                                 {data?.payment?.paid_at && moment(data?.payment?.paid_at).format("DD/MM/YYYY")}
+                                            </td>
+                                            <td className={`px-6 py-4 whitespace-nowrap text-sm font-bold ${coresStatus[data?.status]}`}>
+                                                {status[data?.status]}
                                             </td>
                                             <td className="flex flex-row gap-3 px-6 py-4 whitespace-nowrap text-right text-md font-medium">
                                                 <a className="text-grey-800 hover:text-grey-900" title="Gerar Boleto" rel="noopener noreferrer" href="#"

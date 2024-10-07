@@ -11,6 +11,7 @@ import { FichaClinicaContext } from '../../context/FichaClinicaContext'
 import { usePaciente } from '../../context/PacienteContext'
 import LoadingOverlay from '../../components/LoadingOverlay'
 import CadastroProcedimento from "../../components/CadastroProcedimento"
+import { useAuth } from "../../auth/useAuth"
 
 const PacienteProfile = () => {
     const [paciente, setPaciente] = useState({})
@@ -19,6 +20,8 @@ const PacienteProfile = () => {
     const { idPaciente, idEmpresa, dadosPaciente } = usePaciente()
     const [show, setShow] = useState(false)
     const [numeroDente, setNumeroDente] = useState()
+    const { user } = useAuth()
+    const acessa_financeiro_paciente = user?.user?.foundUser.acessa_financeiro_paciente
     const payload = {
         dente: numeroDente,
         face_dente: '',
@@ -153,18 +156,20 @@ const PacienteProfile = () => {
                         aria-selected="true"
                     >Procedimento</a>
                 </li>
-                <li role="presentation">
-                    <a
-                        href="#tabs-financeiro"
-                        className="my-2 block border-x-0 border-b-2 border-t-0 border-transparent px-7 pb-3.5 pt-4 text-xs font-medium uppercase leading-tight text-neutral-500 hover:isolate hover:border-transparent hover:bg-neutral-100 focus:isolate focus:border-transparent data-[te-nav-active]:border-primary data-[te-nav-active]:text-primary dark:text-neutral-400 dark:hover:bg-transparent dark:data-[te-nav-active]:border-primary-400 dark:data-[te-nav-active]:text-primary-400"
-                        data-te-toggle="pill"
-                        data-te-target="#tabs-financeiro"
-                        role="tab"
-                        aria-controls="tabs-profile"
-                        aria-selected="false"
-                    >Financeiro</a
-                    >
-                </li>
+                {acessa_financeiro_paciente &&
+                    <li role="presentation">
+                        <a
+                            href="#tabs-financeiro"
+                            className="my-2 block border-x-0 border-b-2 border-t-0 border-transparent px-7 pb-3.5 pt-4 text-xs font-medium uppercase leading-tight text-neutral-500 hover:isolate hover:border-transparent hover:bg-neutral-100 focus:isolate focus:border-transparent data-[te-nav-active]:border-primary data-[te-nav-active]:text-primary dark:text-neutral-400 dark:hover:bg-transparent dark:data-[te-nav-active]:border-primary-400 dark:data-[te-nav-active]:text-primary-400"
+                            data-te-toggle="pill"
+                            data-te-target="#tabs-financeiro"
+                            role="tab"
+                            aria-controls="tabs-profile"
+                            aria-selected="false"
+                        >Financeiro</a
+                        >
+                    </li>
+                }
                 <li role="presentation">
                     <a
                         href="#tabs-anamnese"

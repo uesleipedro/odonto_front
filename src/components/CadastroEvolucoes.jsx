@@ -5,7 +5,6 @@ import Select from "react-select"
 import LoadingOverlay from "./LoadingOverlay"
 
 const CadastroEvolucoes = ({ toogleShowCadastroEvolucoes, showCadastroEvolucoes, dados, getEvolucoes, evolucao }) => {
-    console.log('dados evolucao', dados, evolucao)
     if (!showCadastroEvolucoes) return
 
     const [texto, setTexto] = useState(dados?.texto)
