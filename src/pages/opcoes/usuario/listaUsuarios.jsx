@@ -1,7 +1,6 @@
-import React, { use, useEffect, useState, useMemo } from "react"
+import React, { useEffect, useState, useMemo } from "react"
 import { FaPencilAlt, FaTrashAlt } from "react-icons/fa"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import api from "../../../utils/Api"
@@ -15,7 +14,10 @@ const ListaUsuarios = () => {
     const { user } = useAuth()
     const { saveIdPaciente, saveIdEmpresa } = usePaciente()
     const id_empresa = user?.user?.foundUser.id_empresa
-    const router = useRouter()
+    const checkStatus = {
+        true: "Ativo",
+        false: "Inativo"
+    }
 
     useEffect(() => {
         getUsuarios()
@@ -26,7 +28,7 @@ const ListaUsuarios = () => {
         await api.get(`user/empresa2/${id_empresa}`)
             .then(response => {
                 console.log('response', response.data)
-                setUsers([...users, ...response.data])
+                setUsers([...response.data])
             })
             .catch(function (error) {
                 console.error(error)
@@ -34,15 +36,21 @@ const ListaUsuarios = () => {
     }
 
     const handleDeleteUser = async (id_user) => {
-        await api.delete(`user/${id_user}/${id_empresa}`)
+        return await api.delete(`user/`,
+            {
+                data: {
+                    id_user: id_user,
+                    id_empresa: id_empresa
+                }
+            })
             .then(response => {
                 if (response.status === 204)
-                    return
+                    console.log(response)
+                return { success: true, message: "Excluído com sucesso" }
             })
             .catch(error => {
-                console.error(error)
+                return { success: false, message: error?.response?.data?.message }
             })
-        router.refresh()
     }
 
     const filteredData = useMemo(() => {
@@ -61,13 +69,19 @@ const ListaUsuarios = () => {
             confirmButtonText: 'Excluir',
             confirmButtonColor: '#EF4444',
             denyButtonText: `Cancelar`,
-        }).then((result) => {
+        }).then(async (result) => {
             if (result.isConfirmed) {
-                handleDeleteUser(id_user)
-                Swal.fire('Excluído!', '', 'success')
+                const res = await handleDeleteUser(id_user)
+                getUsuarios()
+                if (res.success) {
+                    return Swal.fire(res.message, '', 'success')
+                }
+
+                return Swal.fire(res.message, '', 'info')
             } else if (result.isDenied) {
                 Swal.fire('Nenhuma alteração foi realizada', '', 'info')
             }
+
         })
     }
 
@@ -93,6 +107,7 @@ const ListaUsuarios = () => {
                                         <th scope="col" className="px-6 py-3">Nome</th>
                                         <th scope="col" className="px-6 py-3 ">Email</th>
                                         <th scope="col" className="px-6 py-3">Nível de Acesso</th>
+                                        <th scope="col" className="px-6 py-3">Status</th>
                                         <th scope="col" className="px-6 py-3">Ações</th>
                                     </tr>
                                 </thead>
@@ -107,6 +122,7 @@ const ListaUsuarios = () => {
 
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.email}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data?.level_name}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{checkStatus[data?.status]}</td>
                                             <td className="flex flex-row gap-3 px-6 py-4 whitespace-nowrap text-right text-md font-medium">
                                                 <Link
                                                     href={{ pathname: "cadastroUsuarioInterno" }}
@@ -122,6 +138,9 @@ const ListaUsuarios = () => {
                                                     onClick={() => showSwalWithLink(data.id_user)}
                                                 >
                                                     <FaTrashAlt />
+                                                </a>
+                                                <a className="text-danger hover:text-danger-700" href="#">
+
                                                 </a>
                                             </td>
                                         </tr>

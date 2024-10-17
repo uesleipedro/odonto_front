@@ -1,10 +1,15 @@
 import { useContext, useEffect } from 'react'
+import { useRouter } from 'next/router'
 import { FichaClinicaContext } from '../../context/FichaClinicaContext'
 import PacienteProfile from './pacienteProfile'
 import { usePaciente } from '../../context/PacienteContext'
+import { useAuth } from '../../auth/useAuth'
 
 const PacienteProfilePage = () => {
-  const { idPaciente, dadosPaciente } = usePaciente()
+  const { saveIdPaciente, saveIdEmpresa } = usePaciente()
+  const router = useRouter()
+  const { user } = useAuth()
+  const id_empresa = user?.user?.foundUser.id_empresa
 
   const {
     getPagamentoList,
@@ -13,12 +18,14 @@ const PacienteProfilePage = () => {
   } = useContext(FichaClinicaContext)
 
   useEffect(() => {
-    if (idPaciente) {
+    if (router.isReady) {
+      saveIdPaciente(router.query.data)
+      saveIdEmpresa(id_empresa)
       getPagamentoList()
       getProcedimentoList()
       getOrcamentoList()
     }
-  }, [idPaciente, dadosPaciente])
+  }, [router.isReady])
 
   return <PacienteProfile />
 

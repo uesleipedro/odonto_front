@@ -60,7 +60,6 @@ const ListaOrcamento = ({ id_paciente, id_empresa }) => {
     const deletePagamento = async (id_orcamento) => {
         return await api.delete(`pagamento/${id_orcamento}`)
             .then(async response => {
-                console.log('response deletePagamento ', response)
                 return response.id_pagamento
             })
     }

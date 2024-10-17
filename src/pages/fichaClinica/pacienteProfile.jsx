@@ -1,5 +1,3 @@
-"use client"
-
 import { useEffect, useState, useContext } from "react"
 import ListaProcedimento from "./listaProcedimento"
 import ListaOrcamento from "./listaOrcamento"
@@ -15,13 +13,14 @@ import { useAuth } from "../../auth/useAuth"
 
 const PacienteProfile = () => {
     const [paciente, setPaciente] = useState({})
-    const [isLoading, setIsloading] = useState(true)
+    const [isLoading, setIsloading] = useState(false)
     const { procedimento, loading, getProcedimentoList } = useContext(FichaClinicaContext)
     const { idPaciente, idEmpresa, dadosPaciente } = usePaciente()
     const [show, setShow] = useState(false)
     const [numeroDente, setNumeroDente] = useState()
     const { user } = useAuth()
     const acessa_financeiro_paciente = user?.user?.foundUser.acessa_financeiro_paciente
+    const id_empresa = user?.user?.foundUser.id_empresa
     const payload = {
         dente: numeroDente,
         face_dente: '',
@@ -37,16 +36,15 @@ const PacienteProfile = () => {
                 await import("tw-elements")
             initTE({
                 Collapse,
-                initTE,
+                initTE
             })
         }
         init()
     }, [])
 
     useEffect(() => {
-        if (!idEmpresa && !idPaciente) return
         getPaciente()
-    }, [])
+    }, [id_empresa, idPaciente])
 
     const toogleShow = () => {
         setShow(!show)
@@ -54,7 +52,7 @@ const PacienteProfile = () => {
 
     const getPaciente = async () => {
         setIsloading(true)
-        await api.get(`paciente/one/${idPaciente}/${idEmpresa}`)
+        await api.get(`paciente/one/${idPaciente}/${id_empresa}`)
             .then(response => {
                 setPaciente(response.data)
             })
@@ -193,7 +191,7 @@ const PacienteProfile = () => {
                     data-te-tab-active>
                     <ListaProcedimento
                         id_paciente={idPaciente}
-                        id_empresa={idEmpresa}
+                        id_empresa={id_empresa}
                         procedimento={procedimento}
                         loading={loading}
                         getProcedimentoList={getProcedimentoList}

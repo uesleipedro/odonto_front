@@ -7,6 +7,9 @@ const cadastroAnamnese = ({ id_paciente }) => {
     const [anamnese, setAnamnese] = useState({ id_paciente })
 
     useEffect(() => {
+        if (id_paciente === 0)
+            return
+
         const getAnamnese = async () => {
             await api.get(`anamnese/${id_paciente}`)
                 .then(response => {
@@ -44,7 +47,8 @@ const cadastroAnamnese = ({ id_paciente }) => {
             "hipertensao",
             "uso_medicamento",
             "historico_familiar_doenca",
-            "outra"]
+            "outra"
+        ]
 
         const fieldName = e.target.name
         let value = booleans.includes(e.target.name) ? e.target.checked : e.target.value
@@ -70,7 +74,6 @@ const cadastroAnamnese = ({ id_paciente }) => {
             .catch(function (error) {
 
             })
-        // router.push('/listaPacientes')
     }
 
     const updateAnamnese = async () => {

@@ -1,7 +1,6 @@
-import { createContext, useState, useContext, useEffect } from 'react'
+import { createContext, useState, useEffect } from 'react'
 import api from "../utils/Api"
 import { usePaciente } from './PacienteContext'
-import { useAuth } from '../auth/useAuth'
 
 export const FichaClinicaContext = createContext()
 
@@ -12,19 +11,18 @@ export const FichaClinicaProvider = ({ children }) => {
   const [procedimentoList, setProcedimentoList] = useState()
   const [orcamento, setOrcamento] = useState()
   const { idPaciente, idEmpresa } = usePaciente()
-  const { user } = useAuth()
   const [token, setToken] = useState()
 
   useEffect(() => {
     let token = localStorage.getItem("token")
     setToken(token)
-  },[])
+  }, [])
 
   useEffect(() => {
     getPagamentoList()
     getProcedimentoList()
     getOrcamentoList()
-  }, [idPaciente, token])
+  }, [idPaciente, token, idEmpresa])
 
   const getPagamentoList = async () => {
     await api.get(`contas_receber/paciente/${idPaciente}/${idEmpresa}`)
@@ -51,7 +49,7 @@ export const FichaClinicaProvider = ({ children }) => {
 
     await api.get('procedimento_list')
       .then(response => {
-        setProcedimentoList([...procedimentoList, ...response.data])
+        setProcedimentoList([...response.data])
       })
       .catch(function (error) {
         console.error(error)

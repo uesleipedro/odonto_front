@@ -57,7 +57,10 @@ const ListaPagamento = ({ dadosPaciente }) => {
   }
 
   const pagamentoAgrupado = useMemo(() => {
-    const agrupados = pagamento.reduce((acc, current) => {
+    if (!pagamento)
+      return
+
+    const agrupados = pagamento?.reduce((acc, current) => {
       const { id_pagamento, nr_parcela, valor, data_vencimento } = current
 
       if (!acc[id_pagamento]) {
@@ -244,18 +247,11 @@ const ListaPagamento = ({ dadosPaciente }) => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                    {pagamentoAgrupado.map((row, index) => (
+                    {pagamentoAgrupado?.map((row, index) => (
                       <>
-                        {/* <div
-                          onClick={() => handleRowClick(row.id_pagamento)}
-                          className="flex flex-row gap-5 pl-5">
-                          <HiArrowNarrowRight />
-                          <p>Pagamento número: {row.id_pagamento}</p>
-                          <p>Valor total: {toCurrency(row.total_pagamento)}</p>
-                        </div> */}
                         <tr key={row.id} className="cursor-pointer" onClick={() => handleRowClick(row.id_pagamento)}>
                           <td className="flex flex-row gap-4 pl-4 py-4  text-sm text-gray-500 font-bold cursor-pointer">
-                            Pagamento nº: {row.id_pagamento} - Valor Total: {row.total_pagamento}
+                            Pagamento nº: {row.id_pagamento} - Valor Total: {toCurrency(row.total_pagamento)}
                             <p
                               onClick={() => {
                                 if (
@@ -273,22 +269,11 @@ const ListaPagamento = ({ dadosPaciente }) => {
                             >
                               <FaBarcode />
                             </p>
-                            {/* {JSON.stringify(row.parcelas)} */}
                           </td>
-                          {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{row.total_pagamento}</td> */}
                         </tr>
 
                         {isRowExpanded(row.id_pagamento) && (
                           <>
-                            {/* <tr>
-                              <th scope="col" className="px-6 py-3">Parcela</th>
-                              <th scope="col" className="px-6 py-3 ">Vencimento</th>
-                              <th scope="col" className="px-6 py-3">Valor</th>
-                              <th scope="col" className="px-6 py-3">Recebimento</th>
-                              <th scope="col" className="px-6 py-3">Status</th>
-                              <th scope="col" className="px-6 py-3">Ações</th>
-                            </tr> */}
-
                             {row?.parcelas.map((parcela, index) => (
                               <tr>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{parcela.nr_parcela}</td>
@@ -340,9 +325,7 @@ const ListaPagamento = ({ dadosPaciente }) => {
                                 </td>
                               </tr>
                             ))}
-
                           </>
-
                         )}
                       </>
                     ))}
@@ -352,22 +335,17 @@ const ListaPagamento = ({ dadosPaciente }) => {
             </div>
           </div>
 
-
           <Toast
             message="Salvo com sucesso!"
             show={showToast}
             onClose={() => setShowToast(false)}
           />
 
+        </div>}
 
-        </div>
-      }
-      {
-        geraOrcamento &&
-        <GeraOrcamento />
-      }
-      {
-        modal &&
+      {geraOrcamento && <GeraOrcamento />}
+
+      {modal &&
         <div
           data-te-modal-init
           className="fixed left-0 top-0 z-[1055] block h-full w-full overflow-y-auto overflow-x-hidden outline-none bg-black/[.8]"
@@ -460,8 +438,7 @@ const ListaPagamento = ({ dadosPaciente }) => {
               </div>
             </div>
           </div>
-        </div >
-      }
+        </div >}
     </div >
   )
 }

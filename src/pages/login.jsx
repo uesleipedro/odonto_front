@@ -33,6 +33,7 @@ const login = () => {
 
         if (!authorized) {
             Swal.fire("Login ou senha incorretos!")
+            setIsLoading(false)
             return
         }
         setIsLoading(false)

@@ -1,19 +1,16 @@
 import React, { useState, useEffect } from "react"
-import Link from "next/link"
 import api from "../../../utils/Api"
 import Swal from "sweetalert2"
-import { useRouter } from 'next/router'
 import { useAuth } from "../../../auth/useAuth"
 import LoadingOverlay from "../../../components/LoadingOverlay"
 import { maskCPF_CNPJ, maskPhone } from "../../../utils/mask"
 
 const Empresa = () => {
-    const router = useRouter()
     const { user } = useAuth()
     const [empresa, setEmpresa] = useState()
+    const [image, setImage] = useState("https://img.freepik.com/vecteurs-premium/vecteur-icone-image-par-defaut-page-image-manquante-pour-conception-site-web-application-mobile-aucune-photo-disponible_87543-11093.jpg?")
     const [isLoading, setIsLoading] = useState(false)
     const id_empresa = user?.user?.foundUser?.id_empresa
-    const [image, setImage] = useState("https://img.freepik.com/vecteurs-premium/vecteur-icone-image-par-defaut-page-image-manquante-pour-conception-site-web-application-mobile-aucune-photo-disponible_87543-11093.jpg?")
 
     useEffect(() => {
         getEmpresa()
@@ -48,6 +45,8 @@ const Empresa = () => {
             ...existingValues,
             [fieldName]: e.target.value,
         }))
+
+        console.log("empresa", empresa)
     }
 
     const updateEmpresa = async () => {
@@ -55,9 +54,19 @@ const Empresa = () => {
         let dadosTratados = await cleanData([empresa])
 
         await api.put(`empresa`, dadosTratados[0])
-            .then(function (response) {
-                if (response.status === 201)
+            .then(async function (response) {
+                if (response.status !== 201) {
+                    Swal.fire("Problema ao salvar os dados!")
+                    return
+                }
+
+                try {
+                    let re = await uploadImage()
+                    console.log("resq image", re)
                     Swal.fire("Salvo com sucesso!")
+                } catch (error) {
+                    Swal.fire("Problema ao salvar a imagem!")
+                }
             })
             .catch(e => {
                 console.error(e.error)
@@ -66,11 +75,41 @@ const Empresa = () => {
         await getEmpresa()
     }
 
+    const uploadImage = async () => {
+        console.log("image", empresa    )
+        if (!empresa.image)
+            return
+
+        const formData = new FormData()
+        formData.append('image', empresa.image)
+
+        await api.post(`upload/image`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        })
+            .then(function (response) {
+                if (response.status !== 201)
+                    Swal.fire("Problema ao salvar imagem")
+
+                return response
+            })
+            .catch(e => {
+                console.error(e.error)
+            })
+    }
+
     const handleChangeImage = (e) => {
         if (!e)
             return
 
         setImage(URL?.createObjectURL(e?.target?.files[0]))
+        updateField({
+            target: {
+                name: "image",
+                value: e?.target?.files[0]
+            }
+        })
     }
 
     return (
@@ -82,7 +121,8 @@ const Empresa = () => {
                 <input
                     className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
                     type="file"
-                    id="formFile"
+                    id="image"
+                    name="image"
                     onChange={handleChangeImage} />
                 <img
                     src={image}

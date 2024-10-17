@@ -13,6 +13,9 @@ const Sidebar = ({ children }) => {
 	const pathname = usePathname()
 
 	useEffect(() => {
+		if (!pathname)
+			return
+
 		setShowSubMenu(pathname.startsWith("/opcoes") ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0 max-w-0')
 	}, [pathname])
 

@@ -30,7 +30,7 @@ const ListaProcedimento = ({ id_paciente, id_empresa }) => {
     useEffect(() => {
         getEvolucoes()
         getDentesComProcedimento()
-    }, [])
+    }, [id_paciente, id_empresa])
 
     const getDentesComProcedimento = async () => {
         await api.get(`dentes/dentesComProcedimento?id_paciente=${id_paciente}&id_empresa=${id_empresa}`)
@@ -145,10 +145,7 @@ const ListaProcedimento = ({ id_paciente, id_empresa }) => {
                             className="bg-success hover:bg-success-600 rounded-full w-10 h-10 text-white font-bold mb-5"
                         >+</button>
                         <div className=" pl-5 border rounded-lg shadow overflow-scroll max-h-96">
-                            {/* {evolucoes
-                                ? <p className="p-4">O paciente não possui evoluções adicionadas.</p> */}
                             <TimeLine evolucoes={evolucoes} getEvolucoes={getEvolucoes} />
-                            {/* } */}
                         </div>
 
                     </div>

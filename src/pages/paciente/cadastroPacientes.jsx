@@ -109,13 +109,16 @@ const CadastroPacientes = () => {
         <div className="m-5 p-5 rounded-lg shadow-lg">
 
             <div className="flex justify-end gap-3">
+                <button onClick={sendPacienteData} className="bg-success-600 hover:bg-success-700 text-white font-bold py-2 px-4 rounded-full mt-5">
+                    Salvar
+                </button>
+
                 <Link href="/paciente/listaPacientes">
-                    <button className="bg-purple-700 hover:bg-purple-500 text-white border font-bold py-2 px-4 rounded-full mt-5">
+                    <button className="bg-white hover:bg-gray-200 text-purple-800 border font-bold py-2 px-4 rounded-full mt-5">
                         Voltar
                     </button>
                 </Link>
             </div>
-
             <p className="text-gray-600 font-bold">Dados Pessoais</p>
             <hr />
             <div className="w-full pl-6 mb-8 flex flex-row flex-wrap justify-between">
@@ -138,15 +141,12 @@ const CadastroPacientes = () => {
                 <div className="w-full md:w-2/5 pr-2 pt-3">
                     <label for="dt_nascimento" className="text-gray-700 ">Data de nascimento</label>
                     <div className="w-full">
-
                         <DatePicker
                             className="form-input rounded-lg text-gray-600 w-full"
                             name="dt_nascimento"
                             id="dt_nascimento"
-                            peekNextMonth
-                            showMonthDropdown
+                            withPortal
                             showYearDropdown
-                            scrollableYearDropdown={true}
                             dateFormat="dd/MM/yyyy"
                             selected={paciente?.dt_nascimento}
                             onChange={(e) =>
@@ -280,7 +280,7 @@ const CadastroPacientes = () => {
 
             <hr />
             <div className="flex justify-end gap-3">
-                <button onClick={sendPacienteData} className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full mt-5">
+                <button onClick={sendPacienteData} className="bg-success-600 hover:bg-success-700 text-white font-bold py-2 px-4 rounded-full mt-5">
                     Salvar
                 </button>
 
