@@ -18,6 +18,10 @@ const ListaUsuarios = () => {
         true: "Ativo",
         false: "Inativo"
     }
+    const styleStatus = {
+        true: "text-success-500",
+        false: "text-danger-500"
+    }
 
     useEffect(() => {
         getUsuarios()
@@ -122,7 +126,10 @@ const ListaUsuarios = () => {
 
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data.email}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{data?.level_name}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-purple-900 font-bold">{checkStatus[data?.status]}</td>
+                                            <td
+                                                className={`px-6 py-4 whitespace-nowrap text-sm ${styleStatus[data?.status]} font-bold`}>
+                                                {checkStatus[data?.status]}
+                                            </td>
                                             <td className="flex flex-row gap-3 px-6 py-4 whitespace-nowrap text-right text-md font-medium">
                                                 <Link
                                                     href={{ pathname: "cadastroUsuarioInterno" }}

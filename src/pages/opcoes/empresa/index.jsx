@@ -76,14 +76,13 @@ const Empresa = () => {
     }
 
     const uploadImage = async () => {
-        console.log("image", empresa    )
         if (!empresa.image)
             return
 
         const formData = new FormData()
         formData.append('image', empresa.image)
 
-        await api.post(`upload/image`, formData, {
+        await api.post(`uploads/image`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
