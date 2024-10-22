@@ -1,20 +1,23 @@
 import React, { useState, useEffect } from "react"
+import Image from "next/image"
 import api from "../../../utils/Api"
 import Swal from "sweetalert2"
 import { useAuth } from "../../../auth/useAuth"
 import LoadingOverlay from "../../../components/LoadingOverlay"
 import { maskCPF_CNPJ, maskPhone } from "../../../utils/mask"
+import noImage from "/public/notfoundimage.png"
 
 const Empresa = () => {
     const { user } = useAuth()
     const [empresa, setEmpresa] = useState()
-    const [image, setImage] = useState("https://img.freepik.com/vecteurs-premium/vecteur-icone-image-par-defaut-page-image-manquante-pour-conception-site-web-application-mobile-aucune-photo-disponible_87543-11093.jpg?")
+    const [image, setImage] = useState()
     const [isLoading, setIsLoading] = useState(false)
     const id_empresa = user?.user?.foundUser?.id_empresa
 
     useEffect(() => {
         getEmpresa()
-    }, [])
+        getLogo()
+    }, [id_empresa])
 
     const getEmpresa = async () => {
         setIsLoading(true)
@@ -24,6 +27,14 @@ const Empresa = () => {
             }).catch((e) => {
             })
         setIsLoading(false)
+    }
+
+    const getLogo = () => {
+        api.get(`/uploads/image/${id_empresa}`).then(res => {
+            setImage(`http://localhost:3333/uploads/image/${id_empresa}`)
+        }).catch((e) => {
+            setImage(noImage)
+        })
     }
 
     const cleanInput = (input) => input?.replace(/\D/g, '')
@@ -81,6 +92,7 @@ const Empresa = () => {
 
         const formData = new FormData()
         formData.append('image', empresa.image)
+        formData.append('id_empresa', id_empresa)
 
         await api.post(`uploads/image`, formData, {
             headers: {
@@ -99,7 +111,7 @@ const Empresa = () => {
     }
 
     const handleChangeImage = (e) => {
-        if (!e)
+        if (!URL?.createObjectURL(e?.target?.files[0]))
             return
 
         setImage(URL?.createObjectURL(e?.target?.files[0]))
@@ -123,9 +135,14 @@ const Empresa = () => {
                     id="image"
                     name="image"
                     onChange={handleChangeImage} />
-                <img
+                <Image
                     src={image}
-                    className="h-1/6 max-w-sm shadow-lg dark:shadow-black/30 cursor-pointer" />
+                    alt="Logomarca"
+                    width={200}
+                    height={200}
+                    className="mr-4 basis-1/5"
+                />
+
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <div className="">

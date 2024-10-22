@@ -6,7 +6,7 @@ import LoadingOverlay from '../../../../components/LoadingOverlay'
 import { useAuth } from '../../../../auth/useAuth'
 import moment from 'moment'
 import Image from 'next/image'
-import png from "/public/1.png"
+import png from "/public/notfoundimage.png"
 
 const OrcamentoView = () => {
     const router = useRouter()
@@ -15,6 +15,7 @@ const OrcamentoView = () => {
     const { user } = useAuth()
     const id_empresa = user?.user?.foundUser.id_empresa
     const empresa = user?.user?.foundUser
+    const [logo, setLogo] = useState(png)
 
     useEffect(() => {
         const init = async () => {
@@ -25,6 +26,8 @@ const OrcamentoView = () => {
     }, [])
 
     useEffect(() => {
+        getLogo()
+
         if (router.isReady && id_orcamento) {
             api.get(`orcamento/view/${id_orcamento}/${id_empresa}`)
                 .then(async response => {
@@ -35,7 +38,11 @@ const OrcamentoView = () => {
                     console.error(error)
                 })
         }
-    }, [router.isReady, id_orcamento])
+    }, [router.isReady, id_orcamento, id_empresa])
+
+    const getLogo = () => {
+        setLogo(`http://localhost:3333/uploads/image/${id_empresa}`)
+    }
 
     const handlePrint = () => {
         window.print()
@@ -56,7 +63,7 @@ const OrcamentoView = () => {
             </div>
             <div className="flex flex-row">
                 <Image
-                    src={png}
+                    src={logo}
                     alt="Logomarca"
                     width={200}
                     height={200}
