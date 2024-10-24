@@ -117,15 +117,12 @@ const OrcamentoView = () => {
                     Assino este declarando verdadeiras as informações escritas acima
                 </div>
 
-                <div className="flex flex-row justify-between h-10 mt-10">
-                    <div className=" flex flex-col justify-center basis-2/6">
-                        ________________
-                        {orcamento[0].nome}
+                <div className="flex justify-between items-end mt-10">
+                    <div className="border-t border-gray-400 w-48 text-center mt-2">
+                        <p>{orcamento[0].nome}</p>
                     </div>
-                    <div className="flex basis-2/6"></div>
-                    <div className="flex basis-2/6">
-                        <hr />
-                        {orcamento[0].nome_profissional}
+                    <div className="border-t border-gray-400 w-48 text-center mt-2">
+                        <p>{orcamento[0].nome_profissional}</p>
                     </div>
                 </div>
             </div>

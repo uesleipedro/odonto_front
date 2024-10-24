@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useRef } from "react"
-import { useRouter } from 'next/router'
+import { useRouter } from "next/router"
+import Image from "next/image"
 import n2words from "n2words"
 import moment from "moment"
 import { useAuth } from "../../../../auth/useAuth"
 import LoadingOverlay from "../../../../components/LoadingOverlay"
 import { formatarMoedaBRL, maskCPF_CNPJ } from "../../../../utils/mask"
 import { usePaciente } from "../../../../context/PacienteContext"
+import api from "../../../../utils/Api"
+import noImage from "/public/notfoundimage.png"
 
 const ReciboPagamento = () => {
     const printRef = useRef()
@@ -13,6 +16,7 @@ const ReciboPagamento = () => {
     const [valorPorExtenso, setValorPorExtenso] = useState()
     const [isLoading, setIsLoading] = useState(false)
     const { dadosPaciente } = usePaciente()
+    const [logo, setLogo] = useState(noImage)
     const { user } = useAuth()
     const dadosEmpresa = user?.user?.foundUser
     const router = useRouter()
@@ -24,11 +28,12 @@ const ReciboPagamento = () => {
             setIsLoading(true)
         }
         carregarValores()
-    }, [])
+        getLogo()
+    }, [dadosEmpresa])
 
     useEffect(() => {
-        console.log("dadosPaciente",JSON.stringify(dadosPaciente))
-    }, dadosPaciente)
+        console.log("dadosPaciente", JSON.stringify(dadosPaciente))
+    }, [dadosPaciente])
 
     useEffect(() => {
         if (reciboPagamento !== null && reciboPagamento !== undefined) {
@@ -36,6 +41,14 @@ const ReciboPagamento = () => {
             setValorPorExtenso(words)
         }
     }, [reciboPagamento])
+
+    const getLogo = () => {
+        api.get(`/uploads/image/${dadosEmpresa?.id_empresa}`).then(res => {
+            setLogo(`http://localhost:3333/uploads/image/${dadosEmpresa.id_empresa}`)
+        }).catch((e) => {
+            setLogo(noImage)
+        })
+    }
 
     const handlePrint = () => {
         const printContents = printRef.current.innerHTML
@@ -50,14 +63,19 @@ const ReciboPagamento = () => {
 
             <div className="flex flex-column gap-10">
                 <div className="flex items-center ml-20">
-                    {/* <img src={receiptInfo.companyLogo} alt="Logomarca" className="w-16 h-16 mr-4" /> */}
-                    <p className="text-xl font-bold">LogoMarca</p>
+                    <Image
+                        src={logo}
+                        alt="Logomarca"
+                        width={200}
+                        height={200}
+                        className="mr-4 basis-1/5"
+                    />
                 </div>
 
                 <div>
                     <div className="text-xl font-semibold">{dadosEmpresa?.nome_fantasia}</div>
                     <p> <span className="font-semibold">CNPJ: </span>{maskCPF_CNPJ(dadosEmpresa?.cnpj_cpf)}</p>
-                    <p>{`${dadosEmpresa?.logradouro} ${dadosEmpresa?.bairro} ${dadosEmpresa?.cidade} ${dadosEmpresa?.uf}`}</p>
+                    <p>{`${dadosEmpresa?.logradouro} ${dadosEmpresa?.bairro} ${dadosEmpresa?.cidade} ${dadosEmpresa?.uf}, ${dadosEmpresa.numero}`}</p>
                     <p>{dadosEmpresa?.cep}</p>
                     <p>{dadosEmpresa?.email}</p>
                     <p className="basis-1/4">Recibo Nº: <span className="font-semibold">{reciboPagamento?.id_pagamento}</span></p>

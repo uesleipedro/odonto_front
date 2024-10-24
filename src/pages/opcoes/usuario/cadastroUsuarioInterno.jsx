@@ -215,7 +215,7 @@ const CadastroUsuario = () => {
                         role="switch"
                         id="acessa_financeiro_paciente"
                         name="acessa_financeiro_paciente"
-                        checked={userData?.status}
+                        checked={!userData?.id_user ? true : userData?.status}
                         onChange={showSwalWithLink} />
                 </div>
 

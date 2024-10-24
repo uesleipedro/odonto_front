@@ -31,14 +31,31 @@ const ListaUsuarios = () => {
     }
 
     useEffect(() => {
-        getBoletos()
+        getCobrancas()
     }, [])
+
+    const getCobrancas = async () => {
+        await getBoletos()
+        await getCarnes()
+    }
 
     const getBoletos = async () => {
         setIsLoading(true)
         await api.get(`/efi/listaBoletos?id_empresa=${id_empresa}`)
             .then(response => {
-                setBoletos([...response.data.data])
+                setBoletos([...boletos, ...response.data.data])
+            })
+            .catch(function (error) {
+                console.error(error)
+            })
+        setIsLoading(false)
+    }
+
+    const getCarnes = async () => {
+        setIsLoading(true)
+        await api.get(`/efi/listaCarnes?id_empresa=${id_empresa}`)
+            .then(response => {
+                setBoletos([...boletos, ...response.data.data])
             })
             .catch(function (error) {
                 console.error(error)
